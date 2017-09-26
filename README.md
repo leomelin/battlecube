@@ -23,7 +23,7 @@ Basically all you have to do is create a bot that stays on the game area, doesn'
 
 1. Connect to server API address via websocket
 2. Emit "NEW_GAME" event with proper configuration to start a new game:
-```json
+```js
 {
   "setup": [
     "edgeLength": <number>,
@@ -51,7 +51,7 @@ No json, just a confirmation that a new game was successfully initialized.
 
 ###### PLAYER_LOST event
 Get the info when some player loses the game
-```json
+```js
 {
   "name": <string>, /* Player name */
   "cause": <string> /* Explanation why player lost the game */
@@ -60,7 +60,7 @@ Get the info when some player loses the game
 
 ###### GAME_ENDED event
 Here we can get the info about the winner
-```json
+```js
 {
   "result": "TIE"|"WINNER_FOUND"|"NO_WINNER",
   "scores": [
@@ -73,7 +73,7 @@ Here we can get the info about the winner
 
 ###### PLAYER_MOVED event
 Just for logging purposes
-```json
+```js
 {
   "name": <string>, /* Player name */
   "direction": "+X"|"-X"|"+Y"|"-Y"|"+Z"|"-Z"
@@ -82,7 +82,7 @@ Just for logging purposes
 
 ###### PLAYER_PLACED_BOMB event
 Get info who placed a bomb and where
-```json
+```js
 {
   "name": <string>, /* Player name */
   "x": <number>, 
@@ -93,7 +93,7 @@ Get info who placed a bomb and where
 
 ###### NEXT_TICK event
 A new tick happened, get current game info, bomb and player positions
-```json
+```js
 {
   "gameInfo": {
     "edgeLength": <number>,
@@ -129,7 +129,7 @@ Your bot needs to implement this design to be able to play.
 
 This is the endpoint that gets called by the Battlecube server.
 Your bot implementation should have this endpoint implemented and it should accept the following json structure as HTTP request body with *Content-Type: application/json*.
-```json
+```js
 {
   "gameInfo": {
     "edgeLength": <number>,
@@ -160,7 +160,7 @@ After receiving this data, your bot should respond with *Content-Type: applicati
 
 ###### Move
 Moves the player one unit in any direction
-```json
+```js
 {
   "task": "MOVE",
   "direction": "+X"|"-X"|"+Y"|"-Y"|"+Z"|"-Z"
@@ -169,7 +169,7 @@ Moves the player one unit in any direction
 
 ###### Place a bomb
 Places a bomb to selected coordinates
-```json
+```js
 {
   "task": "PLACE_BOMB",
   "x": <number>, 
@@ -179,7 +179,7 @@ Places a bomb to selected coordinates
 ```
 
 ###### ...Or do nothing
-```json
+```js
 {
   "task": "NOOP"
 }
