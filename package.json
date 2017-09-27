@@ -1,0 +1,32 @@
+{
+  "name": "battlecube",
+  "version": "1.0.0",
+  "description": "Battlecube is a game where small cubes (bots) fight each other with bombs inside a cube shaped 3d grid.",
+  "main": "build/src/server.js",
+  "scripts": {
+    "start": "npm run build && node build/server.js",
+    "start-debug": "npm run build && node $NODE_DEBUG_OPTION build/server.js",
+    "client": "node build/client.js",
+    "build": "rm -rf build/ && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leomelin/battlecube.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leomelin/battlecube/issues"
+  },
+  "homepage": "https://github.com/leomelin/battlecube#readme",
+  "dependencies": {
+    "@types/socket.io": "^1.4.30",
+    "@types/socket.io-client": "^1.4.30",
+    "socket.io": "^2.0.3",
+    "socket.io-client": "^2.0.3",
+    "tslint": "^5.7.0",
+    "tslint-config-airbnb": "^5.3.0",
+    "typescript": "^2.5.3"
+  }
+}
