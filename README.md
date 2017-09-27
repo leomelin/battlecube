@@ -28,6 +28,7 @@ Basically all you have to do is create a bot that stays on the game area, doesn'
   "setup": [
     "edgeLength": <number>,
     "speed": <number>, /* milliseconds to delay between ticks, zero being the fastest setting. */
+    "numOfTasksPerTick": <number>, /* how many tasks bots can do per tick */
     "playerStartPositions": [ /* This is optional (for dev puropses). If not set, will be random. */
       {
         "name": <string>,
@@ -97,6 +98,7 @@ A new tick happened, get current game info, bomb and player positions
 {
   "gameInfo": {
     "edgeLength": <number>,
+    "numOfTasksPerTick": <number>, /* how many tasks bots can do per tick */
     "numOfBotsInPlay": <number>,
     "currentTick": <number>
   },
@@ -161,25 +163,27 @@ After receiving this data, your bot should respond with *Content-Type: applicati
 ###### Move
 Moves the player one unit in any direction
 ```js
-{
+[{
   "task": "MOVE",
   "direction": "+X"|"-X"|"+Y"|"-Y"|"+Z"|"-Z"
-}
+}, ... ]
 ```
 
 ###### Place a bomb
 Places a bomb to selected coordinates
 ```js
-{
+[{
   "task": "PLACE_BOMB",
   "x": <number>, 
   "y": <number>,
   "z": <number> 
-}
+}, ...]
 ```
 
 ###### ...Or do nothing
 ```js
-{
+[{
   "task": "NOOP"
-}
+}, ...]
+
+Note that the bot needs to respond an array of tasks. Maximum number of tasks per tick is defined in game configuration.
