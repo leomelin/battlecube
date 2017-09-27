@@ -185,5 +185,6 @@ Places a bomb to selected coordinates
 [{
   "task": "NOOP"
 }, ...]
+```
 
 Note that the bot needs to respond an array of tasks. Maximum number of tasks per tick is defined in game configuration.
