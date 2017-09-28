@@ -25,7 +25,7 @@ Basically all you have to do is create a bot that stays on the game area, doesn'
 2. Emit "NEW_GAME" event with proper configuration to start a new game:
 ```js
 {
-  "setup": [
+  "setup": {
     "edgeLength": <number>,
     "speed": <number>, /* milliseconds to delay between ticks, zero being the fastest setting. */
     "numOfTasksPerTick": <number>, /* how many tasks bots can do per tick */
@@ -38,7 +38,7 @@ Basically all you have to do is create a bot that stays on the game area, doesn'
       },
       ...
     ]
-  ],
+  },
   "players": [
     "name": <string>,
     "url": <string> /* the http endpoint for your bot service. e.g. http://my-cool-bot.com */

@@ -8,8 +8,9 @@
     "start:server-debug": "node $NODE_DEBUG_OPTION build/server/src/server.js",
     "start:client": "node build/client/src/client.js",
     "start:client-debug": "node $NODE_DEBUG_OPTION build/client/src/client.js",
-    "build": "rm -rf build/ && tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "copy-assets": "copyfiles client/**/*.json server/**/*.json build/",
+    "build": "rm -rf build/ && tsc && npm run copy-assets",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -21,13 +22,30 @@
     "url": "https://github.com/leomelin/battlecube/issues"
   },
   "homepage": "https://github.com/leomelin/battlecube#readme",
-  "dependencies": {
+  "devDependencies": {
+    "@types/node-fetch": "^1.6.7",
     "@types/socket.io": "^1.4.30",
     "@types/socket.io-client": "^1.4.30",
-    "socket.io": "^2.0.3",
-    "socket.io-client": "^2.0.3",
+    "@types/joi": "^10.4.3",
+    "copyfiles": "^1.2.0",
+    "jest": "^21.2.1",
     "tslint": "^5.7.0",
     "tslint-config-airbnb": "^5.3.0",
     "typescript": "^2.5.3"
+  },
+  "dependencies": {
+    "joi": "^11.1.1",
+    "node-fetch": "^1.7.3",
+    "socket.io": "^2.0.3",
+    "socket.io-client": "^2.0.3"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/build/server/src",
+      "<rootDir>/build/client/src",
+      "<rootDir>/tests/"
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/tests/jasmine-config.js",
+    "testEnvironment": "node"
   }
 }

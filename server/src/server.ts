@@ -1,21 +1,25 @@
 import * as socketIO from 'socket.io';
+import { getValidatedGameConfig } from './validators';
+import { Game } from './game';
 
 const io = socketIO(9999);
 
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 io.on('connection', (socket) => {
-  console.log('user connected', socket.id);
+  console.log('User connected', socket.id);
 
-  socket.on('NEW_GAME', async (data) => {
-    console.log('new game with data', data);
+  socket.on('NEW_GAME', async (payload: any) => {
+    const gameConfig = getValidatedGameConfig(payload, socket);
+    if (!gameConfig) {
+      return;
+    }
 
-    await wait(10000);
-    socket.emit('GAME_STARTED', { foo: 'bar' });
+    const game = new Game(gameConfig, socket);
+    game.start();
   });
 
   socket.on('disconnect', () => {
     console.log('user disconnected', socket.id);
   });
 });
-

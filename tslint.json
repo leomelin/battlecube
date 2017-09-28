@@ -1,12 +1,49 @@
 {
   "extends": "tslint-config-airbnb",
   "rules": {
+    "no-duplicate-imports": false,
+    "typedef-whitespace": [
+      true,
+      {
+        "call-signature": "nospace",
+        "index-signature": "nospace",
+        "parameter": "nospace",
+        "property-declaration": "nospace",
+        "variable-declaration": "nospace"
+      },
+      {
+        "call-signature": "onespace",
+        "index-signature": "onespace",
+        "parameter": "onespace",
+        "property-declaration": "onespace",
+        "variable-declaration": "onespace"
+      }
+    ],
+    "no-trailing-whitespace": true,
     "trailing-comma": [
       true,
       {
         "multiline": "never",
         "singleline": "never"
       }
+    ],
+    "max-line-length": [
+      true,
+      140
+    ],
+    "no-consecutive-blank-lines": [
+      true,
+      1
+    ],
+    "semicolon": [
+      true,
+      "always"
+    ],
+    "import-name": false,
+    "align": [
+      true,
+      "parameters",
+      "statements"
     ]
   }
 }

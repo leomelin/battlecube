@@ -1,0 +1,25 @@
+{
+  "setup": {
+    "edgeLength": 8,
+    "speed": 0,
+    "numOfTasksPerTick": 1
+  },
+  "players": [
+    {
+      "name": "John",
+      "url": "http://localhost:4001"
+    },
+    {
+      "name": "Petra",
+      "url": "http://localhost:4001"
+    },
+    {
+      "name": "Carmine",
+      "url": "http://localhost:4001"
+    },
+    {
+      "name": "Whoopie",
+      "url": "http://localhost:4001"
+    }
+  ]
+}
