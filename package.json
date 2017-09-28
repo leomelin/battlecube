@@ -4,9 +4,10 @@
   "description": "Battlecube is a game where small cubes (bots) fight each other with bombs inside a cube shaped 3d grid.",
   "main": "build/src/server.js",
   "scripts": {
-    "start": "npm run build && node build/server.js",
-    "start-debug": "npm run build && node $NODE_DEBUG_OPTION build/server.js",
-    "client": "node build/client.js",
+    "start:server": "node build/server/src/server.js",
+    "start:server-debug": "node $NODE_DEBUG_OPTION build/server/src/server.js",
+    "start:client": "node build/client/src/client.js",
+    "start:client-debug": "node $NODE_DEBUG_OPTION build/client/src/client.js",
     "build": "rm -rf build/ && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

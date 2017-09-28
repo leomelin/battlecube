@@ -17,9 +17,11 @@
     ]
   },
   "files": [
-    "src/server.ts"
+    "client/src/client.ts",
+    "server/src/server.ts"
   ],
   "include": [
-    "src/**/*"
+    "client/**/*",
+    "server/**/*"
   ]
 }
