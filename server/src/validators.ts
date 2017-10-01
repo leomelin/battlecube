@@ -20,6 +20,34 @@ const gameConfigSchema = Joi.object().keys({
   }))
 });
 
+const bombOrderSchema = Joi.object().keys({
+  task: Joi.string().allow('BOMB').required(),
+  x: Joi.number().min(0).integer().required(),
+  y: Joi.number().min(0).integer().required(),
+  z: Joi.number().min(0).integer().required()
+});
+
+const noopSchema = Joi.object().keys({
+  task: Joi.string().allow('NOOP').required()
+});
+
+const moveSchema = Joi.object().keys({
+  task: Joi.string().allow('MOVE').required(),
+  direction: Joi.string().allow('+X', '-X', '+Y', '-Y', '+Z', '-Z').required()
+});
+
+const botDirectionsSchema = Joi.array().items(bombOrderSchema, noopSchema, moveSchema);
+
+export const getValidatedBotDirections = (payoad: any) => {
+  const directionsValidationObj = Joi.validate(payoad, botDirectionsSchema);
+
+  if (directionsValidationObj.error) {
+    return null;
+  }
+
+  return directionsValidationObj.value;
+};
+
 export const getValidatedGameConfig = (payload: any, socket: any): GameConfig | null => {
   const gameConfigValidationObj = Joi.validate(payload, gameConfigSchema);
 

@@ -11,15 +11,15 @@
     },
     {
       "name": "Petra",
-      "url": "http://localhost:4001"
+      "url": "http://localhost:4002"
     },
     {
       "name": "Carmine",
-      "url": "http://localhost:4001"
+      "url": "http://localhost:4003"
     },
     {
       "name": "Whoopie",
-      "url": "http://localhost:4001"
+      "url": "http://localhost:4004"
     }
   ]
 }

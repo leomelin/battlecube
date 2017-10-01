@@ -12,14 +12,24 @@ export class PlayerPosition extends Coordinate {
 
 export class GameSetup {
   edgeLength: number;
-  speed?: number = 0;
+  speed: number = 0;
   numOfTasksPerTick: number;
   playerStartPositions?: PlayerPosition[];
 }
 
+export class HighScoreInfo {
+  result: 'TIE'|'WINNER_FOUND';
+  winner?: PlayerWithHighScore;
+  scores: PlayerWithHighScore[];
+};
+
 export class PlayerSetup {
   name: string;
   url: string;
+}
+
+export class PlayerWithHighScore extends PlayerSetup {
+  highScore: number;
 }
 
 export class GameConfig {
@@ -27,8 +37,10 @@ export class GameConfig {
   players: PlayerSetup[];
 }
 
+export type ItemType = 'BOMB';
+
 export class GameItem extends Coordinate {
-  type: 'BOMB';
+  type: ItemType;
 }
 
 export class GameInfo {
@@ -42,6 +54,12 @@ export class NextTickInfo {
   gameInfo: GameInfo;
   players: PlayerPosition[];
   items: GameItem[];
+
+  constructor(nextTickInfo: NextTickInfo) {
+    this.gameInfo = nextTickInfo.gameInfo;
+    this.players = nextTickInfo.players;
+    this.items = nextTickInfo.items;
+  }
 }
 
 export class BotOrder {
@@ -73,4 +91,8 @@ export class PreValidationInfo {
   outOfBoundsPlayers: PlayerSetup[];
   collisions: CollisionInfo[];
   players: PlayerPosition[];
+}
+
+export class NextTickInfoForBot extends NextTickInfo {
+  currentPlayer: PlayerSetup;
 }

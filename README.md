@@ -39,13 +39,13 @@ Basically all you have to do is create a bot that stays on the game area, doesn'
       ...
     ]
   },
-  "players": [
+  "players": [{
     "name": <string>,
     "url": <string> /* the http endpoint for your bot service. e.g. http://my-cool-bot.com */
-  ]
+  }, ...]
 }
 ```
-3. Listen to "GAME_STARTED", "PLAYER_LOST", "GAME_ENDED", "PLAYER_MOVED", "PLAYER_PLACED_BOMB" and "NEXT_TICK" events. These will keep you informed what has happened:
+3. Listen to "GAME_STARTED", "PLAYER_LOST", "GAME_ENDED", "PLAYER_MOVE_ATTEMPT", "PLAYER_PLACED_BOMB", "PLAYER_DID_NOTHING" and "NEXT_TICK" events. These will keep you informed what has happened:
 
 ###### GAME_STARTED event
 No json, just a confirmation that a new game was successfully initialized.
@@ -63,16 +63,22 @@ Get info when some player loses the game
 Here we can get info about the winner
 ```js
 {
-  "result": "TIE"|"WINNER_FOUND"|"NO_WINNER",
+  "result": "TIE"|"WINNER_FOUND",
+  "winner": { // Optionally here if not TIE
+    "name": <string>,
+    "url": <string>, /* the http endpoint for your bot service. e.g. http://my-cool-bot.com */
+    "score": <number>
+  },
   "scores": [
     "name": <string>, /* Player name */
+    "url": <string>, /* the http endpoint for your bot service. e.g. http://my-cool-bot.com */
     "score": <number> /* Number of ticks player survived */ 
   ]
 
 }
 ``` 
 
-###### PLAYER_MOVED event
+###### PLAYER_MOVE_ATTEMPT event
 Just for logging purposes
 ```js
 {
@@ -83,6 +89,17 @@ Just for logging purposes
 
 ###### PLAYER_PLACED_BOMB event
 Get info who placed a bomb and where
+```js
+{
+  "name": <string>, /* Player name */
+  "x": <number>, 
+  "y": <number>,
+  "z": <number> 
+}
+```
+
+###### PLAYER_DID_NOTHING event
+Get info when player NOOPed
 ```js
 {
   "name": <string>, /* Player name */
@@ -133,6 +150,10 @@ This is the endpoint that gets called by the Battlecube server.
 Your bot implementation should have this endpoint implemented and it should accept the following json structure as HTTP request body with *Content-Type: application/json*.
 ```js
 {
+  "currentPlayer": {
+    "name": <string>,
+    "url": <string> /* the http endpoint for your bot service. e.g. http://my-cool-bot.com */
+  },
   "gameInfo": {
     "edgeLength": <number>,
     "numOfBotsInPlay": <number>,
