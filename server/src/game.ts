@@ -1,3 +1,4 @@
+import Error from './error-code';
 import {
   BotDirection, CollisionInfo, GameConfig, ItemType, PlayerWithHighScore, MoveOrder, NextTickInfo, PlaceBombOrder,
   PlayerPosition,
@@ -78,13 +79,6 @@ export class Game {
     });
   }
 
-  sendPlayerLostDueConnectionErrorInfo({ name }: PlayerSetup) {
-    this.socket.emit('PLAYER_LOST', {
-      name,
-      cause: 'Connection error'
-    });
-  }
-
   moveBot(player: PlayerSetup, moveOrder: BotDirection) {
     const currentPlayerPosition: any = this.playerPositions.find(p => p.name === player.name);
 
@@ -160,14 +154,21 @@ export class Game {
           ...nextTickInfo
         });
 
+        // If not valid, error is thrown
         const directions = getValidatedBotDirections(payload);
-
-        if (!directions) {
-          // TODO: Set player lost when directions are not correct!
-        }
         this.applyBotDirections(playerSetup, directions);
       } catch (e) {
-        this.sendPlayerLostDueConnectionErrorInfo(playerSetup);
+        if (e.error && e.error === Error[Error.VALIDATION_ERROR]) {
+          this.socket.emit('PLAYER_LOST', {
+            name: playerSetup.name,
+            cause: e
+          });
+        } else {
+          this.socket.emit('PLAYER_LOST', {
+            name: playerSetup.name,
+            cause: e
+          });
+        }
         if (!this.lostPlayers.find(p => p.name === player.name)) this.lostPlayers.push({
           ...playerSetup,
           highScore: this.currentTick

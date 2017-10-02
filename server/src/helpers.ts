@@ -3,6 +3,7 @@ import {
   PlayerSetup
 } from './models';
 import fetch from 'node-fetch';
+import ErrorCode from './error-code';
 
 export const getRandomInt = (max: number, min = 0) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -32,7 +33,7 @@ export const getDirectionsFromBot = async (nextTickInfoForBot: NextTickInfoForBo
       body: JSON.stringify(nextTickInfoForBot)
     })).json();
   } catch (err) {
-    throw new Error('Connection error');
+    throw new Error(ErrorCode[ErrorCode.CONNECTION_ERROR]);
   }
 };
 

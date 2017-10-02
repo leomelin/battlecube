@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import Error from './error';
+import Error from './error-code';
 import { GameConfig } from './models';
 
 const gameConfigSchema = Joi.object().keys({
@@ -42,7 +42,10 @@ export const getValidatedBotDirections = (payoad: any) => {
   const directionsValidationObj = Joi.validate(payoad, botDirectionsSchema);
 
   if (directionsValidationObj.error) {
-    return null;
+    throw {
+      error: Error[Error.VALIDATION_ERROR],
+      details: directionsValidationObj.error.details
+    };
   }
 
   return directionsValidationObj.value;
@@ -53,7 +56,7 @@ export const getValidatedGameConfig = (payload: any, socket: any): GameConfig | 
 
   if (gameConfigValidationObj.error) {
     socket.emit('ERROR', {
-      error: Error.INVALID_GAME_CONFIGURATION.toString(),
+      error: Error[Error.INVALID_GAME_CONFIGURATION],
       details: gameConfigValidationObj.error.details
     });
     return null;
@@ -63,7 +66,7 @@ export const getValidatedGameConfig = (payload: any, socket: any): GameConfig | 
   const uniquePlayerNames = [...new Set(playerNames)];
   if (playerNames.length !== uniquePlayerNames.length) {
     socket.emit('ERROR', {
-      error: Error.INVALID_GAME_CONFIGURATION.toString(),
+      error: Error[Error.INVALID_GAME_CONFIGURATION],
       details: 'All player names must be unique'
     });
     return null;
@@ -71,7 +74,7 @@ export const getValidatedGameConfig = (payload: any, socket: any): GameConfig | 
   if (gameConfig.setup.playerStartPositions) {
     if (gameConfig.setup.playerStartPositions.length !== gameConfig.players.length) {
       socket.emit('ERROR', {
-        error: Error.INVALID_GAME_CONFIGURATION.toString(),
+        error: Error[Error.INVALID_GAME_CONFIGURATION],
         details: 'There are no player start positions for all players in the game'
       });
       return null;
@@ -82,7 +85,7 @@ export const getValidatedGameConfig = (payload: any, socket: any): GameConfig | 
     // Make sure player names are the same in both arrays
     if (playerNames.every(p => playerStartPositionNames.indexOf(p) > -1)) {
       socket.emit('ERROR', {
-        error: Error.INVALID_GAME_CONFIGURATION.toString(),
+        error: Error[Error.INVALID_GAME_CONFIGURATION],
         details: 'There are no player start positions for all players in the game'
       });
       return null;
@@ -91,7 +94,7 @@ export const getValidatedGameConfig = (payload: any, socket: any): GameConfig | 
 
   if (playerNames.length > Math.pow(gameConfig.setup.edgeLength, 3)) {
     socket.emit('ERROR', {
-      error: Error.INVALID_GAME_CONFIGURATION.toString(),
+      error: Error[Error.INVALID_GAME_CONFIGURATION],
       details: 'Too many players for the selected game area size'
     });
     return null;
