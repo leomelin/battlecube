@@ -22,7 +22,7 @@ Basically all you have to do is create a bot that stays on the game area, doesn'
 ## Starting a new game
 
 1. Connect to server API address via socket.io (websocket) using `npm run start:client` or by implementing your own client.
-2. Emit "NEW_GAME" event with proper configuration to start a new game:
+2. Emit "NEW_GAME" event with proper configuration to start a new game: (Remember to start the bot services first!)
 ```js
 {
   "setup": {
