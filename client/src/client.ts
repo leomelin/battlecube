@@ -1,7 +1,7 @@
 import * as socketIO from 'socket.io-client';
 import * as defaultConfig from './defaultConfig.json';
 
-const io = socketIO('http://localhost:9999');
+const io = socketIO(`${process.env.SERVER_HOST || 'http://localhost'}:${process.env.SERVER_PORT || 9999}`);
 
 io.emit('NEW_GAME', defaultConfig);
 

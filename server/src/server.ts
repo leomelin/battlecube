@@ -2,7 +2,7 @@ import * as socketIO from 'socket.io';
 import { getValidatedGameConfig } from './validators';
 import { Game } from './game';
 
-const io = socketIO(9999);
+const io = socketIO(process.env.SERVER_PORT || 9999);
 
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
