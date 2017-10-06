@@ -340,6 +340,136 @@ describe('test game logic', () => {
       highScore: 1
     });
   });
+
+  test('should make bot named Paul win after three ticks', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    let johnTickCount = 0;
+    let paulTickCount = 0;
+
+    const johnDirections = [[{
+      task: 'MOVE',
+      direction: '+Y'
+    }], [{
+      task: 'MOVE',
+      direction: '+X'
+    }], [{
+      task: 'NOOP'
+    }]];
+    const paulDirections = [[{
+      task: 'BOMB',
+      x: 0,
+      y: 0,
+      z: 0
+    }], [{
+      task: 'MOVE',
+      direction: '+Y'
+    }], [{
+      task: 'BOMB',
+      x: 1,
+      y: 1,
+      z: 0
+    }]];
+
+    const game = new Game({
+      'setup': {
+        'edgeLength': 8,
+        'speed': 0,
+        'numOfTasksPerTick': 1,
+        'playerStartPositions': [
+          {
+            'name': 'John',
+            'x': 0,
+            'y': 0,
+            'z': 0
+          },
+          {
+            'name': 'Paul',
+            'x': 0,
+            'y': 0,
+            'z': 1
+          }
+        ]
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': (nextTickInfo) => {
+            const directions = johnDirections[johnTickCount];
+            johnTickCount++;
+            return directions;
+          }
+        },
+        {
+          'name': 'Paul',
+          'url': (nextTickInfo) => {
+            const directions = paulDirections[paulTickCount];
+            paulTickCount++;
+            return directions;
+          }
+        }
+      ]
+    }, createMockSocket(socket));
+
+    game.start();
+
+    // Wait game to finish
+    await wait(1000);
+    expect(eventsList.length).toBe(12);
+    expect(eventsList[0].event).toBe('GAME_STARTED');
+    expect(eventsList[1].event).toBe('NEXT_TICK');
+    expect(eventsList[2].event).toBe('PLAYER_MOVE_ATTEMPT');
+    expect(eventsList[3].event).toBe('PLAYER_PLACED_BOMB');
+    expect(eventsList[4].event).toBe('NEXT_TICK');
+    expect(eventsList[4].data.items).toMatchObject([{ x: 0, y: 0, z: 0, type: 'BOMB' }]);
+    expect(eventsList[4].data.players[0]).toMatchObject({
+      name: 'John',
+      x: 0,
+      y: 1,
+      z: 0
+    });
+    expect(eventsList[4].data.players[1]).toMatchObject({
+      name: 'Paul',
+      x: 0,
+      y: 0,
+      z: 1
+    });
+    expect(eventsList[5].event).toBe('PLAYER_MOVE_ATTEMPT');
+    expect(eventsList[6].event).toBe('PLAYER_MOVE_ATTEMPT');
+    expect(eventsList[7].event).toBe('NEXT_TICK');
+    expect(eventsList[7].data.items).toMatchObject([{ x: 0, y: 0, z: 0, type: 'BOMB' }]);
+    expect(eventsList[7].data.players[0]).toMatchObject({
+      name: 'John',
+      x: 1,
+      y: 1,
+      z: 0
+    });
+    expect(eventsList[7].data.players[1]).toMatchObject({
+      name: 'Paul',
+      x: 0,
+      y: 1,
+      z: 1
+    });
+
+    expect(eventsList[8].event).toBe('PLAYER_DID_NOTHING');
+    expect(eventsList[9].event).toBe('PLAYER_PLACED_BOMB');
+
+    expect(eventsList[10].event).toBe('PLAYER_LOST');
+    expect(eventsList[10].data).toMatchObject({
+      name: 'John',
+      cause: 'Player stepped on a BOMB'
+    });
+    expect(eventsList[11].event).toBe('GAME_ENDED');
+
+    expect(eventsList[11].data.result).toBe('WINNER_FOUND');
+    expect(eventsList[11].data.winner).toMatchObject({
+      name: 'Paul',
+      highScore: 3
+    });
+  });
 });
 
 
