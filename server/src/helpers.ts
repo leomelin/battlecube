@@ -26,6 +26,10 @@ export const coordinateIsInUse = (a: Coordinate, arr: Coordinate[]) => {
 };
 
 export const getDirectionsFromBot = async (nextTickInfoForBot: NextTickInfoForBot): Promise<any> => {
+  if (typeof nextTickInfoForBot.currentPlayer.url === 'function') {
+    // Tests can emulate bot behaviour by having a function as url. Normally this is not possible
+    return nextTickInfoForBot.currentPlayer.url(nextTickInfoForBot);
+  }
   try {
     return await (await fetch(nextTickInfoForBot.currentPlayer.url, {
       method: 'POST',

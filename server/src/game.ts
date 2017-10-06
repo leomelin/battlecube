@@ -97,6 +97,7 @@ export class Game {
         ...player,
         highScore: this.currentTick
       });
+      throw 'Player moved out of bounds';
     }
   }
 
@@ -155,7 +156,7 @@ export class Game {
         });
 
         // If not valid, error is thrown
-        const directions = getValidatedBotDirections(payload);
+        const directions = getValidatedBotDirections(payload, this.gameConfig);
         this.applyBotDirections(playerSetup, directions);
       } catch (e) {
         if (e.error && e.error === Error[Error.VALIDATION_ERROR]) {

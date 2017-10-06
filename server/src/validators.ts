@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 import Error from './error-code';
-import { GameConfig } from './models';
+import { BotDirection, GameConfig } from './models';
 
 const gameConfigSchema = Joi.object().keys({
   setup: {
@@ -38,13 +38,21 @@ const moveSchema = Joi.object().keys({
 
 const botDirectionsSchema = Joi.array().items(bombOrderSchema, noopSchema, moveSchema);
 
-export const getValidatedBotDirections = (payoad: any) => {
+export const getValidatedBotDirections = (payoad: any, gameConfig: GameConfig) => {
   const directionsValidationObj = Joi.validate(payoad, botDirectionsSchema);
 
   if (directionsValidationObj.error) {
     throw {
       error: Error[Error.VALIDATION_ERROR],
       details: directionsValidationObj.error.details
+    };
+  }
+
+  const validBotDirections = <BotDirection[]>directionsValidationObj.value;
+  if (validBotDirections.length > gameConfig.setup.numOfTasksPerTick) {
+    throw {
+      error: Error[Error.VALIDATION_ERROR],
+      details: 'Invalid amount of directions sent'
     };
   }
 
