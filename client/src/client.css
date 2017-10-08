@@ -1,0 +1,189 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Helvetica Neue, sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%
+}
+
+h1 {
+  font: 4.2em Helvetica Neue, sans-serif;
+  font-weight: 200;
+  margin: 9px 0;
+  color: #55ff55;
+}
+
+button {
+  background: #111;
+  border: 1px solid #55ff55;
+  color: OrangeRed;
+  height: 62px;
+  font-size: 1.8em;
+  font-weight: 200;
+  outline: none;
+  padding: 5px 15px;
+  margin: 0 3px;
+
+  &:hover, &:disabled {
+     background: OrangeRed;
+     color: #111;
+   }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &:active {
+    outline: 2px solid OrangeRed;
+  }
+
+  &:focus {
+    border: 1px solid OrangeRed;
+  }
+}
+
+label {
+  color: OrangeRed;
+  font-size: 1.8em;
+  font-weight: 200;
+  margin-top: 20px;
+}
+
+.slider-wrap {
+  width: 200px;
+  position: relative;
+  margin-bottom: 10px;
+  height: 60px;
+}
+
+input[type='range'].slider {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+  margin: 1.25;
+  width: 100%;
+  height: 60px;
+  background: transparent;
+
+  &::-moz-range-thumb {
+    appearance: none;
+    position: relative;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: OrangeRed;
+    cursor: pointer;
+    transition: all .2s ease;
+    z-index: 100;
+  }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    position: relative;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: OrangeRed;
+    cursor: pointer;
+    margin: 0.2;
+    transition: all .2s ease;
+    z-index: 10;
+  }
+
+  &:focus {
+    outline: none
+  }
+}
+
+.sliderbar {
+  position: absolute;
+  margin: 1.25;
+  width: 100%;
+  bottom: 50%;
+  left: 0;
+  margin: 0 0 -2.5px;
+  height: 5px;
+  background: #55ff55;
+  border-radius: 3px;
+  z-index: -1;
+}
+
+.log {
+  border: 2px #55ff55 solid;
+  border-radius: 3px;
+  margin-top: 40px;
+  min-height: 145px;
+  padding: 20px;
+  resize: none;
+  outline: none;
+  background: #1a1a1a;
+  color: #ddd;
+  width: 45vw;
+  overflow-y: auto;
+  height: 300px;
+}
+
+.log-item {
+  list-style: none;
+  color: white;
+
+  &__Carmine {
+    color: #00FFFF;
+  }
+  &__Whoopie {
+    color: #FF2EFF;
+  }
+  &__John {
+    color: #EAEA00;
+  }
+  &__Petra {
+    color: #FF6767;
+  }
+
+  &__special-message {
+    text-transform: uppercase;
+    color: #55ff55;
+  }
+  &__separator {
+    color: #FDA5FF
+  }
+}
+
+.log-item.special,
+.log-item.winner,
+.log-item.tick {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.log-item__tick-message {
+  &__current-players,
+  &__current-tick {
+    color: #55ff55;
+    padding-bottom: 5px;
+  }
+}
+
+.log-item__final-message {
+  &__winner,
+  &__scores {
+    color: #55ff55;
+    padding-bottom: 5px;
+  }
+
+}
