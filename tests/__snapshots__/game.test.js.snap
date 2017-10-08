@@ -1,0 +1,168 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test game logic should play two ticks on single bot directions response 1`] = `
+Array [
+  Object {
+    "event": "GAME_STARTED",
+  },
+  Object {
+    "data": Object {
+      "gameInfo": Object {
+        "currentTick": 0,
+        "edgeLength": 8,
+        "numOfBotsInPlay": 2,
+        "numOfTasksPerTick": 2,
+      },
+      "items": Array [],
+      "players": Array [
+        Object {
+          "name": "John",
+          "x": 6,
+          "y": 6,
+          "z": 0,
+        },
+        Object {
+          "name": "Paul",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+      ],
+    },
+    "event": "NEXT_TICK",
+  },
+  Object {
+    "data": Object {
+      "name": "John",
+      "x": 7,
+      "y": 6,
+      "z": 0,
+    },
+    "event": "PLAYER_MOVE_ATTEMPT",
+  },
+  Object {
+    "data": Object {
+      "name": "Paul",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+    },
+    "event": "PLAYER_DID_NOTHING",
+  },
+  Object {
+    "data": Object {
+      "gameInfo": Object {
+        "currentTick": 1,
+        "edgeLength": 8,
+        "numOfBotsInPlay": 2,
+        "numOfTasksPerTick": 2,
+      },
+      "items": Array [],
+      "players": Array [
+        Object {
+          "name": "John",
+          "x": 7,
+          "y": 6,
+          "z": 0,
+        },
+        Object {
+          "name": "Paul",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+      ],
+    },
+    "event": "NEXT_TICK",
+  },
+  Object {
+    "data": Object {
+      "name": "John",
+      "x": 7,
+      "y": 7,
+      "z": 0,
+    },
+    "event": "PLAYER_MOVE_ATTEMPT",
+  },
+  Object {
+    "data": Object {
+      "name": "Paul",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+    },
+    "event": "PLAYER_DID_NOTHING",
+  },
+  Object {
+    "data": Object {
+      "gameInfo": Object {
+        "currentTick": 2,
+        "edgeLength": 8,
+        "numOfBotsInPlay": 2,
+        "numOfTasksPerTick": 2,
+      },
+      "items": Array [],
+      "players": Array [
+        Object {
+          "name": "John",
+          "x": 7,
+          "y": 7,
+          "z": 0,
+        },
+        Object {
+          "name": "Paul",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+      ],
+    },
+    "event": "NEXT_TICK",
+  },
+  Object {
+    "data": Object {
+      "name": "John",
+      "x": 8,
+      "y": 7,
+      "z": 0,
+    },
+    "event": "PLAYER_MOVE_ATTEMPT",
+  },
+  Object {
+    "data": Object {
+      "cause": "Player moved out of bounds",
+      "name": "John",
+    },
+    "event": "PLAYER_LOST",
+  },
+  Object {
+    "data": Object {
+      "name": "Paul",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+    },
+    "event": "PLAYER_DID_NOTHING",
+  },
+  Object {
+    "data": Object {
+      "result": "WINNER_FOUND",
+      "scores": Array [
+        Object {
+          "highScore": 2,
+          "name": "John",
+        },
+        Object {
+          "highScore": 3,
+          "name": "Paul",
+        },
+      ],
+      "winner": Object {
+        "highScore": 3,
+        "name": "Paul",
+      },
+    },
+    "event": "GAME_ENDED",
+  },
+]
+`;

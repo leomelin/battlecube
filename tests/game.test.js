@@ -470,6 +470,66 @@ describe('test game logic', () => {
       highScore: 3
     });
   });
+
+  test('should play two ticks on single bot directions response', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+    const game = new Game({
+      'setup': {
+        'edgeLength': 8,
+        'speed': 0,
+        'numOfTasksPerTick': 2,
+        'playerStartPositions': [
+          {
+            'name': 'John',
+            'x': 6,
+            'y': 6,
+            'z': 0
+          },
+          {
+            'name': 'Paul',
+            'x': 0,
+            'y': 0,
+            'z': 0
+          }
+        ]
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': (nextTickInfo) => {
+            return [{
+              task: 'MOVE',
+              direction: '+X'
+            }, {
+              task: 'MOVE',
+              direction: '+Y'
+            }];
+          }
+        },
+        {
+          'name': 'Paul',
+          'url': (nextTickInfo) => {
+            return [{
+              task: 'NOOP'
+            }, {
+              task: 'NOOP'
+            }];
+          }
+        }
+      ]
+    }, createMockSocket(socket));
+
+    game.start();
+
+    // Wait game to finish
+    await wait(1000);
+    expect(eventsList.length).toBe(12);
+    expect(eventsList).toMatchSnapshot();
+  });
+
 });
 
 

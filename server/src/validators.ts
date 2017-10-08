@@ -49,7 +49,8 @@ export const getValidatedBotDirections = (payoad: any, gameConfig: GameConfig) =
   }
 
   const validBotDirections = <BotDirection[]>directionsValidationObj.value;
-  if (validBotDirections.length > gameConfig.setup.numOfTasksPerTick) {
+  if (validBotDirections.length > gameConfig.setup.numOfTasksPerTick ||
+    validBotDirections.length < gameConfig.setup.numOfTasksPerTick) {
     throw {
       error: Error[Error.VALIDATION_ERROR],
       details: 'Invalid amount of directions sent'

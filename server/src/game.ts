@@ -21,6 +21,7 @@ export class Game {
   otherItems: GameItem[] = [];
 
   currentTick = 0;
+  subTick = 0;
   lostPlayers: PlayerWithHighScore[] = [];
   gameEnded = false;
   preValidationInfo: PreValidationInfo = {
@@ -28,6 +29,8 @@ export class Game {
     collisions: [],
     outOfBoundsPlayers: []
   };
+
+  cachedDirections: { [ name: string ]: BotDirection[] } = {};
 
   constructor(gameConfig: GameConfig, socket: any) {
     this.gameConfig = gameConfig;
@@ -150,14 +153,19 @@ export class Game {
     for (const player of this.playerPositions) {
       const playerSetup = <PlayerSetup>this.gameConfig.players.find(p => p.name === player.name);
       try {
-        const payload = await getDirectionsFromBot({
-          currentPlayer: playerSetup,
-          ...nextTickInfo
-        });
+        // Only fetch new directions via api on start of sub tick sequence
+        if (this.subTick === 1) {
+          const payload = await getDirectionsFromBot({
+            currentPlayer: playerSetup,
+            ...nextTickInfo
+          });
 
-        // If not valid, error is thrown
-        const directions = getValidatedBotDirections(payload, this.gameConfig);
-        this.applyBotDirections(playerSetup, directions);
+          // If not valid, error is thrown
+          const directions = getValidatedBotDirections(payload, this.gameConfig);
+          this.cachedDirections[player.name] = directions;
+        }
+
+        this.applyBotDirections(playerSetup, [this.cachedDirections[player.name][this.subTick - 1]]);
       } catch (e) {
         if (e.error && e.error === Error[Error.VALIDATION_ERROR]) {
           this.socket.emit('PLAYER_LOST', {
@@ -289,6 +297,10 @@ export class Game {
     this.preValidationInfo.collisions = [];
     this.otherItems = [];
     while (!this.gameEnded) {
+      if (this.subTick === this.gameConfig.setup.numOfTasksPerTick) {
+        this.subTick = 0;
+      }
+      this.subTick += 1;
       const nextTickInfo = this.getNextTickInfo();
       this.removeExplodedBombs();
       this.resetPreValidationInfo();
