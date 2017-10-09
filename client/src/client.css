@@ -20,6 +20,11 @@ main {
   width: 100%
 }
 
+.canvas-3d {
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
 h1 {
   font: 4.2em Helvetica Neue, sans-serif;
   font-weight: 200;
@@ -60,7 +65,7 @@ label {
   color: OrangeRed;
   font-size: 1.8em;
   font-weight: 200;
-  margin-top: 20px;
+  margin-top: 70px;
 }
 
 .slider-wrap {

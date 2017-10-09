@@ -1,20 +1,20 @@
-import {
-  ISetup,
-  IAppState,
-  GameStatus,
-  ILogItem,
-  MessageType
-} from './initialState';
+import { GameStatus, IAppState, ILogItem, MessageType } from './initialState';
+
+import THREE from 'three';
+
 import socket, { ITickInfo } from './socket';
+
 export const io = socket('http://localhost:9999');
 
 interface IStart {
   (source: string, subString: string): object;
+
   (): void;
 }
 
 interface IUpdateSpeed {
   (state: IAppState, actions: IActions): Function;
+
   (speed: number): object;
 }
 
@@ -23,7 +23,9 @@ export interface IActions {
   setup: {
     updateSpeed: IUpdateSpeed;
   };
+
   log(): any;
+
   clearLog(): any;
 }
 
@@ -42,6 +44,47 @@ export default {
       speed,
       ...state.setup
     })
+  },
+
+  drawCube: () => {
+    const container = document.getElementsByClassName('canvas-3d')[0];
+
+    let camera: any;
+    let scene: any;
+    let renderer: any;
+    let cube: any;
+
+    // create the camera
+    camera = new THREE.PerspectiveCamera(70, 500 / 500, 1, 1000);
+    camera.position.y = 150;
+    camera.position.z = 350;
+    // create the Scene
+    scene = new THREE.Scene();
+    // create the Cube
+    const geometry = new THREE.BoxBufferGeometry(200, 200, 200);
+
+    const material = new THREE.MeshNormalMaterial({
+      wireframe: true
+    });
+    cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    cube.position.y = 150;
+    // add the object to the scene
+    // create the container element
+
+    // init the WebGL renderer and append it to the Dom
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(500, 500);
+    container.appendChild(renderer.domElement);
+
+    // animate the cube
+    setInterval(() => {
+      cube.rotation.x += 0.02;
+      cube.rotation.y += 0.0225;
+      cube.rotation.z += 0.0175;
+      // actually display the scene in the Dom element
+      renderer.render(scene, camera);
+    }, 20);
   },
 
   updateGameStatus: () => (update: Function) => {
