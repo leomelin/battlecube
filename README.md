@@ -16,6 +16,7 @@ Basically all you have to do is create a bot that stays on the game area, doesn'
 - Game area coordinates are counted as X: left to right, Y: top to bottom, Z: front to back. So that `{ x: 0, y: 0, z: 0 }` would be the top left corner on front.
 - All the bots in the game must have an unique name
 - The time is measured in *ticks* in other words play turns. Ticks start from 0.
+- If a bot is allowed to give more directions at once (numOfTasksPerTick), directions will be asked again after all directions are evaluated. So with numOfTaskPerTick with value 2 the server will play two ticks before asking another 2 directions.
 - Game area size might change during the game. If so, players are randomly positioned after that and all the bombs currently placed are removed.
 - The bot that survives the longest amount of *ticks* without losing, *WINS*
 
@@ -28,7 +29,7 @@ Basically all you have to do is create a bot that stays on the game area, doesn'
   "setup": {
     "edgeLength": <number>,
     "speed": <number>, /* milliseconds to delay between ticks, zero being the fastest setting. */
-    "numOfTasksPerTick": <number>, /* how many tasks bots can do per tick */
+    "numOfTasksPerTick": <number>, /* how many tasks bots can send at once (= how many ticks bots need to plan in advance) */
     "playerStartPositions": [ /* This is optional (for dev puropses). If not set, will be random. */
       {
         "name": <string>,
