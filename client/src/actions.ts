@@ -7,15 +7,13 @@ import socket, { ITickInfo } from './socket';
 export const io = socket('http://localhost:9999');
 
 interface IStart {
-  (source: string, subString: string): object;
-
-  (): void;
+  (state?: IAppState, actions?: IActions): void;
+  [key: string]: any;
 }
 
 interface IUpdateSpeed {
-  (state: IAppState, actions: IActions): Function;
-
-  (speed: number): object;
+  (state: IAppState, actions: IActions, speed: number): Object;
+  [key: string]: any;
 }
 
 export interface IActions {
@@ -25,13 +23,13 @@ export interface IActions {
   };
 
   log(): any;
-
   clearLog(): any;
+  [key: string]: any;
 }
 
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
 
-export default {
+export default <IActions>{
   start: (state: IAppState, actions: IActions) => {
     actions.clearLog();
     io.startGame({ setup: state.setup, players: state.players });

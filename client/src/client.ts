@@ -1,13 +1,13 @@
-import { h, app } from 'hyperapp';
+import { app, h } from 'hyperapp';
 import './client.css';
-import initialState, { IAppState, GameStatus } from './initialState';
+import initialState, { GameStatus, IAppState } from './initialState';
 import { LogItem, Slider } from './views';
-import actions from './actions';
+import actions, { IActions } from './actions';
 
 const appActions: any = app({
   actions,
   state: { ...initialState },
-  view: (state: IAppState, actions) =>
+  view: (state: IAppState, actions: IActions) =>
     h('main', {}, [
       h('h1', {}, 'Battlecube'),
       h(
@@ -38,7 +38,7 @@ const appActions: any = app({
       )
     ]),
   root: document.getElementById('app')
-})
+});
 
 appActions.updateGameStatus();
 appActions.log();
