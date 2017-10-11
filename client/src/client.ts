@@ -18,7 +18,7 @@ const appActions: any = app({
           style: { width: '500px', height: '500px' }
         }
       ),
-      h('label', {}, `Speed: ${state.setup.speed} ms`),
+      h('label', {}, `Speed: ${state.sliderSpeedValue} ms`),
       Slider(state, actions),
       h(
         'button',

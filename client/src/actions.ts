@@ -12,11 +12,17 @@ interface IStart {
 }
 
 interface IUpdateSpeed {
-  (state: IAppState, actions: IActions, speed: number): Object;
+  (state: IAppState, actions: IActions, speed: number): IAppState;
+  [key: string]: any;
+}
+
+interface IShowNewSpeedWhileDragging {
+  (state: IAppState, actions: IActions, sliderSpeedValue: number): IAppState;
   [key: string]: any;
 }
 
 export interface IActions {
+  showNewSpeedWhileDragging: IShowNewSpeedWhileDragging;
   start: IStart;
   setup: {
     updateSpeed: IUpdateSpeed;
@@ -30,6 +36,14 @@ export interface IActions {
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
 
 export default <IActions>{
+  showNewSpeedWhileDragging: (state: IAppState, actions: IActions, sliderSpeedValue: number) => {
+    const newState: IAppState = {
+      ...state,
+      sliderSpeedValue
+    };
+
+    return newState;
+  },
   start: (state: IAppState, actions: IActions) => {
     actions.clearLog();
     io.startGame({ setup: state.setup, players: state.players });
@@ -38,10 +52,14 @@ export default <IActions>{
   // set the amount of milliseconds delay you want between ticks
   // could add further config here
   setup: {
-    updateSpeed: (state: IAppState, actions: IActions, speed: number) => ({
-      speed,
-      ...state.setup
-    })
+    updateSpeed: (state: IAppState, actions: IActions, speed: number) => {
+      const newSetup = {
+        ...state,
+        speed
+      };
+      io.updateSetup(newSetup);
+      return newSetup;
+    }
   },
 
   drawCube: () => {

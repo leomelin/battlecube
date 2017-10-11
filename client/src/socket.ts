@@ -10,6 +10,7 @@ export interface ITickInfo {
 interface ISocket {
   io: SocketIOClient.Socket;
   startGame(config?: object): void;
+  updateSetup(setup: object): void;
   onStart(action: Function): void;
   onStop(action: Function): void;
   onPlayerMove(action: Function): void;
@@ -30,6 +31,7 @@ export default (serverUrl: string): ISocket => {
   return {
     io,
     startGame: config => io.emit('NEW_GAME', config || defaultConfig),
+    updateSetup: setup => io.emit('GAME_SETUP_UPDATE', setup),
     onStart: action => io.on('GAME_STARTED', () => action()),
     onStop: action => io.on('GAME_ENDED', (scores: any) => action(scores)),
     onPlayerMove: action =>

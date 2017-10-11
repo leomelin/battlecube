@@ -66,9 +66,9 @@ export const Slider = (state: IAppState, actions: any) =>
         min: '10',
         max: '2000',
         step: '10',
-        value: state.setup.speed,
-        disabled: state.gameStatus === GameStatus.started,
-        onchange: (e: any) => actions.setup.updateSpeed(e.target.value)
+        value: state.sliderSpeedValue,
+        oninput: (e: any) => actions.showNewSpeedWhileDragging(+e.target.value),
+        onchange: (e: any) => actions.setup.updateSpeed(+e.target.value)
       },
       []
     ),

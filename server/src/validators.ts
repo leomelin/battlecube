@@ -1,19 +1,21 @@
 import * as Joi from 'joi';
 import Error from './error-code';
-import { BotDirection, GameConfig } from './models';
+import { BotDirection, GameConfig, GameSetup } from './models';
+
+const gameSetupSchema = Joi.object().keys({
+  edgeLength: Joi.number().positive().integer().required(),
+  speed: Joi.number().positive().integer().allow(0).default(0).optional(),
+  numOfTasksPerTick: Joi.number().positive().integer().required(),
+  playerStartPositions: Joi.array().items(Joi.object().keys({
+    name: Joi.string().required(),
+    x: Joi.number().positive().integer().required(),
+    y: Joi.number().positive().integer().required(),
+    z: Joi.number().positive().integer().required()
+  })).optional()
+});
 
 const gameConfigSchema = Joi.object().keys({
-  setup: {
-    edgeLength: Joi.number().positive().integer().required(),
-    speed: Joi.number().positive().integer().allow(0).default(0).optional(),
-    numOfTasksPerTick: Joi.number().positive().integer().required(),
-    playerStartPositions: Joi.array().items(Joi.object().keys({
-      name: Joi.string().required(),
-      x: Joi.number().positive().integer().required(),
-      y: Joi.number().positive().integer().required(),
-      z: Joi.number().positive().integer().required()
-    })).optional()
-  },
+  setup: gameSetupSchema,
   players: Joi.array().items(Joi.object().keys({
     name: Joi.string().required(),
     url: Joi.string().uri().required()
@@ -58,6 +60,20 @@ export const getValidatedBotDirections = (payoad: any, gameConfig: GameConfig) =
   }
 
   return directionsValidationObj.value;
+};
+
+export const getValidatedGameSetup = (payload: any, socket: any): GameSetup | null => {
+  const gameSetupValidationObj = Joi.validate(payload, gameSetupSchema);
+
+  if (gameSetupValidationObj.error) {
+    socket.emit('ERROR', {
+      error: Error[Error.INVALID_GAME_CONFIGURATION],
+      details: gameSetupValidationObj.error.details
+    });
+    return null;
+  }
+  const gameSetup: GameSetup = gameSetupValidationObj.value;
+  return gameSetup;
 };
 
 export const getValidatedGameConfig = (payload: any, socket: any): GameConfig | null => {

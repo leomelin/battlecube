@@ -3,7 +3,7 @@ import {
   BotDirection, CollisionInfo, GameConfig, ItemType, PlayerWithHighScore, MoveOrder, NextTickInfo, PlaceBombOrder,
   PlayerPosition,
   PlayerSetup,
-  PreValidationInfo, HighScoreInfo, GameItem
+  PreValidationInfo, HighScoreInfo, GameItem, GameSetup
 } from './models';
 import {
   coordinateIsInUse, getDirectionsFromBot, getRandom3DCoordinate, isOutOfBounds,
@@ -29,6 +29,7 @@ export class Game {
     collisions: [],
     outOfBoundsPlayers: []
   };
+  gameSetupUpdate: GameSetup | null = null;
 
   cachedDirections: { [ name: string ]: BotDirection[] } = {};
 
@@ -290,6 +291,10 @@ export class Game {
     });
   }
 
+  updateGameSetup(setup: GameSetup) {
+    this.gameSetupUpdate = setup;
+  }
+
   async start() {
     this.positionPlayers();
     this.socket.emit('GAME_STARTED');
@@ -299,6 +304,11 @@ export class Game {
     while (!this.gameEnded) {
       if (this.subTick === this.gameConfig.setup.numOfTasksPerTick) {
         this.subTick = 0;
+        // Apply new game config
+        if (this.gameSetupUpdate) {
+          this.gameConfig.setup = this.gameSetupUpdate;
+          this.gameSetupUpdate = null;
+        }
       }
       this.subTick += 1;
       const nextTickInfo = this.getNextTickInfo();

@@ -31,12 +31,14 @@ export interface ILogItem {
 }
 
 export interface IAppState extends ISetup {
+  sliderSpeedValue: number;
   gameStatus: GameStatus;
   error: any;
   log: ILogItem[];
 }
 
 export default {
+  sliderSpeedValue: 200,
   setup: {
     edgeLength: 8,
     speed: 200,
