@@ -41,7 +41,7 @@ button {
   font-weight: 200;
   outline: none;
   padding: 5px 15px;
-  margin: 0 3px;
+  margin: 0 3px 40px 3px;
 
   &:hover, &:disabled {
      background: OrangeRed;
@@ -138,7 +138,7 @@ input[type='range'].slider {
   outline: none;
   background: #1a1a1a;
   color: #ddd;
-  width: 45vw;
+  width: 42vw;
   overflow-y: auto;
   height: 300px;
 }
@@ -146,19 +146,6 @@ input[type='range'].slider {
 .log-item {
   list-style: none;
   color: white;
-
-  &__Carmine {
-    color: #00FFFF;
-  }
-  &__Whoopie {
-    color: #FF2EFF;
-  }
-  &__John {
-    color: #EAEA00;
-  }
-  &__Petra {
-    color: #FF6767;
-  }
 
   &__special-message {
     text-transform: uppercase;
@@ -190,5 +177,12 @@ input[type='range'].slider {
     color: #55ff55;
     padding-bottom: 5px;
   }
+}
 
+.cube-container {
+  display: block;
+  padding: 10px;
+  border: 2px #55ff55 solid;
+  border-radius: 3px;
+  margin-top: 40px;
 }

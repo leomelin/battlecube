@@ -27,6 +27,10 @@ export default (serverUrl: string): ISocket => {
     console.log('Error...', err);
   });
 
+  io.on('NEXT_TICK', (info: ITickInfo) => {
+    console.log(info);
+  })
+
   // TODO: log errors
   return {
     io,
@@ -51,7 +55,7 @@ export default (serverUrl: string): ISocket => {
       }),
     onPlayerLoses: action =>
       io.on('PLAYER_LOST', ({ name, cause }: any) => {
-        action({ name, message: `☠ ${cause}` });
+        action({ name, message: `💀 ${cause}` });
       }),
     onTick: action =>
       io.on('NEXT_TICK', (info: ITickInfo) => {

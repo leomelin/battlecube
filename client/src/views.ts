@@ -12,10 +12,10 @@ const RESULTS_SEPARATOR =
   '########################################################';
 
 const Item: IItem = {
-  normal: ({ name, message }: ILogItem) => [
+  normal: ({ name, message}: ILogItem, color: string) => [
     h(
       'span',
-      { className: `log-item__${name}`, key: `${Math.random()}` },
+      { className: 'log-item', key: `${Math.random()}`, style: {color}},
       `${name}: `
     ),
     h('span', { className: 'log-item__message' }, message)
@@ -46,13 +46,14 @@ const Item: IItem = {
   ]
 };
 
-export const LogItem = (item: ILogItem) => {
+export const LogItem = (players: any) => (item: ILogItem) => {
   const type = MessageType[item.type || 0];
+  const currentPlayer = players.find((p: any) => p.name === item.name);
   const children = Item[type];
   return h(
     'li',
     { className: `log-item ${item.type ? MessageType[item.type] : 'normal'}` },
-    children(item)
+    children(item, currentPlayer ? currentPlayer.color : 'white')
   );
 };
 
