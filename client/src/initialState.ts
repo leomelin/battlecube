@@ -4,7 +4,6 @@ export enum GameStatus {
 }
 
 export enum MessageType {
-  normal,
   special,
   tick,
   result
@@ -25,6 +24,7 @@ export interface IPlayer {
     y: number | null,
     z: number | null
   };
+  wins: number;
 }
 
 export interface ISetup {
@@ -64,28 +64,32 @@ export default {
       url: 'http://localhost:4001',
       color: '#FF6767',
       status: PlayerStatus.inactive,
-      position: { x: null, y: null, z: null }
+      position: { x: null, y: null, z: null },
+      wins: 0
     },
     {
       name: 'Petra',
       url: 'http://localhost:4002',
       color: '#EAEA00',
       status: PlayerStatus.inactive,
-      position: { x: null, y: null, z: null }
+      position: { x: null, y: null, z: null },
+      wins: 0
     },
     {
       name: 'Carmine',
       url: 'http://localhost:4003',
       color: '#00FFFF',
       status: PlayerStatus.inactive,
-      position: { x: null, y: null, z: null }
+      position: { x: null, y: null, z: null },
+      wins: 0
     },
     {
       name: 'Whoopie',
       url: 'http://localhost:4004',
       color: '#FF2EFF',
       status: PlayerStatus.inactive,
-      position: { x: null, y: null, z: null }
+      position: { x: null, y: null, z: null },
+      wins: 0
     }
   ],
   gameStatus: GameStatus.stopped,

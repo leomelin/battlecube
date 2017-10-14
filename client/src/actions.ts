@@ -8,6 +8,7 @@ import {
 } from './initialState';
 import socket, { ITickInfo } from './socket';
 import { createCube } from './Cube';
+import * as store from './localStorage';
 
 export const io = socket('http://localhost:9999');
 
@@ -26,15 +27,28 @@ interface IShowNewSpeedWhileDragging {
   [key: string]: any;
 }
 
+interface ILog {
+  (state: IAppState, actions: IActions): any;
+  (): any;
+}
+
+interface IPersist {
+  (state: IAppState): any;
+  (): any;
+}
+
 export interface IActions {
   showNewSpeedWhileDragging: IShowNewSpeedWhileDragging;
   start: IStart;
   setup: {
     updateSpeed: IUpdateSpeed;
   };
-  log(state: IAppState, actions: IActions): any;
+  log: ILog;
   clearLog(): any;
   [key: string]: any;
+  getPersistState(): any;
+  persistState: IPersist;
+  removePersistedState(): any;
 }
 
 const cubeActions = {
@@ -43,17 +57,21 @@ const cubeActions = {
     cube.init(state);
     return { cube };
   },
-  updateCube: ({ cube, players}: IAppState) => {
+  updateCube: ({ cube, players }: IAppState) => {
     cube.update({ players });
   }
 };
 
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
 
-export default <IActions>{
+export default {
   ...cubeActions,
 
-  showNewSpeedWhileDragging: (state: IAppState, actions: IActions, sliderSpeedValue: number) => {
+  showNewSpeedWhileDragging: (
+    state: IAppState,
+    actions: IActions,
+    sliderSpeedValue: number
+  ) => {
     const newState: IAppState = {
       ...state,
       sliderSpeedValue
@@ -83,12 +101,16 @@ export default <IActions>{
     }
   },
 
-  updateGameStatus: (state: IAppState, { updateCube }: IActions) => (update: Function) => {
+  updateGameStatus: (state: IAppState, { updateCube, recordWin }: IActions) => (
+    update: Function
+  ) => {
     io.onStart(() => update({ gameStatus: GameStatus.started }));
 
     io.onStop(async (finalInfo: any) => {
       await update((state: IAppState) => {
-        const winner = finalInfo.winner ? `🏆 WINNER: ${finalInfo.winner.name}` : 'Error occurred';
+        const winner = finalInfo.winner
+          ? `🏆 WINNER: ${finalInfo.winner.name}`
+          : 'Error occurred';
 
         const results = finalInfo.scores
           .sort((a: any, b: any) => b.highScore - a.highScore)
@@ -111,6 +133,7 @@ export default <IActions>{
         return { ...state, players, log, gameStatus: GameStatus.stopped };
       });
 
+      finalInfo.winner && recordWin(finalInfo.winner.name);
       updateCube();
     });
   },
@@ -139,11 +162,15 @@ export default <IActions>{
       update((state: IAppState) => ({
         log: [{ name, message, type: MessageType.special }, ...state.log]
       }));
-      await update(({ players, log, cube }: IAppState) => {
-        const newLog =  [{ name, message, type: MessageType.special }, ...log];
+      await update(({ players, log }: IAppState) => {
+        const newLog = [{ name, message, type: MessageType.special }, ...log];
         const updatedPlayers = players.map((p: any) => {
           if (p.name === name) {
-            return { ...p, position: { x: null, y: null, z: null },  status: PlayerStatus.inactive };
+            return {
+              ...p,
+              position: { x: null, y: null, z: null },
+              status: PlayerStatus.inactive
+            };
           }
           return p;
         });
@@ -161,11 +188,13 @@ export default <IActions>{
           ...state.log
         ];
 
-        const updatedPlayers = state.players.map((player) => {
-          const { x = null, y = null, z = null } = players.find(p => p.name === player.name) || {};
+        const updatedPlayers = state.players.map((player: IPlayer) => {
+          const { x = null, y = null, z = null } =
+            players.find(p => p.name === player.name) || {};
           const position = { x, y, z };
-          return x !== null ? { ...player, position, status: PlayerStatus.active }
-          : { ...player, position, status: PlayerStatus.inactive };
+          return x !== null
+            ? { ...player, position, status: PlayerStatus.active }
+            : { ...player, position, status: PlayerStatus.inactive };
         });
         return { log, players: updatedPlayers };
       });
@@ -174,5 +203,39 @@ export default <IActions>{
     });
   },
 
-  clearLog: () => ({ log: [] })
+  clearLog: () => ({ log: [] }),
+
+  persistState: ({ players, setup }: IAppState) => {
+    store.persist({ players, setup });
+  },
+
+  getPersistedState: () => async (update: Function) => {
+    const retrievedState = await store.get();
+    if (retrievedState) {
+      update((state: IAppState) => ({ ...state, ...retrievedState }));
+    }
+  },
+
+  removePersistedState: () => store.remove(),
+
+  removePlayer: (state: IAppState, actions: IActions, index: number) => {
+    const players = [
+      ...state.players.slice(0, index),
+      ...state.players.slice(index + 1)
+    ];
+    return { ...state, players };
+  },
+
+  recordWin: (state: IAppState, action: IActions, name: string) => (
+    update: Function
+  ) => {
+    update((newState: IAppState) => {
+      const players = state.players.map((p: IPlayer) => {
+        const wins = p.name === name ? p.wins + 1 : p.wins;
+        return { ...p, wins };
+      });
+
+      return { ...newState, players };
+    });
+  }
 };

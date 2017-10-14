@@ -12,7 +12,6 @@ import nested from 'postcss-nested'
 
 export default {
   input: 'client/src/client.ts',
-  format: 'iife',
   name: 'Battlecube',
   output: {
     file: 'client/static/client.js',
@@ -35,6 +34,7 @@ export default {
       contentBase: ['client/static'],
       historyApiFallback: true,
       port: 8080,
+      open: true
     })
   ]
 }

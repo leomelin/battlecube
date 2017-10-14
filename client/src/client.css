@@ -37,6 +37,7 @@ button {
   outline: none;
   padding: 5px 15px;
   margin: 0 3px 40px 3px;
+  text-transform: uppercase;
 
   &:hover, &:disabled {
      background: OrangeRed;
@@ -54,6 +55,13 @@ button {
   &:focus {
     border: 1px solid OrangeRed;
   }
+}
+
+button.btn-small {
+  height: 31px;
+  font-size: .9em;
+  padding: 2.5px 7.5px;
+  margin: 0 1.5px 20px;
 }
 
 label {
@@ -124,6 +132,8 @@ input[type='range'].slider {
 }
 
 .log {
+  font: 1em Helvetica Neue, sans-serif;
+  font-weight: 200;
   border: 2px #55ff55 solid;
   border-radius: 3px;
   margin-top: 40px;
@@ -180,4 +190,44 @@ input[type='range'].slider {
   border: 2px #55ff55 solid;
   border-radius: 3px;
   margin-top: 40px;
+}
+
+.flex-grid {
+  display: flex;
+}
+
+.players {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  color: white;
+  wrap: wrap;
+  padding: 3px;
+  font: 1em Helvetica Neue, sans-serif;
+  font-weight: 200;
+  margin-left: 30px;
+  max-width: 600px;
+
+  player- {
+    flex: 1;
+    min-width: 200px;
+    padding-left: 10px;
+    margin: 30px 20px;
+
+    .player-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .player-actions {
+       display: flex;
+       flex-direction: row;
+     }
+
+    .player-info {
+      margin-bottom: 10px;
+      &__detail {
+        padding: 5px 0;
+      }
+    }
+  }
 }

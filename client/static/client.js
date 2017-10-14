@@ -23,7 +23,7 @@ function __$styleInject(css, returnValue) {
 var i;
 var stack = [];
 
-function h(tag, props) {
+function h(type, props) {
   var node;
   var children = [];
 
@@ -41,52 +41,46 @@ function h(tag, props) {
     }
   }
 
-  return typeof tag === "string"
-    ? {
-        tag: tag,
-        props: props || {},
-        children: children
-      }
-    : tag(props, children)
+  return typeof type === "string"
+    ? { type: type, props: props || {}, children: children }
+    : type(props || {}, children)
 }
 
-var lifecycleCallbackStack = [];
-
-function app(props) {
+function app(props, container) {
+  var root = (container = container || document.body).children[0];
+  var node = toVNode(root, [].map);
+  var callbacks = [];
   var skipRender;
-  var appView = props.view;
-  var appState = props.state;
-  var appActions = {};
-  var appRoot = props.root || document.body;
-  var element = appRoot.children[0];
-  var node = hydrate(element, [].map);
+  var globalState;
+  var globalActions;
 
-  if (typeof props === "function") {
-    return props(app)
-  }
+  repaint(flush(init(props, (globalState = {}), (globalActions = {}))));
 
-  requestRender(createActions(appActions, props.actions, []));
+  return globalActions
 
-  return appActions
-
-  function requestRender() {
-    if (appView && !skipRender) {
+  function repaint() {
+    if (props.view && !skipRender) {
       requestAnimationFrame(render, (skipRender = !skipRender));
     }
   }
 
-  function render(cb) {
-    element = patch(
-      appRoot,
-      element,
-      node,
-      (node = appView(appState, appActions)),
-      (skipRender = !skipRender)
+  function render() {
+    flush(
+      (root = patchElement(
+        container,
+        root,
+        node,
+        (node = props.view(globalState, globalActions)),
+        (skipRender = !skipRender)
+      ))
     );
-    while ((cb = lifecycleCallbackStack.pop())) cb();
   }
 
-  function hydrate(element, map) {
+  function flush(cb) {
+    while ((cb = callbacks.pop())) cb();
+  }
+
+  function toVNode(element, map) {
     return (
       element &&
       h(
@@ -95,115 +89,88 @@ function app(props) {
         map.call(element.childNodes, function(element) {
           return element.nodeType === 3
             ? element.nodeValue
-            : hydrate(element, map)
+            : toVNode(element, map)
         })
       )
     )
   }
 
-  function createActions(actions, withActions, lastPath) {
-    Object.keys(withActions || {}).map(function(name) {
-      return typeof withActions[name] === "function"
-        ? (actions[name] = function(data) {
-            return typeof (data = withActions[name](
-              getPath(lastPath, appState),
-              getPath(lastPath, appActions),
-              data
-            )) === "function"
-              ? data(update)
-              : update(data)
-          })
-        : createActions(
-            actions[name] || (actions[name] = {}),
-            withActions[name],
-            lastPath.concat(name)
-          )
-    });
+  function init(module, state, actions) {
+    if (module.init) {
+      callbacks.push(function() {
+        module.init(state, actions);
+      });
+    }
 
-    function update(withState) {
-      if (typeof withState === "function") {
-        return update(withState(getPath(lastPath, appState)))
-      }
-      if (
-        withState &&
-        (withState = setPath(
-          lastPath,
-          merge(getPath(lastPath, appState), withState),
-          appState
-        ))
-      ) {
-        requestRender((appState = withState));
-      }
-      return appState
+    assign(state, module.state);
+
+    initActions(state, actions, module.actions);
+
+    for (var i in module.modules) {
+      init(module.modules[i], (state[i] = {}), (actions[i] = {}));
     }
   }
 
-  function set(prop, value, source) {
-    var target = merge(source);
-    target[prop] = value;
+  function initActions(state, actions, source) {
+    Object.keys(source || {}).map(function(i) {
+      if (typeof source[i] === "function") {
+        actions[i] = function(data) {
+          return typeof (data = source[i](state, actions, data)) === "function"
+            ? data(update)
+            : update(data)
+        };
+      } else {
+        initActions(state[i] || (state[i] = {}), (actions[i] = {}), source[i]);
+      }
+    });
+
+    function update(data) {
+      return (
+        typeof data === "function"
+          ? update(data(state))
+          : data && repaint(assign(state, data)),
+        state
+      )
+    }
+  }
+
+  function assign(target, source) {
+    for (var i in source) {
+      target[i] = source[i];
+    }
     return target
   }
 
-  function getPath(paths, source) {
-    return paths.length === 0
-      ? source
-      : source && getPath(paths.slice(1), source[paths[0]])
-  }
-
-  function setPath(paths, value, source) {
-    var name = paths[0];
-    return paths.length === 0
-      ? value
-      : set(
-          name,
-          paths.length > 1
-            ? setPath(
-                paths.slice(1),
-                value,
-                source && name in source ? source[name] : {}
-              )
-            : value,
-          source
-        )
-  }
-
   function merge(target, source) {
-    var result = {};
-    for (var i in target) {
-      result[i] = target[i];
-    }
-    for (var i in source) {
-      result[i] = source[i];
-    }
-    return result
+    return assign(assign({}, target), source)
   }
 
   function createElement(node, isSVG) {
     if (typeof node === "string") {
       var element = document.createTextNode(node);
     } else {
-      var element = (isSVG = isSVG || node.tag === "svg")
-        ? document.createElementNS("http://www.w3.org/2000/svg", node.tag)
-        : document.createElement(node.tag);
+      var element = (isSVG = isSVG || node.type === "svg")
+        ? document.createElementNS("http://www.w3.org/2000/svg", node.type)
+        : document.createElement(node.type);
 
       if (node.props && node.props.oncreate) {
-        lifecycleCallbackStack.push(function() {
+        callbacks.push(function() {
           node.props.oncreate(element);
         });
       }
 
-      for (var i = 0; i < node.children.length; ) {
-        element.appendChild(createElement(node.children[i++], isSVG));
+      for (var i = 0; i < node.children.length; i++) {
+        element.appendChild(createElement(node.children[i], isSVG));
       }
 
       for (var i in node.props) {
-        setProp(element, i, node.props[i]);
+        setElementProp(element, i, node.props[i]);
       }
     }
     return element
   }
 
-  function setProp(element, name, value, oldValue) {
+  function setElementProp(element, name, value, oldValue) {
     if (name === "key") {
     } else if (name === "style") {
       for (var name in merge(oldValue, (value = value || {}))) {
@@ -225,18 +192,17 @@ function app(props) {
   }
 
   function updateElement(element, oldProps, props) {
-    for (var name in merge(oldProps, props)) {
-      var value = props[name];
-      var oldValue =
-        name === "value" || name === "checked" ? element[name] : oldProps[name];
+    for (var i in merge(oldProps, props)) {
+      var value = props[i];
+      var oldValue = i === "value" || i === "checked" ? element[i] : oldProps[i];
 
       if (value !== oldValue) {
-        setProp(element, name, value, oldValue);
+        value !== oldValue && setElementProp(element, i, value, oldValue);
       }
     }
 
     if (props && props.onupdate) {
-      lifecycleCallbackStack.push(function() {
+      callbacks.push(function() {
         props.onupdate(element, oldProps);
       });
     }
@@ -259,16 +225,18 @@ function app(props) {
   }
 
   function getKey(node) {
-    return node && (node = node.props) && node.key
+    if (node && node.props) {
+      return node.props.key
+    }
   }
 
-  function patch(parent, element, oldNode, node, isSVG, nextSibling) {
+  function patchElement(parent, element, oldNode, node, isSVG, nextSibling) {
     if (oldNode == null) {
       element = parent.insertBefore(createElement(node, isSVG), element);
-    } else if (node.tag != null && node.tag === oldNode.tag) {
+    } else if (node.type != null && node.type === oldNode.type) {
       updateElement(element, oldNode.props, node.props);
 
-      isSVG = isSVG || node.tag === "svg";
+      isSVG = isSVG || node.type === "svg";
 
       var len = node.children.length;
       var oldLen = oldNode.children.length;
@@ -306,19 +274,19 @@ function app(props) {
 
         if (null == newKey) {
           if (null == oldKey) {
-            patch(element, oldElement, oldChild, newChild, isSVG);
+            patchElement(element, oldElement, oldChild, newChild, isSVG);
             j++;
           }
           i++;
         } else {
           if (oldKey === newKey) {
-            patch(element, keyedNode[0], keyedNode[1], newChild, isSVG);
+            patchElement(element, keyedNode[0], keyedNode[1], newChild, isSVG);
             i++;
           } else if (keyedNode[0]) {
             element.insertBefore(keyedNode[0], oldElement);
-            patch(element, keyedNode[0], keyedNode[1], newChild, isSVG);
+            patchElement(element, keyedNode[0], keyedNode[1], newChild, isSVG);
           } else {
-            patch(element, oldElement, null, newChild, isSVG);
+            patchElement(element, oldElement, null, newChild, isSVG);
           }
 
           j++;
@@ -464,7 +432,9 @@ function h1(props, children) {
 
 
 
-
+function input(props, children) {
+  return vnode("input")(props, children)
+}
 
 
 
@@ -476,13 +446,73 @@ function label(props, children) {
 
 
 
-
+function li(props, children) {
+  return vnode("li")(props, children)
+}
 
 function main(props, children) {
   return vnode("main")(props, children)
 }
 
-__$styleInject("* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n  font-family: Helvetica Neue, sans-serif;\n}\n\nbody {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #111;\n}\n\nmain {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  width: 100%\n}\n\nh1 {\n  font: 4.2em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  margin: 40px 0 0;\n  color: #55ff55;\n}\n\nbutton {\n  background: #111;\n  border: 1px solid #55ff55;\n  color: OrangeRed;\n  height: 62px;\n  font-size: 1.8em;\n  font-weight: 200;\n  outline: none;\n  padding: 5px 15px;\n  margin: 0 3px 40px 3px;\n}\n\nbutton:hover, button:disabled {\n     background: OrangeRed;\n     color: #111;\n   }\n\nbutton:disabled {\n    cursor: not-allowed;\n  }\n\nbutton:active {\n    outline: 2px solid OrangeRed;\n  }\n\nbutton:focus {\n    border: 1px solid OrangeRed;\n  }\n\nlabel {\n  color: OrangeRed;\n  font-size: 1.8em;\n  font-weight: 200;\n  margin-top: 30px;\n}\n\n.slider-wrap {\n  width: 200px;\n  position: relative;\n  margin-bottom: 10px;\n  height: 60px;\n}\n\ninput[type='range'].slider {\n  appearance: none;\n  -webkit-appearance: none;\n  padding: 0;\n  margin: 1.25;\n  width: 100%;\n  height: 60px;\n  background: transparent;\n}\n\ninput[type='range'].slider::-moz-range-thumb {\n    appearance: none;\n    position: relative;\n    width: 15px;\n    height: 15px;\n    border-radius: 50%;\n    background: OrangeRed;\n    cursor: pointer;\n    transition: all .2s ease;\n    z-index: 100;\n  }\n\ninput[type='range'].slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    appearance: none;\n    position: relative;\n    width: 15px;\n    height: 15px;\n    border-radius: 50%;\n    background: OrangeRed;\n    cursor: pointer;\n    margin: 0.2;\n    transition: all .2s ease;\n    z-index: 10;\n  }\n\ninput[type='range'].slider:focus {\n    outline: none\n  }\n\n.sliderbar {\n  position: absolute;\n  margin: 1.25;\n  width: 100%;\n  bottom: 50%;\n  left: 0;\n  margin: 0 0 -2.5px;\n  height: 5px;\n  background: #55ff55;\n  border-radius: 3px;\n  z-index: -1;\n}\n\n.log {\n  border: 2px #55ff55 solid;\n  border-radius: 3px;\n  margin-top: 40px;\n  min-height: 145px;\n  padding: 20px;\n  resize: none;\n  outline: none;\n  background: #1a1a1a;\n  color: #ddd;\n  width: 42vw;\n  overflow-y: auto;\n  height: 300px;\n}\n\n.log-item {\n  list-style: none;\n  color: white;\n}\n\n.log-item__special-message {\n    text-transform: uppercase;\n    color: #55ff55;\n  }\n\n.log-item__separator {\n    color: #FDA5FF\n  }\n\n.log-item.special,\n.log-item.winner,\n.log-item.tick {\n  margin-top: 5px;\n  margin-bottom: 5px;\n}\n\n.log-item__tick-message__current-players,\n  .log-item__tick-message__current-tick {\n    color: #55ff55;\n    padding-bottom: 5px;\n  }\n\n.log-item__final-message__winner,\n  .log-item__final-message__scores {\n    color: #55ff55;\n    padding-bottom: 5px;\n  }\n\n.cube-container {\n  display: block;\n  padding: 10px;\n  border: 2px #55ff55 solid;\n  border-radius: 3px;\n  margin-top: 40px;\n}\n",undefined);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function p(props, children) {
+  return vnode("p")(props, children)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function span(props, children) {
+  return vnode("span")(props, children)
+}
+
+__$styleInject("* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n  font-family: Helvetica Neue, sans-serif;\n}\n\nbody {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #111;\n}\n\nmain {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  width: 100%\n}\n\nh1 {\n  font: 4.2em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  margin: 40px 0 0;\n  color: #55ff55;\n}\n\nbutton {\n  background: #111;\n  border: 1px solid #55ff55;\n  color: OrangeRed;\n  height: 62px;\n  font-size: 1.8em;\n  font-weight: 200;\n  outline: none;\n  padding: 5px 15px;\n  margin: 0 3px 40px 3px;\n  text-transform: uppercase;\n}\n\nbutton:hover, button:disabled {\n     background: OrangeRed;\n     color: #111;\n   }\n\nbutton:disabled {\n    cursor: not-allowed;\n  }\n\nbutton:active {\n    outline: 2px solid OrangeRed;\n  }\n\nbutton:focus {\n    border: 1px solid OrangeRed;\n  }\n\nbutton.btn-small {\n  height: 31px;\n  font-size: .9em;\n  padding: 2.5px 7.5px;\n  margin: 0 1.5px 20px;\n}\n\nlabel {\n  color: OrangeRed;\n  font-size: 1.8em;\n  font-weight: 200;\n  margin-top: 30px;\n}\n\n.slider-wrap {\n  width: 200px;\n  position: relative;\n  margin-bottom: 10px;\n  height: 60px;\n}\n\ninput[type='range'].slider {\n  appearance: none;\n  -webkit-appearance: none;\n  padding: 0;\n  margin: 1.25;\n  width: 100%;\n  height: 60px;\n  background: transparent;\n}\n\ninput[type='range'].slider::-moz-range-thumb {\n    appearance: none;\n    position: relative;\n    width: 15px;\n    height: 15px;\n    border-radius: 50%;\n    background: OrangeRed;\n    cursor: pointer;\n    transition: all .2s ease;\n    z-index: 100;\n  }\n\ninput[type='range'].slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    appearance: none;\n    position: relative;\n    width: 15px;\n    height: 15px;\n    border-radius: 50%;\n    background: OrangeRed;\n    cursor: pointer;\n    margin: 0.2;\n    transition: all .2s ease;\n    z-index: 10;\n  }\n\ninput[type='range'].slider:focus {\n    outline: none\n  }\n\n.sliderbar {\n  position: absolute;\n  margin: 1.25;\n  width: 100%;\n  bottom: 50%;\n  left: 0;\n  margin: 0 0 -2.5px;\n  height: 5px;\n  background: #55ff55;\n  border-radius: 3px;\n  z-index: -1;\n}\n\n.log {\n  font: 1em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  border: 2px #55ff55 solid;\n  border-radius: 3px;\n  margin-top: 40px;\n  min-height: 145px;\n  padding: 20px;\n  resize: none;\n  outline: none;\n  background: #1a1a1a;\n  color: #ddd;\n  width: 42vw;\n  overflow-y: auto;\n  height: 300px;\n}\n\n.log-item {\n  list-style: none;\n  color: white;\n}\n\n.log-item__special-message {\n    text-transform: uppercase;\n    color: #55ff55;\n  }\n\n.log-item__separator {\n    color: #FDA5FF\n  }\n\n.log-item.special,\n.log-item.winner,\n.log-item.tick {\n  margin-top: 5px;\n  margin-bottom: 5px;\n}\n\n.log-item__tick-message__current-players,\n  .log-item__tick-message__current-tick {\n    color: #55ff55;\n    padding-bottom: 5px;\n  }\n\n.log-item__final-message__winner,\n  .log-item__final-message__scores {\n    color: #55ff55;\n    padding-bottom: 5px;\n  }\n\n.cube-container {\n  display: block;\n  padding: 10px;\n  border: 2px #55ff55 solid;\n  border-radius: 3px;\n  margin-top: 40px;\n}\n\n.flex-grid {\n  display: flex;\n}\n\n.players {\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  color: white;\n  wrap: wrap;\n  padding: 3px;\n  font: 1em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  margin-left: 30px;\n  max-width: 600px;\n}\n\n.players player- {\n    flex: 1;\n    min-width: 200px;\n    padding-left: 10px;\n    margin: 30px 20px;\n  }\n\n.players player- .player-info {\n      display: flex;\n      flex-direction: column;\n    }\n\n.players player- .player-actions {\n       display: flex;\n       flex-direction: row;\n     }\n\n.players player- .player-info {\n      margin-bottom: 10px;\n    }\n\n.players player- .player-info__detail {\n        padding: 5px 0;\n      }\n",undefined);
 
 var GameStatus;
 (function (GameStatus) {
@@ -491,10 +521,9 @@ var GameStatus;
 })(GameStatus || (GameStatus = {}));
 var MessageType;
 (function (MessageType) {
-    MessageType[MessageType["normal"] = 0] = "normal";
-    MessageType[MessageType["special"] = 1] = "special";
-    MessageType[MessageType["tick"] = 2] = "tick";
-    MessageType[MessageType["result"] = 3] = "result";
+    MessageType[MessageType["special"] = 0] = "special";
+    MessageType[MessageType["tick"] = 1] = "tick";
+    MessageType[MessageType["result"] = 2] = "result";
 })(MessageType || (MessageType = {}));
 var PlayerStatus;
 (function (PlayerStatus) {
@@ -514,28 +543,32 @@ var initialState = {
             url: 'http://localhost:4001',
             color: '#FF6767',
             status: PlayerStatus.inactive,
-            position: { x: null, y: null, z: null }
+            position: { x: null, y: null, z: null },
+            wins: 0
         },
         {
             name: 'Petra',
             url: 'http://localhost:4002',
             color: '#EAEA00',
             status: PlayerStatus.inactive,
-            position: { x: null, y: null, z: null }
+            position: { x: null, y: null, z: null },
+            wins: 0
         },
         {
             name: 'Carmine',
             url: 'http://localhost:4003',
             color: '#00FFFF',
             status: PlayerStatus.inactive,
-            position: { x: null, y: null, z: null }
+            position: { x: null, y: null, z: null },
+            wins: 0
         },
         {
             name: 'Whoopie',
             url: 'http://localhost:4004',
             color: '#FF2EFF',
             status: PlayerStatus.inactive,
-            position: { x: null, y: null, z: null }
+            position: { x: null, y: null, z: null },
+            wins: 0
         }
     ],
     gameStatus: GameStatus.stopped,
@@ -550,34 +583,34 @@ const TICK_SEPARATOR = '********************************************************
 const RESULTS_SEPARATOR = '########################################################';
 const Item = {
     normal: ({ name, message }, color) => [
-        h('span', { className: 'log-item', key: `${Math.random()}`, style: { color } }, `${name}: `),
-        h('span', { className: 'log-item__message' }, message)
+        span({ className: 'log-item', key: `${Math.random()}`, style: { color } }, `${name}: `),
+        span({ className: 'log-item__message' }, message)
     ],
     special: ({ message, name }) => [
-        h('span', { className: `log-item__special-message` }, `${message}: `),
-        h('span', { className: `log-item__${name}` }, name)
+        span({ className: `log-item__special-message` }, `${message}: `),
+        span({ className: `log-item__${name}` }, name)
     ],
     tick: ({ message }) => [
-        h('div', { className: 'log-item__separator' }, TICK_SEPARATOR),
-        h('div', { className: `log-item__tick-message__current-tick` }, message.currentTick),
-        h('div', { className: `log-item__tick-message__current-players` }, message.currentPlayers),
-        h('div', { className: 'log-item__separator' }, TICK_SEPARATOR)
+        div({ className: 'log-item__separator' }, TICK_SEPARATOR),
+        div({ className: `log-item__tick-message__current-tick` }, message.currentTick),
+        div({ className: `log-item__tick-message__current-players` }, message.currentPlayers),
+        div({ className: 'log-item__separator' }, TICK_SEPARATOR)
     ],
     result: ({ message }) => [
-        h('div', { className: 'log-item__separator' }, RESULTS_SEPARATOR),
-        h('div', { className: `log-item__final-message__winner` }, message.winner),
-        h('div', { className: `log-item__final-message__scores` }, message.scores),
-        h('div', { className: 'log-item__separator' }, RESULTS_SEPARATOR)
+        div({ className: 'log-item__separator' }, RESULTS_SEPARATOR),
+        div({ className: `log-item__final-message__winner` }, message.winner),
+        div({ className: `log-item__final-message__scores` }, message.scores),
+        div({ className: 'log-item__separator' }, RESULTS_SEPARATOR)
     ]
 };
 const LogItem = (players) => (item) => {
     const type = MessageType[item.type || 0];
-    const currentPlayer = players.find((p) => p.name === item.name);
+    const currentPlayer = players.find((p$$1) => p$$1.name === item.name);
     const children = Item[type];
-    return h('li', { className: `log-item ${item.type ? MessageType[item.type] : 'normal'}` }, children(item, currentPlayer ? currentPlayer.color : 'white'));
+    return li({ className: `log-item ${item.type ? MessageType[item.type] : 'normal'}` }, children(item, currentPlayer ? currentPlayer.color : 'white'));
 };
-const Slider = (state, actions) => h('div', { className: 'slider-wrap' }, [
-    h('input', {
+const Slider = (state, actions) => div({ className: 'slider-wrap' }, [
+    input({
         className: 'slider',
         type: 'range',
         min: '10',
@@ -587,8 +620,32 @@ const Slider = (state, actions) => h('div', { className: 'slider-wrap' }, [
         oninput: (e) => actions.showNewSpeedWhileDragging(+e.target.value),
         onchange: (e) => actions.setup.updateSpeed(+e.target.value)
     }, []),
-    h('div', { className: 'sliderbar' })
+    div({ className: 'sliderbar' })
 ]);
+const Player = (player, index, hasWinner, actions) => {
+    const alive = player.status === 1;
+    const statusText = alive && hasWinner ? 'winner' : PlayerStatus[player.status];
+    return h('player-', { style: { borderLeft: `3px solid ${player.color}` } }, [
+        div({}, [
+            div({ className: 'player-info', key: 'name' }, [
+                p({ className: 'player-info__detail' }, `${player.name} at ${player.url}`),
+                p({
+                    className: 'player-info__detail'
+                }, [
+                    span({}, 'status: '),
+                    span({ style: { color: alive ? '#55ff55' : 'OrangeRed' } }, statusText)
+                ]),
+                p({ className: 'player-info__detail' }, `wins: ${player.wins}`)
+            ]),
+            div({ className: 'player-actions' }, [
+                button({
+                    className: 'btn-small',
+                    onclick: () => actions.removePlayer(index)
+                }, 'Remove bot')
+            ])
+        ])
+    ]);
+};
 //# sourceMappingURL=views.js.map
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -50198,7 +50255,7 @@ const createCube = () => {
         renderer = new WebGLRenderer();
         renderer.setClearColor(0x131313);
         renderer.setSize(config.WIDTH, config.HEIGHT);
-        renderer.shadowMapEnabled = true;
+        renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = PCFSoftShadowMap;
         container = document.getElementById('cube-container');
         container.appendChild(renderer.domElement);
@@ -50254,6 +50311,28 @@ var Cube = (state, actions) => h('div', {
 });
 //# sourceMappingURL=Cube.js.map
 
+const STORAGE_ID = 'battlecube-storage';
+const persist = (state) => localStorage.setItem(STORAGE_ID, JSON.stringify(state));
+const get = () => {
+    const promise = new Promise((resolve) => {
+        try {
+            const data = localStorage.getItem(STORAGE_ID);
+            if (data) {
+                return resolve(JSON.parse(data));
+            }
+            else {
+                return resolve(null);
+            }
+        }
+        catch (error) {
+            console.error('Error retrieving data from locale storage', error);
+            resolve(null);
+        }
+    });
+    return promise;
+};
+const remove = () => localStorage.removeItem(STORAGE_ID);
+
 const io = socket('http://localhost:9999');
 const cubeActions = {
     initCube: (state) => {
@@ -50284,11 +50363,13 @@ var actions = Object.assign({}, cubeActions, { showNewSpeedWhileDragging: (state
             io.updateSetup(newSetup);
             return newSetup;
         }
-    }, updateGameStatus: (state, { updateCube }) => (update) => {
+    }, updateGameStatus: (state, { updateCube, recordWin }) => (update) => {
         io.onStart(() => update({ gameStatus: GameStatus.started }));
         io.onStop(async (finalInfo) => {
             await update((state) => {
-                const winner = finalInfo.winner ? `🏆 WINNER: ${finalInfo.winner.name}` : 'Error occurred';
+                const winner = finalInfo.winner
+                    ? `🏆 WINNER: ${finalInfo.winner.name}`
+                    : 'Error occurred';
                 const results = finalInfo.scores
                     .sort((a, b) => b.highScore - a.highScore)
                     .map((s) => `${s.name}: ${s.highScore}`)
@@ -50306,6 +50387,7 @@ var actions = Object.assign({}, cubeActions, { showNewSpeedWhileDragging: (state
                 ];
                 return Object.assign({}, state, { players, log, gameStatus: GameStatus.stopped });
             });
+            finalInfo.winner && recordWin(finalInfo.winner.name);
             updateCube();
         });
     }, 
@@ -50330,7 +50412,7 @@ var actions = Object.assign({}, cubeActions, { showNewSpeedWhileDragging: (state
             update((state) => ({
                 log: [{ name, message, type: MessageType.special }, ...state.log]
             }));
-            await update(({ players, log, cube }) => {
+            await update(({ players, log }) => {
                 const newLog = [{ name, message, type: MessageType.special }, ...log];
                 const updatedPlayers = players.map((p) => {
                     if (p.name === name) {
@@ -50353,17 +50435,46 @@ var actions = Object.assign({}, cubeActions, { showNewSpeedWhileDragging: (state
                 const updatedPlayers = state.players.map((player) => {
                     const { x = null, y = null, z = null } = players.find(p => p.name === player.name) || {};
                     const position = { x, y, z };
-                    return x !== null ? Object.assign({}, player, { position, status: PlayerStatus.active }) : Object.assign({}, player, { position, status: PlayerStatus.inactive });
+                    return x !== null
+                        ? Object.assign({}, player, { position, status: PlayerStatus.active }) : Object.assign({}, player, { position, status: PlayerStatus.inactive });
                 });
                 return { log, players: updatedPlayers };
             });
             updateCube();
         });
-    }, clearLog: () => ({ log: [] }) });
-//# sourceMappingURL=actions.js.map
+    }, clearLog: () => ({ log: [] }), persistState: ({ players, setup }) => {
+        persist({ players, setup });
+    }, getPersistedState: () => async (update) => {
+        const retrievedState = await get();
+        if (retrievedState) {
+            update((state) => (Object.assign({}, state, retrievedState)));
+        }
+    }, removePersistedState: () => remove(), removePlayer: (state, actions, index) => {
+        const players = [
+            ...state.players.slice(0, index),
+            ...state.players.slice(index + 1)
+        ];
+        return Object.assign({}, state, { players });
+    }, recordWin: (state, action, name) => (update) => {
+        update((newState) => {
+            const players = state.players.map((p) => {
+                const wins = p.name === name ? p.wins + 1 : p.wins;
+                return Object.assign({}, p, { wins });
+            });
+            return Object.assign({}, newState, { players });
+        });
+    } });
 
-const appActions = app({
+app({
     actions,
+    init: (_s, actions$$1) => {
+        actions$$1.getPersistedState();
+        actions$$1.updateGameStatus();
+        actions$$1.log();
+        window.addEventListener('unload', () => {
+            actions$$1.persistState();
+        });
+    },
     state: Object.assign({}, initialState),
     view: (state, actions$$1) => main({}, [
         h1({}, 'Battle³'),
@@ -50377,11 +50488,14 @@ const appActions = app({
         div({
             className: 'log',
             style: { display: state.log.length < 1 ? 'none' : 'flex' }
-        }, [h('ul', {}, state.log.map(LogItem(state.players)))])
-    ]),
-    root: document.getElementById('app')
-});
-appActions.updateGameStatus();
-appActions.log();
+        }, [h('ul', {}, state.log.map(LogItem(state.players)))]),
+        div({ className: 'players' }, state.players.map((p$$1, index) => Player(p$$1, index, state.players.filter(p$$1 => p$$1.status === 1).length === 1, actions$$1))),
+        button({
+            disabled: state.gameStatus === GameStatus.started,
+            onclick: () => console.log('TODO')
+        }, 'Add bot')
+    ])
+}, document.getElementById('app'));
+//# sourceMappingURL=client.js.map
 
 }());

@@ -78,7 +78,7 @@ export const createCube = () => {
     renderer = new WebGLRenderer();
     renderer.setClearColor(0x131313);
     renderer.setSize(config.WIDTH, config.HEIGHT);
-    renderer.shadowMapEnabled = true;
+    renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = PCFSoftShadowMap;
     container = document.getElementById('cube-container');
     container.appendChild(renderer.domElement);
