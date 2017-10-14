@@ -126,7 +126,7 @@ export default <IActions>{
           return p;
         });
 
-        cube.run({ setup, players: updatedPlayers });
+        cube.update({ setup, players: updatedPlayers });
         return { log: newLog, players: updatedPlayers };
       });
     });
@@ -146,7 +146,7 @@ export default <IActions>{
           : { ...player, position, status: PlayerStatus.inactive };
         });
 
-        state.cube.run({ setup: state.setup, players: updatedPlayers });
+        state.cube.update({ setup: state.setup, players: updatedPlayers });
         return { log, players: updatedPlayers };
       });
     });
