@@ -50360,6 +50360,7 @@ var actions = Object.assign({}, cubeActions, { showNewSpeedWhileDragging: (state
             updateCube();
         });
     }, clearLog: () => ({ log: [] }) });
+//# sourceMappingURL=actions.js.map
 
 const appActions = app({
     actions,
@@ -50373,7 +50374,6 @@ const appActions = app({
             onclick: () => actions$$1.start()
         }, 'Start game'),
         Cube(state, actions$$1),
-        h('pre', { style: { color: 'white' } }, JSON.stringify(state.players, null, 2)),
         div({
             className: 'log',
             style: { display: state.log.length < 1 ? 'none' : 'flex' }
@@ -50383,6 +50383,5 @@ const appActions = app({
 });
 appActions.updateGameStatus();
 appActions.log();
-//# sourceMappingURL=client.js.map
 
 }());

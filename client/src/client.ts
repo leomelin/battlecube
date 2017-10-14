@@ -22,7 +22,6 @@ const appActions: any = app({
         'Start game'
       ),
       Cube(state, actions),
-      h('pre', {style: {color: 'white'}}, JSON.stringify(state.players, null, 2)),
       div(
         {
           className: 'log',
