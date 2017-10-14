@@ -1,4 +1,21 @@
-interface IPlayer {
+export enum GameStatus {
+  started,
+  stopped
+}
+
+export enum MessageType {
+  normal,
+  special,
+  tick,
+  result
+}
+
+export enum PlayerStatus {
+  inactive,
+  active
+}
+
+export interface IPlayer {
   name: string;
   url: string;
   status: PlayerStatus;
@@ -17,23 +34,6 @@ export interface ISetup {
     numOfTasksPerTick: number;
   };
   players: IPlayer[];
-}
-
-export enum GameStatus {
-  started,
-  stopped
-}
-
-export enum MessageType {
-  normal,
-  special,
-  tick,
-  result
-}
-
-export enum PlayerStatus {
-  inactive,
-  active
 }
 
 export interface ILogItem {

@@ -1,13 +1,13 @@
 import {
-  ISetup,
   IAppState,
   GameStatus,
   ILogItem,
   MessageType,
-  PlayerStatus
+  PlayerStatus,
+  IPlayer
 } from './initialState';
 import socket, { ITickInfo } from './socket';
-import { createCube } from './createCube';
+import { createCube } from './Cube';
 
 export const io = socket('http://localhost:9999');
 
@@ -32,14 +32,27 @@ export interface IActions {
   setup: {
     updateSpeed: IUpdateSpeed;
   };
-  log(): any;
+  log(state: IAppState, actions: IActions): any;
   clearLog(): any;
   [key: string]: any;
 }
 
+const cubeActions = {
+  initCube: (state: IAppState) => {
+    const cube = createCube();
+    cube.init(state);
+    return { cube };
+  },
+  updateCube: ({ cube, players}: IAppState) => {
+    cube.update({ players });
+  }
+};
+
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
 
 export default <IActions>{
+  ...cubeActions,
+
   showNewSpeedWhileDragging: (state: IAppState, actions: IActions, sliderSpeedValue: number) => {
     const newState: IAppState = {
       ...state,
@@ -48,14 +61,7 @@ export default <IActions>{
 
     return newState;
   },
-  initCube: (state: IAppState) => {
-    const cube = createCube();
-    cube.init(state);
-    return { cube };
-  },
-  updateCube: (state: IAppState) => {
-    state.cube.run(state);
-  },
+
   start: (state: IAppState, actions: IActions) => {
     actions.clearLog();
     io.startGame({
@@ -77,61 +83,76 @@ export default <IActions>{
     }
   },
 
-  updateGameStatus: () => (update: Function) => {
+  updateGameStatus: (state: IAppState, { updateCube }: IActions) => (update: Function) => {
     io.onStart(() => update({ gameStatus: GameStatus.started }));
-    io.onStop((finalInfo: any) => {
-      update((state: IAppState) => {
+
+    io.onStop(async (finalInfo: any) => {
+      await update((state: IAppState) => {
         const winner = finalInfo.winner ? `🏆 WINNER: ${finalInfo.winner.name}` : 'Error occurred';
+
         const results = finalInfo.scores
           .sort((a: any, b: any) => b.highScore - a.highScore)
           .map((s: any) => `${s.name}: ${s.highScore}`)
           .join(', ');
+
         const scores = `RESULTS: ${results}`;
+
+        const players = state.players.map((p: IPlayer): IPlayer => {
+          if (finalInfo.winner && p.name === finalInfo.winner.name) {
+            return { ...p, status: PlayerStatus.active };
+          }
+          return { ...p, status: PlayerStatus.inactive };
+        });
+
         const log = [
           { name, message: { winner, scores }, type: MessageType.result },
           ...state.log
         ];
-        return { ...state, log, gameStatus: GameStatus.stopped };
+        return { ...state, players, log, gameStatus: GameStatus.stopped };
       });
+
+      updateCube();
     });
   },
 
   // every time a socket message is received the update function will add a message to the log
-  log: () => (update: Function) => {
+  log: (state: IAppState, { updateCube }: IActions) => (update: Function) => {
     io.onPlayerMove(({ name, message }: ILogItem) => {
       update((state: IAppState) => ({
         log: [{ name, message }, ...state.log]
       }));
     });
+
     io.onPlantBomb(({ name, message }: ILogItem) => {
       update((state: IAppState) => ({
         log: [{ name, message }, ...state.log]
       }));
     });
+
     io.onPlayerDoesNothing(({ name, message }: ILogItem) => {
       update((state: IAppState) => ({
         log: [{ name, message }, ...state.log]
       }));
     });
-    io.onPlayerLoses(({ name, message }: ILogItem) => {
+
+    io.onPlayerLoses(async ({ name, message }: ILogItem) => {
       update((state: IAppState) => ({
         log: [{ name, message, type: MessageType.special }, ...state.log]
       }));
-      update(({ setup, players, log, cube }: IAppState) => {
+      await update(({ players, log, cube }: IAppState) => {
         const newLog =  [{ name, message, type: MessageType.special }, ...log];
         const updatedPlayers = players.map((p: any) => {
           if (p.name === name) {
-            return { ...p, position: { x: null, y: null, z: null },  gameStatus: GameStatus.stopped };
+            return { ...p, position: { x: null, y: null, z: null },  status: PlayerStatus.inactive };
           }
           return p;
         });
-
-        cube.update({ setup, players: updatedPlayers });
         return { log: newLog, players: updatedPlayers };
       });
     });
-    io.onTick(({ players = [], gameInfo }: ITickInfo, actions: any) => {
-      update((state: IAppState) => {
+
+    io.onTick(async ({ players = [], gameInfo }: ITickInfo) => {
+      await update((state: IAppState) => {
         const playerList = players.map(p => p.name).join(', ');
         const currentPlayers = `Active players: ${playerList}`;
         const currentTick = `📍 TICK #${gameInfo.currentTick}`;
@@ -139,16 +160,17 @@ export default <IActions>{
           { message: { currentPlayers, currentTick }, type: MessageType.tick },
           ...state.log
         ];
+
         const updatedPlayers = state.players.map((player) => {
           const { x = null, y = null, z = null } = players.find(p => p.name === player.name) || {};
           const position = { x, y, z };
           return x !== null ? { ...player, position, status: PlayerStatus.active }
           : { ...player, position, status: PlayerStatus.inactive };
         });
-
-        state.cube.update({ setup: state.setup, players: updatedPlayers });
         return { log, players: updatedPlayers };
       });
+
+      updateCube();
     });
   },
 

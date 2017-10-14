@@ -13,7 +13,7 @@ import {
   AmbientLight,
   Matrix4
 } from 'three';
-import { IAppState } from './initialState';
+import { IAppState, PlayerStatus } from './initialState';
 
 const config = {
   WIDTH: 400,
@@ -105,11 +105,10 @@ export const createCube = () => {
     return new Vector3(getNum(), getNum(), getNum());
   };
 
-  const update = ({ setup, players }: IAppState) => {
+  const update = ({ players }: IAppState) => {
     cube.children = [];
-    segments = setup.edgeLength - 1;
     children = players
-      .filter((p: any) => p.x !== null || !!p.name)
+      .filter((p: any) => p.status !== PlayerStatus.inactive && p.name)
       .map((p: any) => ({ ...p.position, color: p.color, name: p.name }));
 
     children.forEach((p: any) => {
