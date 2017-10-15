@@ -99,8 +99,9 @@ export const createCube = () => {
   const getPosition = (x: number, y: number, z: number) => {
     const plusOrMinus = Math.random() < 0.5 ? -1 : 1;
     const getNum = (): number => Math.random() * 50 * plusOrMinus;
-    // const a = new Matrix4().set().getTranslation.makeTranslation();
-    // const b = new Matrix4().set().makeTranslation();
+    // Possible solution?
+    // const a = new Matrix4().set(/*..*/).makeTranslation(/*..*/);
+    // const b = new Matrix4().set(/*..*/).makeTranslation(*..*/);
     // const matrix = new Matrix4().multiplyMatrices(a, b);
     return new Vector3(getNum(), getNum(), getNum());
   };
@@ -114,7 +115,11 @@ export const createCube = () => {
     children.forEach((p: any) => {
       const width = config.CUBE_WIDTH / segments;
       const geo = new SphereGeometry(width / 2);
-      const material = new MeshPhongMaterial({ shininess: 100, color: p.color, opacity: 0.8 });
+      const material = new MeshPhongMaterial({
+        shininess: 100,
+        color: p.color,
+        opacity: 0.8
+      });
       material.transparent = true;
       const bot = new Mesh(geo, material);
       bot.name = p.name;
