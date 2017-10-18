@@ -576,7 +576,6 @@ var initialState = {
     log: [],
     cube: null
 };
-//# sourceMappingURL=initialState.js.map
 
 /* tslint:disable */
 const TICK_SEPARATOR = '***************************************************************************************';
@@ -646,7 +645,6 @@ const Player = (player, index, hasWinner, actions) => {
         ])
     ]);
 };
-//# sourceMappingURL=views.js.map
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1243,6 +1241,11 @@ function localstorage() {
 }
 });
 
+/**
+ * Module dependencies.
+ */
+
+
 var debug = browser('socket.io-client:url');
 
 /**
@@ -1484,6 +1487,14 @@ var isarray = Array.isArray || function (arr) {
   return toString$1.call(arr) == '[object Array]';
 };
 
+/* global Blob File */
+
+/*
+ * Module requirements.
+ */
+
+
+
 var toString = Object.prototype.toString;
 var withNativeBlob = typeof commonjsGlobal.Blob === 'function' || toString.call(commonjsGlobal.Blob) === '[object BlobConstructor]';
 var withNativeFile = typeof commonjsGlobal.File === 'function' || toString.call(commonjsGlobal.File) === '[object FileConstructor]';
@@ -1551,6 +1562,14 @@ function isBuf(obj) {
   return (commonjsGlobal.Buffer && commonjsGlobal.Buffer.isBuffer(obj)) ||
          (commonjsGlobal.ArrayBuffer && obj instanceof ArrayBuffer);
 }
+
+/*global Blob,File*/
+
+/**
+ * Module requirements
+ */
+
+
 
 var toString$2 = Object.prototype.toString;
 var withNativeBlob$1 = typeof commonjsGlobal.Blob === 'function' || toString$2.call(commonjsGlobal.Blob) === '[object BlobConstructor]';
@@ -2113,6 +2132,10 @@ try {
 }
 });
 
+// browser shim for xmlhttprequest module
+
+
+
 var xmlhttprequest = function (opts) {
   var xdomain = opts.xdomain;
 
@@ -2552,6 +2575,10 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
   };
 })();
 });
+
+/**
+ * Create a blob builder even when vendor prefixes exist
+ */
 
 var BlobBuilder = commonjsGlobal.BlobBuilder
   || commonjsGlobal.WebKitBlobBuilder
@@ -3255,6 +3282,17 @@ exports.decodePayloadAsBinary = function (data, binaryType, callback) {
 };
 });
 
+/**
+ * Module dependencies.
+ */
+
+
+
+
+/**
+ * Module exports.
+ */
+
 var transport = Transport;
 
 /**
@@ -3521,6 +3559,15 @@ yeast.encode = encode$1;
 yeast.decode = decode$1;
 var yeast_1 = yeast;
 
+/**
+ * Module dependencies.
+ */
+
+
+
+
+
+
 var debug$6 = browser('engine.io-client:polling');
 
 /**
@@ -3757,6 +3804,14 @@ Polling.prototype.uri = function () {
   var ipv6 = this.hostname.indexOf(':') !== -1;
   return schema + '://' + (ipv6 ? '[' + this.hostname + ']' : this.hostname) + port + this.path + query;
 };
+
+/**
+ * Module requirements.
+ */
+
+
+
+
 
 var debug$5 = browser('engine.io-client:polling-xhr');
 
@@ -4166,6 +4221,17 @@ function unloadHandler () {
 
 pollingXhr.Request = Request_1;
 
+/**
+ * Module requirements.
+ */
+
+
+
+
+/**
+ * Module exports.
+ */
+
 var pollingJsonp = JSONPPolling;
 
 /**
@@ -4394,6 +4460,15 @@ var empty$3 = Object.freeze({
 });
 
 var require$$1$1 = ( empty$3 && empty$2 ) || empty$3;
+
+/**
+ * Module dependencies.
+ */
+
+
+
+
+
 
 var debug$7 = browser('engine.io-client:websocket');
 var BrowserWebSocket = commonjsGlobal.WebSocket || commonjsGlobal.MozWebSocket;
@@ -4673,6 +4748,19 @@ WS.prototype.check = function () {
   return !!WebSocket && !('__initialize' in WebSocket && this.name === WS.prototype.name);
 };
 
+/**
+ * Module dependencies
+ */
+
+
+
+
+
+
+/**
+ * Export transports.
+ */
+
 var polling_1 = polling;
 var websocket_1 = websocket;
 
@@ -4728,6 +4816,12 @@ var indexof = function(arr, obj){
   }
   return -1;
 };
+
+/**
+ * Module dependencies.
+ */
+
+
 
 var debug$4 = browser('engine.io-client:socket');
 
@@ -5479,8 +5573,6 @@ var parser = browser$2;
 
 lib$1.parser = parser;
 
-var engine_ioClient = lib$1;
-
 var toArray_1 = toArray;
 
 function toArray(list, index) {
@@ -6047,6 +6139,16 @@ Backoff.prototype.setJitter = function(jitter){
   this.jitter = jitter;
 };
 
+/**
+ * Module dependencies.
+ */
+
+
+
+
+
+
+
 var debug$3 = browser('socket.io-client:manager');
 
 
@@ -6261,7 +6363,7 @@ Manager.prototype.connect = function (fn, opts) {
   if (~this.readyState.indexOf('open')) return this;
 
   debug$3('opening %s', this.uri);
-  this.engine = engine_ioClient(this.uri, this.opts);
+  this.engine = lib$1(this.uri, this.opts);
   var socket = this.engine;
   var self = this;
   this.readyState = 'opening';
@@ -6748,7 +6850,6 @@ var socket = (serverUrl) => {
         })
     };
 };
-//# sourceMappingURL=socket.js.map
 
 // Polyfills
 
@@ -49061,9 +49162,7 @@ function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 ArcCurve.prototype = Object.create( EllipseCurve.prototype );
 ArcCurve.prototype.constructor = ArcCurve;
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
+//
 
 Curve.create = function ( construct, getPoint ) {
 
@@ -49110,7 +49209,6 @@ Object.assign( Spline.prototype, {
 
 } );
 
-//
 GridHelper.prototype.setColors = function () {
 
 	console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
@@ -49122,6 +49220,8 @@ SkeletonHelper.prototype.update = function () {
 	console.error( 'THREE.SkeletonHelper: update() no longer needs to be called.' );
 
 };
+
+//
 
 Object.assign( Box2.prototype, {
 
@@ -50206,8 +50306,6 @@ CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
 
 };
 
-//
-
 const config = {
     WIDTH: 400,
     HEIGHT: 400,
@@ -50273,8 +50371,9 @@ const createCube = () => {
     const getPosition = (x, y, z) => {
         const plusOrMinus = Math.random() < 0.5 ? -1 : 1;
         const getNum = () => Math.random() * 50 * plusOrMinus;
-        // const a = new Matrix4().set().getTranslation.makeTranslation();
-        // const b = new Matrix4().set().makeTranslation();
+        // Possible solution?
+        // const a = new Matrix4().set(/*..*/).makeTranslation(/*..*/);
+        // const b = new Matrix4().set(/*..*/).makeTranslation(*..*/);
         // const matrix = new Matrix4().multiplyMatrices(a, b);
         return new Vector3(getNum(), getNum(), getNum());
     };
@@ -50286,7 +50385,11 @@ const createCube = () => {
         children.forEach((p) => {
             const width = config.CUBE_WIDTH / segments;
             const geo = new SphereGeometry(width / 2);
-            const material = new MeshPhongMaterial({ shininess: 100, color: p.color, opacity: 0.8 });
+            const material = new MeshPhongMaterial({
+                shininess: 100,
+                color: p.color,
+                opacity: 0.8
+            });
             material.transparent = true;
             const bot = new Mesh(geo, material);
             bot.name = p.name;
@@ -50309,7 +50412,6 @@ var Cube = (state, actions) => h('div', {
         actions.initCube(state);
     }
 });
-//# sourceMappingURL=Cube.js.map
 
 const STORAGE_ID = 'battlecube-storage';
 const persist = (state) => localStorage.setItem(STORAGE_ID, JSON.stringify(state));
@@ -50465,6 +50567,8 @@ var actions = Object.assign({}, cubeActions, { showNewSpeedWhileDragging: (state
         });
     } });
 
+// just updated to Hyperapp 15.1 and the type definitions are not yet in master
+// should be there in a few days but until then maybe disable /delete d.ts in node_modules
 app({
     actions,
     init: (_s, actions$$1) => {
@@ -50496,6 +50600,5 @@ app({
         }, 'Add bot')
     ])
 }, document.getElementById('app'));
-//# sourceMappingURL=client.js.map
 
 }());
