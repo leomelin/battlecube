@@ -97,13 +97,19 @@ export const createCube = () => {
   }
 
   const getPosition = (x: number, y: number, z: number) => {
-    const plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-    const getNum = (): number => Math.random() * 50 * plusOrMinus;
-    // Possible solution?
-    // const a = new Matrix4().set(/*..*/).makeTranslation(/*..*/);
-    // const b = new Matrix4().set(/*..*/).makeTranslation(*..*/);
-    // const matrix = new Matrix4().multiplyMatrices(a, b);
-    return new Vector3(getNum(), getNum(), getNum());
+    // Scale grid entity coordinaates to grid space
+    const scale = config.CUBE_WIDTH / segments;
+    const s = new Matrix4().makeScale(scale,scale,scale);
+
+    // Center grid. +1 needed because grid coordinates start from 1
+    const center = (segments - 1) / 2.0 + 1;
+    const t = new Matrix4().makeTranslation(-center,-center,-center);
+
+    // Create transformation matrix
+    const st = new Matrix4().multiplyMatrices(s, t);
+
+    // Transform grid space vector to world space
+    return new Vector3(x, y, z).applyMatrix4(st);
   };
 
   const update = ({ players }: IAppState) => {
