@@ -6,9 +6,6 @@ import { LogItem, Slider, Player } from './views';
 import actions, { IActions } from './actions';
 import Cube from './Cube';
 
-// just updated to Hyperapp 15.1 and the type definitions are not yet in master
-// should be there in a few days but until then maybe disable /delete d.ts in node_modules
-
 app(
   {
     actions,
