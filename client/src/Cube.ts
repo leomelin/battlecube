@@ -97,12 +97,12 @@ export const createCube = () => {
   }
 
   const getPosition = (x: number, y: number, z: number) => {
-    // Scale grid entity coordinaates to grid space
+    // Scale grid entity coordinates to grid space
     const scale = config.CUBE_WIDTH / segments;
     const s = new Matrix4().makeScale(scale,scale,scale);
 
-    // Center grid. +1 needed because grid coordinates start from 1
-    const center = (segments - 1) / 2.0 + 1;
+    // Center grid
+    const center = (segments - 1) / 2.0;
     const t = new Matrix4().makeTranslation(-center,-center,-center);
 
     // Create transformation matrix
