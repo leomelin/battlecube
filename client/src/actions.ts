@@ -81,7 +81,7 @@ const storageActions = {
 
 const playerActions = {
   addPlayer: (state: IAppState, _a: IActions, player: IPlayer) => {
-    return { bots: [...state.players, player] };
+    return { players: [...state.players, player] };
   },
   removePlayer: (state: IAppState, actions: IActions, index: number) => {
     const players = [

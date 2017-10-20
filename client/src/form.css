@@ -7,7 +7,17 @@ form {
   justify-content: center;
 
   button {
-    margin: 0 0 20px 0;
+    margin: 15px 0 20px 0;
+  }
+
+  .bot-input-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .error {
+    margin-bottom: 5px;
+    color: #fff200;
   }
 
   input.bot-input {
@@ -18,7 +28,7 @@ form {
     font-weight: 200;
     height: 62px;
     padding: 15px 20px;
-    margin-bottom: 15px;
+    margin-top: 15px;
     outline: 0;
 
     &::-webkit-input-placeholder {

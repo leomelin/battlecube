@@ -4,6 +4,7 @@ import { div, span, li, input, p, button } from '@hyperapp/html';
 import { ILogItem, MessageType, IAppState } from './initialState';
 import { IActions } from './actions';
 import { PlayerStatus, IPlayer } from './initialState';
+import { isHex } from './botFormModule';
 
 interface IItem {
   [key: string]: Function;
@@ -122,13 +123,18 @@ export const Input = ({
   value = '',
   id = 'input',
   placeholder = '',
-  oninput
-}: any) => input({
-  type,
-  id,
-  value,
-  className: 'bot-input',
-  placeholder,
-  oninput
-});
-
+  oninput,
+  error
+}: any) =>
+  div({className: 'bot-input-group'}, [
+    input({
+      type,
+      id,
+      value,
+      className: 'bot-input',
+      placeholder,
+      oninput,
+      style: isHex(value) ? { backgroundColor: value } : {}
+    }),
+    div({ className: 'error', style: { display: error ? 'flex' : 'none' }}, error)
+  ]);

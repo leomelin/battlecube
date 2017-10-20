@@ -514,7 +514,7 @@ function span(props, children) {
   return vnode("span")(props, children)
 }
 
-__$styleInject("* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n  font-family: Helvetica Neue, sans-serif;\n}\n\nbody {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #111;\n}\n\nmain {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  width: 100%\n}\n\nh1 {\n  font: 4.2em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  margin: 40px 0 0;\n  color: #55ff55;\n}\n\nbutton {\n  background: #111;\n  border: 1px solid #55ff55;\n  color: OrangeRed;\n  height: 62px;\n  font-size: 1.8em;\n  font-weight: 200;\n  outline: none;\n  padding: 5px 15px;\n  margin: 0 3px 40px 3px;\n  text-transform: uppercase;\n}\n\nbutton:hover, button:disabled {\n     background: OrangeRed;\n     color: #111;\n   }\n\nbutton:disabled {\n    cursor: not-allowed;\n  }\n\nbutton:active {\n    outline: 2px solid OrangeRed;\n  }\n\nbutton:focus {\n    border: 1px solid OrangeRed;\n  }\n\nbutton.btn-small {\n  height: 31px;\n  font-size: .9em;\n  padding: 2.5px 7.5px;\n  margin: 0 1.5px 20px;\n}\n\nlabel {\n  color: OrangeRed;\n  font-size: 1.8em;\n  font-weight: 200;\n  margin-top: 30px;\n}\n\n.slider-wrap {\n  width: 200px;\n  position: relative;\n  margin-bottom: 10px;\n  height: 60px;\n}\n\ninput[type='range'].slider {\n  appearance: none;\n  -webkit-appearance: none;\n  padding: 0;\n  margin: 1.25;\n  width: 100%;\n  height: 60px;\n  background: transparent;\n}\n\ninput[type='range'].slider::-moz-range-thumb {\n    appearance: none;\n    position: relative;\n    width: 15px;\n    height: 15px;\n    border-radius: 50%;\n    background: OrangeRed;\n    cursor: pointer;\n    transition: all .2s ease;\n    z-index: 100;\n  }\n\ninput[type='range'].slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    appearance: none;\n    position: relative;\n    width: 15px;\n    height: 15px;\n    border-radius: 50%;\n    background: OrangeRed;\n    cursor: pointer;\n    margin: 0.2;\n    transition: all .2s ease;\n    z-index: 10;\n  }\n\ninput[type='range'].slider:focus {\n    outline: none\n  }\n\n.sliderbar {\n  position: absolute;\n  margin: 1.25;\n  width: 100%;\n  bottom: 50%;\n  left: 0;\n  margin: 0 0 -2.5px;\n  height: 5px;\n  background: #55ff55;\n  border-radius: 3px;\n  z-index: -1;\n}\n\n.log {\n  font: 1em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  border: 2px #55ff55 solid;\n  border-radius: 3px;\n  margin-top: 40px;\n  min-height: 145px;\n  padding: 20px;\n  resize: none;\n  outline: none;\n  background: #1a1a1a;\n  color: #ddd;\n  width: 42vw;\n  overflow-y: auto;\n  height: 300px;\n}\n\n.log-item {\n  list-style: none;\n  color: white;\n}\n\n.log-item__special-message {\n    text-transform: uppercase;\n    color: #55ff55;\n  }\n\n.log-item__separator {\n    color: #FDA5FF\n  }\n\n.log-item.special,\n.log-item.winner,\n.log-item.tick {\n  margin-top: 5px;\n  margin-bottom: 5px;\n}\n\n.log-item__tick-message__current-players,\n  .log-item__tick-message__current-tick {\n    color: #55ff55;\n    padding-bottom: 5px;\n  }\n\n.log-item__final-message__winner,\n  .log-item__final-message__scores {\n    color: #55ff55;\n    padding-bottom: 5px;\n  }\n\n.cube-container {\n  display: block;\n  padding: 10px;\n  border: 2px #55ff55 solid;\n  border-radius: 3px;\n  margin-top: 40px;\n}\n\n.flex-grid {\n  display: flex;\n}\n\n.players {\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  color: white;\n  wrap: wrap;\n  padding: 3px;\n  font: 1em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  margin-left: 30px;\n  max-width: 600px;\n}\n\n.players player- {\n    flex: 1;\n    min-width: 200px;\n    padding-left: 10px;\n    margin: 30px 20px;\n  }\n\n.players player- .player-info {\n      display: flex;\n      flex-direction: column;\n    }\n\n.players player- .player-actions {\n       display: flex;\n       flex-direction: row;\n     }\n\n.players player- .player-info {\n      margin-bottom: 10px;\n    }\n\n.players player- .player-info__detail {\n        padding: 5px 0;\n      }\n\n",undefined);
+__$styleInject("* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n  font-family: Helvetica Neue, sans-serif;\n}\n\nbody {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #111;\n}\n\nmain {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  width: 100%;\n  color: white;\n}\n\nh1 {\n  font: 4.2em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  margin: 40px 0 0;\n  color: #55ff55;\n}\n\nbutton {\n  background: #111;\n  border: 1px solid #55ff55;\n  color: OrangeRed;\n  height: 62px;\n  font-size: 1.8em;\n  font-weight: 200;\n  outline: none;\n  padding: 5px 15px;\n  margin: 0 3px 40px 3px;\n  text-transform: uppercase;\n}\n\nbutton:hover, button:disabled {\n     background: OrangeRed;\n     color: #111;\n   }\n\nbutton:disabled {\n    cursor: not-allowed;\n  }\n\nbutton:active {\n    outline: 2px solid OrangeRed;\n  }\n\nbutton:focus {\n    border: 1px solid OrangeRed;\n  }\n\nbutton.btn-small {\n  height: 31px;\n  font-size: .9em;\n  padding: 2.5px 7.5px;\n  margin: 0 1.5px 20px;\n}\n\nlabel {\n  color: OrangeRed;\n  font-size: 1.8em;\n  font-weight: 200;\n  margin-top: 30px;\n}\n\n.slider-wrap {\n  width: 200px;\n  position: relative;\n  margin-bottom: 10px;\n  height: 60px;\n}\n\ninput[type='range'].slider {\n  appearance: none;\n  -webkit-appearance: none;\n  padding: 0;\n  margin: 1.25;\n  width: 100%;\n  height: 60px;\n  background: transparent;\n}\n\ninput[type='range'].slider::-moz-range-thumb {\n    appearance: none;\n    position: relative;\n    width: 15px;\n    height: 15px;\n    border-radius: 50%;\n    background: OrangeRed;\n    cursor: pointer;\n    transition: all .2s ease;\n    z-index: 100;\n  }\n\ninput[type='range'].slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    appearance: none;\n    position: relative;\n    width: 15px;\n    height: 15px;\n    border-radius: 50%;\n    background: OrangeRed;\n    cursor: pointer;\n    margin: 0.2;\n    transition: all .2s ease;\n    z-index: 10;\n  }\n\ninput[type='range'].slider:focus {\n    outline: none\n  }\n\n.sliderbar {\n  position: absolute;\n  margin: 1.25;\n  width: 100%;\n  bottom: 50%;\n  left: 0;\n  margin: 0 0 -2.5px;\n  height: 5px;\n  background: #55ff55;\n  border-radius: 3px;\n  z-index: -1;\n}\n\n.log {\n  font: 1em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  border: 2px #55ff55 solid;\n  border-radius: 3px;\n  margin-top: 40px;\n  min-height: 145px;\n  padding: 20px;\n  resize: none;\n  outline: none;\n  background: #1a1a1a;\n  color: #ddd;\n  width: 42vw;\n  overflow-y: auto;\n  height: 300px;\n}\n\n.log-item {\n  list-style: none;\n  color: white;\n}\n\n.log-item__special-message {\n    text-transform: uppercase;\n    color: #55ff55;\n  }\n\n.log-item__separator {\n    color: #FDA5FF\n  }\n\n.log-item.special,\n.log-item.winner,\n.log-item.tick {\n  margin-top: 5px;\n  margin-bottom: 5px;\n}\n\n.log-item__tick-message__current-players,\n  .log-item__tick-message__current-tick {\n    color: #55ff55;\n    padding-bottom: 5px;\n  }\n\n.log-item__final-message__winner,\n  .log-item__final-message__scores {\n    color: #55ff55;\n    padding-bottom: 5px;\n  }\n\n.cube-container {\n  display: block;\n  padding: 10px;\n  border: 2px #55ff55 solid;\n  border-radius: 3px;\n  margin-top: 40px;\n}\n\n.flex-grid {\n  display: flex;\n}\n\n.players {\n  display: flex;\n  flex-direction: row;\n  flex-wrap: wrap;\n  color: white;\n  wrap: wrap;\n  padding: 3px;\n  font: 1em Helvetica Neue, sans-serif;\n  font-weight: 200;\n  margin-left: 30px;\n  max-width: 600px;\n}\n\n.players player- {\n    flex: 1;\n    min-width: 200px;\n    padding-left: 10px;\n    margin: 30px 20px;\n  }\n\n.players player- .player-info {\n      display: flex;\n      flex-direction: column;\n    }\n\n.players player- .player-actions {\n       display: flex;\n       flex-direction: row;\n     }\n\n.players player- .player-info {\n      margin-bottom: 10px;\n    }\n\n.players player- .player-info__detail {\n        padding: 5px 0;\n      }\n\n",undefined);
 
 var GameStatus;
 (function (GameStatus) {
@@ -579,6 +579,89 @@ var initialState = {
     cube: null
 };
 //# sourceMappingURL=initialState.js.map
+
+__$styleInject("form {\n  align-items: top;\n  padding-top: 50px;\n  display: flex;\n  flex-direction: column;\n  width: 85%;\n  justify-content: center;\n}\n\n  form button {\n    margin: 15px 0 20px 0;\n  }\n\n  form .bot-input-group {\n    display: flex;\n    flex-direction: column;\n  }\n\n  form .error {\n    margin-bottom: 5px;\n    color: #fff200;\n  }\n\n  form input.bot-input {\n    border: 1px solid OrangeRed;\n    background-color: OrangeRed;\n    color: #1a1a1a;\n    font-size: 1.5em;\n    font-weight: 200;\n    height: 62px;\n    padding: 15px 20px;\n    margin-top: 15px;\n    outline: 0;\n  }\n\n  form input.bot-input::-webkit-input-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input::-moz-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input::-ms-input-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input:hover, form input.bot-input:focus, form input.bot-input:active {\n      background: #55ff55;\n      border-color: #55ff55;\n    }\n",undefined);
+
+const defaultFormValues = {
+    url: 'http://',
+    name: '',
+    color: ''
+};
+const minLen = (minLength) => (v) => v && v.length > minLength;
+const urlRegex = /^(http|https):\/\//;
+const hasProtocalInUrl = (value) => urlRegex.test(value);
+const hexRegex = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
+const isHex = (value) => hexRegex.test(value);
+const inputConfig = [
+    { id: 'url', placeholder: 'http://myboturl', type: 'url' },
+    { id: 'name', placeholder: 'Name' },
+    { id: 'color', placeholder: 'Color (6 digit hex value)' }
+];
+var botForm = {
+    state: {
+        isOpen: false,
+        values: defaultFormValues,
+        tests: {
+            url: [
+                [minLen(5), 'A new bot must have a url'],
+                [hasProtocalInUrl, 'Must be a valid url']
+            ],
+            name: [[minLen(1), 'A name is required']],
+            color: [[isHex, 'Must be in hex color format #fff000']]
+        },
+        errors: {
+            url: null,
+            name: null,
+            color: null
+        }
+    },
+    actions: {
+        setFormValue: (state, _a, { id, value }) => ({ values: Object.assign({}, state.values, { [id]: value }) }),
+        clearForm: () => ({ values: defaultFormValues }),
+        toggleForm: (state) => ({ isOpen: !state.isOpen }),
+        validate: (_s, _a, { id, value }) => (update) => {
+            update((state) => {
+                const error = state.tests[id].reduce((errorMessage, test) => {
+                    if (!test[0](value)) {
+                        return test[1];
+                    }
+                    return errorMessage;
+                }, null);
+                return { errors: { [id]: error } };
+            });
+        }
+    }
+};
+const formInputs = (values, errors, actions) => inputConfig.map((i) => Input(Object.assign({}, i, { value: values[i.id], oninput: (e) => {
+        actions.botForm.validate({ id: e.target.id, value: e.target.value });
+        actions.botForm.setFormValue({
+            id: e.target.id,
+            value: e.target.value
+        });
+    }, error: errors[i.id] })));
+const renderBotForm = ({ botForm: { values, errors, isOpen } }, actions) => {
+    return form({
+        style: { display: isOpen ? 'flex' : 'none' },
+        onsubmit: () => {
+            const isValid = Object.keys(errors).reduce((isValid, id) => {
+                if (errors[id]) {
+                    return false;
+                }
+                return isValid;
+            }, true);
+            if (isValid) {
+                const newPlayer = Object.assign({}, values, { status: PlayerStatus.inactive, position: { x: null, y: null, z: null }, wins: 0 });
+                actions.addPlayer(newPlayer);
+                actions.botForm.clearForm();
+                actions.botForm.toggleForm();
+            }
+            return false;
+        }
+    }, [
+        ...formInputs(values, errors, actions),
+        button({ type: 'submit' }, 'Add bot')
+    ]);
+};
 
 /* tslint:disable */
 const TICK_SEPARATOR = '***************************************************************************************';
@@ -648,14 +731,18 @@ const Player = (player, index, hasWinner, actions) => {
         ])
     ]);
 };
-const Input = ({ type = 'text', value = '', id = 'input', placeholder = '', oninput }) => input({
-    type,
-    id,
-    value,
-    className: 'bot-input',
-    placeholder,
-    oninput
-});
+const Input = ({ type = 'text', value = '', id = 'input', placeholder = '', oninput, error }) => div({ className: 'bot-input-group' }, [
+    input({
+        type,
+        id,
+        value,
+        className: 'bot-input',
+        placeholder,
+        oninput,
+        style: isHex(value) ? { backgroundColor: value } : {}
+    }),
+    div({ className: 'error', style: { display: error ? 'flex' : 'none' } }, error)
+]);
 //# sourceMappingURL=views.js.map
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -50279,13 +50366,16 @@ const createCube = () => {
         renderer.render(scene, camera);
     }
     const getPosition = (x, y, z) => {
-        const plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-        const getNum = () => Math.random() * 50 * plusOrMinus;
-        // Possible solution?
-        // const a = new Matrix4().set(/*..*/).makeTranslation(/*..*/);
-        // const b = new Matrix4().set(/*..*/).makeTranslation(*..*/);
-        // const matrix = new Matrix4().multiplyMatrices(a, b);
-        return new Vector3(getNum(), getNum(), getNum());
+        // Scale grid entity coordinates to grid space
+        const scale = config.CUBE_WIDTH / segments;
+        const s = new Matrix4().makeScale(scale, scale, scale);
+        // Center grid
+        const center = (segments - 1) / 2.0;
+        const t = new Matrix4().makeTranslation(-center, -center, -center);
+        // Create transformation matrix
+        const st = new Matrix4().multiplyMatrices(s, t);
+        // Transform grid space vector to world space
+        return new Vector3(x, y, z).applyMatrix4(st);
     };
     const update = ({ players }) => {
         cube.children = [];
@@ -50372,7 +50462,7 @@ const storageActions = {
 };
 const playerActions = {
     addPlayer: (state, _a, player) => {
-        return { bots: [...state.players, player] };
+        return { players: [...state.players, player] };
     },
     removePlayer: (state, actions, index) => {
         const players = [
@@ -50472,7 +50562,7 @@ var actions = Object.assign({}, cubeActions, storageActions, playerActions, { sh
         });
         io.onTick(async ({ players = [], gameInfo }) => {
             await update((state) => {
-                const playerList = players.map(p => p.name).join(', ');
+                const playerList = players.map((p) => p.name).join(', ');
                 const currentPlayers = `Active players: ${playerList}`;
                 const currentTick = `📍 TICK #${gameInfo.currentTick}`;
                 const log = [
@@ -50480,7 +50570,7 @@ var actions = Object.assign({}, cubeActions, storageActions, playerActions, { sh
                     ...state.log
                 ];
                 const updatedPlayers = state.players.map((player) => {
-                    const { x = null, y = null, z = null } = players.find(p => p.name === player.name) || {};
+                    const { x = null, y = null, z = null } = players.find((p) => p.name === player.name) || {};
                     const position = { x, y, z };
                     return x !== null
                         ? Object.assign({}, player, { position, status: PlayerStatus.active }) : Object.assign({}, player, { position, status: PlayerStatus.inactive });
@@ -50491,64 +50581,6 @@ var actions = Object.assign({}, cubeActions, storageActions, playerActions, { sh
         });
     }, clearLog: () => ({ log: [] }) });
 //# sourceMappingURL=actions.js.map
-
-__$styleInject("form {\n  align-items: top;\n  padding-top: 50px;\n  display: flex;\n  flex-direction: column;\n  width: 85%;\n  justify-content: center;\n}\n\n  form button {\n    margin: 0 0 20px 0;\n  }\n\n  form input.bot-input {\n    border: 1px solid OrangeRed;\n    background-color: OrangeRed;\n    color: #1a1a1a;\n    font-size: 1.5em;\n    font-weight: 200;\n    height: 62px;\n    padding: 15px 20px;\n    margin-bottom: 15px;\n    outline: 0;\n  }\n\n  form input.bot-input::-webkit-input-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input::-moz-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input::-ms-input-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input:hover, form input.bot-input:focus, form input.bot-input:active {\n      background: #55ff55;\n      border-color: #55ff55;\n    }\n",undefined);
-
-const defaultFormValues = {
-    url: 'http://',
-    name: '',
-    color: ''
-};
-const minLen = (minLength) => (v) => v && v.length > minLength;
-const urlRegex = /^(http|https):\/\//;
-const hasProtocalInUrl = (value) => urlRegex.test(value);
-const hexRegex = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
-const isHex = (value) => hexRegex.test(value);
-const inputConfig = [
-    { id: 'url', placeholder: 'http://myboturl', type: 'url' },
-    { id: 'name', placeholder: 'Name' },
-    { id: 'color', placeholder: 'Color (6 digit hex value)' }
-];
-var botForm = {
-    state: {
-        isOpen: false,
-        values: defaultFormValues,
-        tests: {
-            url: [
-                [minLen(5), 'A new bot must have a url'],
-                [hasProtocalInUrl, 'Must be a valid url']
-            ],
-            name: [[minLen(1), 'A name is required']],
-            color: [[isHex, 'Must be in hex color format #fff']]
-        },
-        errors: {
-            url: null,
-            name: null,
-            color: null
-        }
-    },
-    actions: {
-        setFormValue: (state, _a, { id, value }) => ({ values: Object.assign({}, state.values, { [id]: value }) }),
-        toggleForm: (state) => ({ isOpen: !state.isOpen }),
-        validate: (state, _a, { id, value }) => {
-            return state.tests[id].forEach((test) => {
-                if (test[0](value)) {
-                    return { errors: { [id]: test[1] } };
-                }
-                return { errors: { [id]: null } };
-            });
-        }
-    }
-};
-const formInputs = (values, actions) => inputConfig.map((i) => Input(Object.assign({}, i, { value: values[i.id], oninput: (e) => actions.botForm.setFormValue({ id: e.target.id, value: e.target.value }) })));
-const renderBotForm = ({ botForm: { values, errors, isOpen } }, actions) => {
-    return form({
-        style: { display: isOpen ? 'flex' : 'none' },
-        onsubmit: () => {
-            return false;
-        }
-    }, [...formInputs(values, actions), button({ type: 'submit' }, 'Add bot')]);
-};
 
 app({
     actions,
