@@ -4,7 +4,7 @@ import './client.css';
 import initialState, { GameStatus, IAppState, IPlayer } from './initialState';
 import { LogItem, Slider, Player } from './views';
 import actions, { IActions } from './actions';
-import renderCube from './Cube';
+import renderCube from './cube';
 import botForm, { renderBotForm } from './botFormModule';
 
 app(
