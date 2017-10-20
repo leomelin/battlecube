@@ -1,23 +1,23 @@
 # Battlecube
 
-Battlecube is a game where small cubes (bots) fight each other with bombs inside a cube shaped 3d grid.
+Battlecube is a game in which bots fight to survive inside a three-dimensional grid--the cube--by moving and throwing bombs.
 
 ## Rules
 
-Basically all you have to do is create a bot that stays on the game area, doesn't collide with others and don't stand on a bomb. It's as easy as that ... ;)
+Basically, all you have to do is create a bot that stays in the grid, avoids colliding with others and doesn't run into a bomb. It's as easy as that ... ;)
 
-- All bots in the game must implement correct API -endpoints, otherwise bot automatically loses
-- Amount of bots in the game cannot be larger than there is space in the game area
-- If bot moves out of the game area, it loses
-- If bot moves to the same coordinate as other bot, both bots lose
-- If bot is placed in the same coordinate as a bomb, bomb explodes and bot loses
-- If bot doesn't respond request in 5000ms it will automatically lose
+- A participating bots must implement a correct API -endpoint, otherwise the bot automatically loses
+- The amount of bots in the game cannot be larger than there is space in the game area
+- If a bot moves out of the game area, it loses
+- If a bot moves to the same coordinate as another bot, both bots lose
+- If a bot is placed in the same coordinate as a bomb, the bomb explodes and the bot loses
+- If the bot doesn't respond to a request in 5000ms, it will automatically lose
 - Game area coordinates start from index 0 and ends with edge length - 1
 - Game area coordinates are counted as X: left to right, Y: top to bottom, Z: front to back. So that `{ x: 0, y: 0, z: 0 }` would be the top left corner on front.
 - All the bots in the game must have an unique name
-- The time is measured in *ticks* in other words play turns. Ticks start from 0.
-- If a bot is allowed to give more directions at once (numOfTasksPerTick), directions will be asked again after all directions are evaluated. So with numOfTaskPerTick with value 2 the server will play two ticks before asking another 2 directions.
-- Game area size might change during the game. If so, players are randomly positioned after that and all the bombs currently placed are removed.
+- The time is measured in *ticks* , in other words, play turns. Ticks start from 0.
+- If a bot is allowed to give more directions at once (numOfTasksPerTick), directions will be asked again after all directions are evaluated. So with a value of numOfTaskPerTick 2, the server will play two ticks before asking for another 2 directions.
+- The game/grid size might change during the game. If so, players are randomly positioned after that and all the bombs currently placed are removed.
 - The bot that survives the longest amount of *ticks* without losing, *WINS*
 
 ## Starting a new game
@@ -180,7 +180,7 @@ Your bot implementation should have this endpoint implemented and it should acce
   ]
 }
 ```
-After receiving this data, your bot should respond with *Content-Type: application/json* one of following json structures and HTTP status 200 OK in under 5000ms:
+After receiving this data, your bot should respond with *Content-Type: application/json*, one of following json structures, and HTTP status 200 OK in under 5000ms:
 
 ###### Move
 Moves the player one unit in any direction
@@ -192,7 +192,7 @@ Moves the player one unit in any direction
 ```
 
 ###### Place a bomb
-Places a bomb to selected coordinates
+Place a bomb to particular coordinates
 ```js
 [{
   "task": "PLACE_BOMB",
@@ -209,4 +209,4 @@ Places a bomb to selected coordinates
 }, ...]
 ```
 
-Note that the bot needs to respond an array of tasks. Maximum number of tasks per tick is defined in game configuration.
+Note that the bot needs to respond with an array of tasks. The maximum number of tasks per tick is defined in the game configuration.
