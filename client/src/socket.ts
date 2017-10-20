@@ -1,8 +1,9 @@
 import socketIO from 'socket.io-client';
 import defaultConfig from './defaultConfig.json';
+import { IPlayer } from './initialState';
 
 export interface ITickInfo {
-  players: any[];
+  players: IPlayer[] | any;
   gameInfo: any;
   items: any[];
 }

@@ -116,3 +116,19 @@ export const Player = (
     ])
   ]);
 };
+
+export const Input = ({
+  type = 'text',
+  value = '',
+  id = 'input',
+  placeholder = '',
+  oninput
+}: any) => input({
+  type,
+  id,
+  value,
+  className: 'bot-input',
+  placeholder,
+  oninput
+});
+

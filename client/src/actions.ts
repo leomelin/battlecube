@@ -9,6 +9,8 @@ import {
 import socket, { ITickInfo } from './socket';
 import { createCube } from './Cube';
 import * as store from './localStorage';
+import { IBotFormActions } from './botFormModule';
+import { Actions } from 'hyperapp';
 
 export const io = socket('http://localhost:9999');
 
@@ -19,7 +21,6 @@ interface IStart {
 
 interface IUpdateSpeed {
   (state: IAppState, actions: IActions, speed: number): IAppState;
-  [key: string]: any;
 }
 
 interface IShowNewSpeedWhileDragging {
@@ -28,16 +29,16 @@ interface IShowNewSpeedWhileDragging {
 }
 
 interface ILog {
-  (state: IAppState, actions: IActions): any;
+  InternalActions<State, IActions>(): IAppState;
   (): any;
 }
 
 interface IPersist {
-  (state: IAppState): any;
+  InternalActions<State, IActions>(): void;
   (): any;
 }
 
-export interface IActions {
+export interface IActions extends Actions<IAppState> {
   showNewSpeedWhileDragging: IShowNewSpeedWhileDragging;
   start: IStart;
   setup: {
@@ -46,9 +47,10 @@ export interface IActions {
   log: ILog;
   clearLog(): any;
   [key: string]: any;
-  getPersistState(): any;
+  getPersistedState(): any;
   persistState: IPersist;
   removePersistedState(): any;
+  botForm: IBotFormActions;
 }
 
 const cubeActions = {
@@ -62,10 +64,53 @@ const cubeActions = {
   }
 };
 
+const storageActions = {
+  persistState: ({ players, setup }: IAppState) => {
+    store.persist({ players, setup });
+  },
+
+  getPersistedState: () => async (update: Function) => {
+    const retrievedState = await store.get();
+    if (retrievedState) {
+      update((state: IAppState) => ({ ...state, ...retrievedState }));
+    }
+  },
+
+  removePersistedState: () => store.remove()
+};
+
+const playerActions = {
+  addPlayer: (state: IAppState, _a: IActions, player: IPlayer) => {
+    return { bots: [...state.players, player] };
+  },
+  removePlayer: (state: IAppState, actions: IActions, index: number) => {
+    const players = [
+      ...state.players.slice(0, index),
+      ...state.players.slice(index + 1)
+    ];
+    return { ...state, players };
+  },
+
+  recordWin: (state: IAppState, action: IActions, name: string) => (
+    update: Function
+  ) => {
+    update((newState: IAppState) => {
+      const players = state.players.map((p: IPlayer) => {
+        const wins = p.name === name ? p.wins + 1 : p.wins;
+        return { ...p, wins };
+      });
+
+      return { ...newState, players };
+    });
+  }
+};
+
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
 
 export default {
   ...cubeActions,
+  ...storageActions,
+  ...playerActions,
 
   showNewSpeedWhileDragging: (
     state: IAppState,
@@ -180,7 +225,7 @@ export default {
 
     io.onTick(async ({ players = [], gameInfo }: ITickInfo) => {
       await update((state: IAppState) => {
-        const playerList = players.map(p => p.name).join(', ');
+        const playerList = players.map((p: IPlayer) => p.name).join(', ');
         const currentPlayers = `Active players: ${playerList}`;
         const currentTick = `📍 TICK #${gameInfo.currentTick}`;
         const log = [
@@ -190,7 +235,7 @@ export default {
 
         const updatedPlayers = state.players.map((player: IPlayer) => {
           const { x = null, y = null, z = null } =
-            players.find(p => p.name === player.name) || {};
+          players.find((p: IPlayer) => p.name === player.name) || {};
           const position = { x, y, z };
           return x !== null
             ? { ...player, position, status: PlayerStatus.active }
@@ -203,39 +248,5 @@ export default {
     });
   },
 
-  clearLog: () => ({ log: [] }),
-
-  persistState: ({ players, setup }: IAppState) => {
-    store.persist({ players, setup });
-  },
-
-  getPersistedState: () => async (update: Function) => {
-    const retrievedState = await store.get();
-    if (retrievedState) {
-      update((state: IAppState) => ({ ...state, ...retrievedState }));
-    }
-  },
-
-  removePersistedState: () => store.remove(),
-
-  removePlayer: (state: IAppState, actions: IActions, index: number) => {
-    const players = [
-      ...state.players.slice(0, index),
-      ...state.players.slice(index + 1)
-    ];
-    return { ...state, players };
-  },
-
-  recordWin: (state: IAppState, action: IActions, name: string) => (
-    update: Function
-  ) => {
-    update((newState: IAppState) => {
-      const players = state.players.map((p: IPlayer) => {
-        const wins = p.name === name ? p.wins + 1 : p.wins;
-        return { ...p, wins };
-      });
-
-      return { ...newState, players };
-    });
-  }
+  clearLog: () => ({ log: [] })
 };

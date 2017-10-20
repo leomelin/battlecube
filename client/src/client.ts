@@ -4,7 +4,8 @@ import './client.css';
 import initialState, { GameStatus, IAppState, IPlayer } from './initialState';
 import { LogItem, Slider, Player } from './views';
 import actions, { IActions } from './actions';
-import Cube from './Cube';
+import renderCube from './Cube';
+import botForm, { renderBotForm } from './botFormModule';
 
 app(
   {
@@ -18,6 +19,7 @@ app(
       });
     },
     state: { ...initialState },
+    modules: { botForm },
     view: (state: IAppState, actions: IActions) =>
       main({}, [
         h1({}, 'Battle³'),
@@ -30,7 +32,7 @@ app(
           },
           'Start game'
         ),
-        Cube(state, actions),
+        renderCube(state, actions),
         div(
           {
             className: 'log',
@@ -49,12 +51,13 @@ app(
             )
           )
         ),
+        renderBotForm(state, actions),
         button(
           {
             disabled: state.gameStatus === GameStatus.started,
-            onclick: () => console.log('TODO')
+            onclick: () => actions.botForm.toggleForm()
           },
-          'Add bot'
+          state.botForm.isOpen ? 'Close' : 'Add bot'
         )
       ])
   },

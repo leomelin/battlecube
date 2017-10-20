@@ -1,0 +1,41 @@
+form {
+  align-items: top;
+  padding-top: 50px;
+  display: flex;
+  flex-direction: column;
+  width: 85%;
+  justify-content: center;
+
+  button {
+    margin: 0 0 20px 0;
+  }
+
+  input.bot-input {
+    border: 1px solid OrangeRed;
+    background-color: OrangeRed;
+    color: #1a1a1a;
+    font-size: 1.5em;
+    font-weight: 200;
+    height: 62px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    outline: 0;
+
+    &::-webkit-input-placeholder {
+      color: #1a1a1a;
+    }
+
+    &::-moz-placeholder {
+      color: #1a1a1a;
+    }
+
+    &::-ms-input-placeholder {
+      color: #1a1a1a;
+    }
+
+    &:hover, &:focus, &:active {
+      background: #55ff55;
+      border-color: #55ff55;
+    }
+  }
+}

@@ -1,3 +1,6 @@
+import { IBotFormState } from './botFormModule';
+import { State } from 'hyperapp';
+
 export enum GameStatus {
   started,
   stopped
@@ -14,7 +17,7 @@ export enum PlayerStatus {
   active
 }
 
-export interface IPlayer {
+export interface IPlayer extends State {
   name: string;
   url: string;
   status: PlayerStatus;
@@ -27,7 +30,7 @@ export interface IPlayer {
   wins: number;
 }
 
-export interface ISetup {
+export interface ISetup extends State {
   setup: {
     edgeLength: number;
     speed: number;
@@ -49,6 +52,7 @@ export interface IAppState extends ISetup {
   error: any;
   log: ILogItem[];
   cube: any;
+  botForm: IBotFormState;
 }
 
 export default {
