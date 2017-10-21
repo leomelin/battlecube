@@ -41,7 +41,7 @@ const storageActions = {
   removePersistedState: () => store.remove()
 };
 
-const actionsOnWhichToPersist = ['addPlayer', 'removePlayer', 'recordWin'];
+const actionsToSyncWithStorage = ['addPlayer', 'removePlayer', 'recordWin', 'setup.updateSpeed'];
 
 const logSaveMessage = () => console.log('State persisted to locale storage');
 
@@ -58,10 +58,12 @@ export default (app: any) => {
     if (persistedState) {
       Object.assign(props.state, persistedState);
     }
-    function enhanceActionsToPeristData(actions: IActions) {
+    function enhanceActionsToSyncWithStorage(actions: IActions, prefix = '') {
+      const namespace = prefix.length > 0 ? `${prefix}.` : '';
       return Object.keys(actions || {}).reduce((enhancedActions: any, name) => {
+        const namespacedName = `${namespace}${name}`;
         const action = actions[name];
-        enhancedActions[name] = (
+        enhancedActions[name] = typeof action === 'function' ? (
           state: IAppState,
           actions: IActions,
           data: any
@@ -70,19 +72,19 @@ export default (app: any) => {
           if (typeof result === 'function') {
             return (update: Function) => {
               return result((withState: any) => {
-                if (actionsOnWhichToPersist.indexOf(name) > -1) {
+                if (actionsToSyncWithStorage.indexOf(name) > -1) {
                   handleUpdate(state, result);
                 }
                 return update(withState);
               });
             };
           } else {
-            if (actionsOnWhichToPersist.indexOf(name) > -1) {
+            if (actionsToSyncWithStorage.indexOf(name) > -1) {
               handleUpdate(state, result);
             }
             return result;
           }
-        };
+        } : enhanceActionsToSyncWithStorage(action, namespacedName);
         return enhancedActions;
       }, {});
     }
@@ -92,10 +94,10 @@ export default (app: any) => {
       logSaveMessage();
     });
 
-    // add storage actions...yeah, probably not supposed to mutate state this way ;)
+    // add storage actions...yeah, probably not supposed to mutate actions this way
     Object.assign(props.actions, storageActions);
     // presently does not enhance actions of modules
-    props.actions = enhanceActionsToPeristData(props.actions);
+    props.actions = enhanceActionsToSyncWithStorage(props.actions);
     return app(props, root);
   };
 };
