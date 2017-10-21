@@ -102,7 +102,7 @@ export const createCube = () => {
     const s = new Matrix4().makeScale(scale,scale,scale);
 
     // Center grid
-    const center = (segments - 1) / 2.0;
+    const center = segments / 2.0;
     const t = new Matrix4().makeTranslation(-center,-center,-center);
 
     // Create transformation matrix

@@ -1,8 +1,22 @@
 const http = require('http');
 const [port] = process.argv.slice(2);
+const deterministic = false;
+
 if (!port) {
   console.log('Pass port as command line argument...');
   process.exit(1);
+}
+
+const shuffle = (array) => {
+  let arr = array.concat([]);
+  if (deterministic) return arr;
+  for (let i = arr.length - 1; i >= 0; i--) {
+    var index = Math.floor(Math.random() * (i + 1)); 
+    var item = arr[index]; 
+    arr[index] = arr[i]; 
+    arr[i] = item;
+  }
+  return arr;
 }
 
 const coordEq = (p, q) => p.x == q.x && p.y == q.y && p.z == q.z;
@@ -40,7 +54,7 @@ const attackArea = (tx, ty, tz, n, data) => {
         {x: pos.x + 0, y: pos.y + 0, z: pos.z + 1},
         {x: pos.x + 0, y: pos.y + 0, z: pos.z - 1}
       ].filter(p => inBounds(p) && !isDone(p) && !coordEq(p, me));
-      queue = queue.concat(neighbors);
+      queue = queue.concat(shuffle(neighbors));
     }
 
     done.push(pos);
@@ -50,8 +64,8 @@ const attackArea = (tx, ty, tz, n, data) => {
 };
 
 const pickTargets = (n, data) => {
-  let targets = data.players
-    .filter(p => p.name != data.currentPlayer.name)
+  const others = data.players.filter(p => p.name != data.currentPlayer.name);
+  const targets = shuffle(others)
     .splice(0, n)
     .map(t => Object.assign(t, {n: 1}));
 
@@ -88,7 +102,7 @@ const moveDistance = (n, data) => {
         {x: pos.x + 0, y: pos.y + 0, z: pos.z + 1, moves: pos.moves.concat(['+Z'])},
         {x: pos.x + 0, y: pos.y + 0, z: pos.z - 1, moves: pos.moves.concat(['-Z'])}
       ].filter(p => inBounds(p) && !isDone(p) && !hasBomb(p) && !hasPlayer(p));
-      queue = queue.concat(neighbors);
+      queue = queue.concat(shuffle(neighbors));
     }
     done.push(pos);
   }
