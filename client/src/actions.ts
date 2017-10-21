@@ -57,10 +57,17 @@ const cubeActions = {
   initCube: (state: IAppState) => {
     const cube = createCube();
     cube.init(state);
+    cube.render();
     return { cube };
   },
   updateCube: ({ cube, players }: IAppState) => {
     cube.update({ players });
+  },
+  activateCube: ({ cube }: IAppState) => {
+    cube.startRendering();
+  },
+  deactivateCube: ({ cube }: IAppState) => {
+    cube.stopRendering();
   }
 };
 
@@ -146,10 +153,13 @@ export default {
     }
   },
 
-  updateGameStatus: (state: IAppState, { updateCube, recordWin }: IActions) => (
+  updateGameStatus: (state: IAppState, { activateCube, updateCube, recordWin }: IActions) => (
     update: Function
   ) => {
-    io.onStart(() => update({ gameStatus: GameStatus.started }));
+    io.onStart(() => {
+      activateCube();
+      update({ gameStatus: GameStatus.started })
+    });
 
     io.onStop(async (finalInfo: any) => {
       await update((state: IAppState) => {

@@ -40,8 +40,10 @@ export const createCube = () => {
   let children: any;
   let container: any;
   let material: any;
+  let rendering: boolean;
 
   const init = ({ setup }: IAppState) => {
+    rendering = false;
     segments = setup.edgeLength - 1;
     scene = new Scene();
     camera = new PerspectiveCamera(
@@ -50,7 +52,7 @@ export const createCube = () => {
       config.NEAR,
       config.FAR
     );
-    camera.position.z = 200;
+    camera.position.z = 220;
     camera.lookAt(new Vector3(0, 0, 0));
     geometry = new BoxGeometry(
       config.CUBE_WIDTH,
@@ -82,7 +84,6 @@ export const createCube = () => {
     renderer.shadowMap.type = PCFSoftShadowMap;
     container = document.getElementById('cube-container');
     container.appendChild(renderer.domElement);
-    render();
   };
 
   function addCube() {
@@ -93,7 +94,28 @@ export const createCube = () => {
   }
 
   function render() {
+    cube.rotation.y += 0.002;
     renderer.render(scene, camera);
+  }
+
+  function startRendering() {
+    if(rendering) return;
+
+    const scheduleRender = (renderFunc) => {
+      if(rendering) {
+        window.requestAnimationFrame(() => {
+          renderFunc();
+          scheduleRender(renderFunc);
+        });
+      }
+    }
+
+    rendering = true;
+    scheduleRender(render);
+  }
+
+  function stopRendering() {
+    rendering = false;
   }
 
   const getPosition = (x: number, y: number, z: number) => {
@@ -134,13 +156,15 @@ export const createCube = () => {
       const pos = getPosition(p.x, p.y, p.z);
       bot.position.set(pos.x, pos.y, pos.z);
       cube.add(bot);
-      render();
     });
   };
 
   return {
     init,
-    update
+    update,
+    render,
+    startRendering,
+    stopRendering
   };
 };
 
