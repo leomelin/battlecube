@@ -7,7 +7,7 @@ import {
   IPlayer
 } from './initialState';
 import socket, { ITickInfo } from './socket';
-import { createCube } from './Cube';
+import { createCube } from './cube';
 import * as store from './localStorage';
 import { IBotFormActions } from './botFormModule';
 import { Actions } from 'hyperapp';
