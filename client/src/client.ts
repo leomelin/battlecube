@@ -6,17 +6,16 @@ import { LogItem, Slider, Player } from './views';
 import actions, { IActions } from './actions';
 import renderCube from './cube';
 import botForm, { renderBotForm } from './botFormModule';
+import persist from './persist';
 
-app(
+const persistedApp = persist(app);
+
+persistedApp(
   {
     actions,
     init: (_s: IAppState, actions: IActions): void => {
-      actions.getPersistedState();
       actions.updateGameStatus();
       actions.log();
-      window.addEventListener('unload', () => {
-        actions.persistState();
-      });
     },
     state: { ...initialState },
     modules: { botForm },

@@ -64,21 +64,6 @@ const cubeActions = {
   }
 };
 
-const storageActions = {
-  persistState: ({ players, setup }: IAppState) => {
-    store.persist({ players, setup });
-  },
-
-  getPersistedState: () => async (update: Function) => {
-    const retrievedState = await store.get();
-    if (retrievedState) {
-      update((state: IAppState) => ({ ...state, ...retrievedState }));
-    }
-  },
-
-  removePersistedState: () => store.remove()
-};
-
 const playerActions = {
   addPlayer: (state: IAppState, _a: IActions, player: IPlayer) => {
     return { players: [...state.players, player] };
@@ -109,7 +94,6 @@ const playerActions = {
 
 export default {
   ...cubeActions,
-  ...storageActions,
   ...playerActions,
 
   showNewSpeedWhileDragging: (

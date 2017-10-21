@@ -578,7 +578,6 @@ var initialState = {
     log: [],
     cube: null
 };
-//# sourceMappingURL=initialState.js.map
 
 __$styleInject("form {\n  align-items: top;\n  padding-top: 50px;\n  display: flex;\n  flex-direction: column;\n  width: 85%;\n  justify-content: center;\n}\n\n  form button {\n    margin: 15px 0 20px 0;\n  }\n\n  form .bot-input-group {\n    display: flex;\n    flex-direction: column;\n  }\n\n  form .error {\n    margin-bottom: 5px;\n    color: #fff200;\n  }\n\n  form input.bot-input {\n    border: 1px solid OrangeRed;\n    background-color: OrangeRed;\n    color: #1a1a1a;\n    font-size: 1.5em;\n    font-weight: 200;\n    height: 62px;\n    padding: 15px 20px;\n    margin-top: 15px;\n    outline: 0;\n  }\n\n  form input.bot-input::-webkit-input-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input::-moz-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input::-ms-input-placeholder {\n      color: #1a1a1a;\n    }\n\n  form input.bot-input:hover, form input.bot-input:focus, form input.bot-input:active {\n      background: #55ff55;\n      border-color: #55ff55;\n    }\n",undefined);
 
@@ -743,7 +742,6 @@ const Input = ({ type = 'text', value = '', id = 'input', placeholder = '', onin
     }),
     div({ className: 'error', style: { display: error ? 'flex' : 'none' } }, error)
 ]);
-//# sourceMappingURL=views.js.map
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1340,6 +1338,11 @@ function localstorage() {
 }
 });
 
+/**
+ * Module dependencies.
+ */
+
+
 var debug = browser('socket.io-client:url');
 
 /**
@@ -1581,6 +1584,14 @@ var isarray = Array.isArray || function (arr) {
   return toString$1.call(arr) == '[object Array]';
 };
 
+/* global Blob File */
+
+/*
+ * Module requirements.
+ */
+
+
+
 var toString = Object.prototype.toString;
 var withNativeBlob = typeof commonjsGlobal.Blob === 'function' || toString.call(commonjsGlobal.Blob) === '[object BlobConstructor]';
 var withNativeFile = typeof commonjsGlobal.File === 'function' || toString.call(commonjsGlobal.File) === '[object FileConstructor]';
@@ -1648,6 +1659,14 @@ function isBuf(obj) {
   return (commonjsGlobal.Buffer && commonjsGlobal.Buffer.isBuffer(obj)) ||
          (commonjsGlobal.ArrayBuffer && obj instanceof ArrayBuffer);
 }
+
+/*global Blob,File*/
+
+/**
+ * Module requirements
+ */
+
+
 
 var toString$2 = Object.prototype.toString;
 var withNativeBlob$1 = typeof commonjsGlobal.Blob === 'function' || toString$2.call(commonjsGlobal.Blob) === '[object BlobConstructor]';
@@ -2210,6 +2229,10 @@ try {
 }
 });
 
+// browser shim for xmlhttprequest module
+
+
+
 var xmlhttprequest = function (opts) {
   var xdomain = opts.xdomain;
 
@@ -2649,6 +2672,10 @@ var base64Arraybuffer = createCommonjsModule(function (module, exports) {
   };
 })();
 });
+
+/**
+ * Create a blob builder even when vendor prefixes exist
+ */
 
 var BlobBuilder = commonjsGlobal.BlobBuilder
   || commonjsGlobal.WebKitBlobBuilder
@@ -3352,6 +3379,17 @@ exports.decodePayloadAsBinary = function (data, binaryType, callback) {
 };
 });
 
+/**
+ * Module dependencies.
+ */
+
+
+
+
+/**
+ * Module exports.
+ */
+
 var transport = Transport;
 
 /**
@@ -3618,6 +3656,15 @@ yeast.encode = encode$1;
 yeast.decode = decode$1;
 var yeast_1 = yeast;
 
+/**
+ * Module dependencies.
+ */
+
+
+
+
+
+
 var debug$6 = browser('engine.io-client:polling');
 
 /**
@@ -3854,6 +3901,14 @@ Polling.prototype.uri = function () {
   var ipv6 = this.hostname.indexOf(':') !== -1;
   return schema + '://' + (ipv6 ? '[' + this.hostname + ']' : this.hostname) + port + this.path + query;
 };
+
+/**
+ * Module requirements.
+ */
+
+
+
+
 
 var debug$5 = browser('engine.io-client:polling-xhr');
 
@@ -4263,6 +4318,17 @@ function unloadHandler () {
 
 pollingXhr.Request = Request_1;
 
+/**
+ * Module requirements.
+ */
+
+
+
+
+/**
+ * Module exports.
+ */
+
 var pollingJsonp = JSONPPolling;
 
 /**
@@ -4491,6 +4557,15 @@ var empty$3 = Object.freeze({
 });
 
 var require$$1$1 = ( empty$3 && empty$2 ) || empty$3;
+
+/**
+ * Module dependencies.
+ */
+
+
+
+
+
 
 var debug$7 = browser('engine.io-client:websocket');
 var BrowserWebSocket = commonjsGlobal.WebSocket || commonjsGlobal.MozWebSocket;
@@ -4770,6 +4845,19 @@ WS.prototype.check = function () {
   return !!WebSocket && !('__initialize' in WebSocket && this.name === WS.prototype.name);
 };
 
+/**
+ * Module dependencies
+ */
+
+
+
+
+
+
+/**
+ * Export transports.
+ */
+
 var polling_1 = polling;
 var websocket_1 = websocket;
 
@@ -4825,6 +4913,12 @@ var indexof = function(arr, obj){
   }
   return -1;
 };
+
+/**
+ * Module dependencies.
+ */
+
+
 
 var debug$4 = browser('engine.io-client:socket');
 
@@ -6142,6 +6236,16 @@ Backoff.prototype.setJitter = function(jitter){
   this.jitter = jitter;
 };
 
+/**
+ * Module dependencies.
+ */
+
+
+
+
+
+
+
 var debug$3 = browser('socket.io-client:manager');
 
 
@@ -6843,7 +6947,6 @@ var socket = (serverUrl) => {
         })
     };
 };
-//# sourceMappingURL=socket.js.map
 
 // Polyfills
 
@@ -49156,9 +49259,7 @@ function ArcCurve( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 ArcCurve.prototype = Object.create( EllipseCurve.prototype );
 ArcCurve.prototype.constructor = ArcCurve;
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
+//
 
 Curve.create = function ( construct, getPoint ) {
 
@@ -49205,7 +49306,6 @@ Object.assign( Spline.prototype, {
 
 } );
 
-//
 GridHelper.prototype.setColors = function () {
 
 	console.error( 'THREE.GridHelper: setColors() has been deprecated, pass them in the constructor instead.' );
@@ -49217,6 +49317,8 @@ SkeletonHelper.prototype.update = function () {
 	console.error( 'THREE.SkeletonHelper: update() no longer needs to be called.' );
 
 };
+
+//
 
 Object.assign( Box2.prototype, {
 
@@ -50301,8 +50403,6 @@ CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
 
 };
 
-//
-
 const config = {
     WIDTH: 400,
     HEIGHT: 400,
@@ -50406,36 +50506,6 @@ const createCube = () => {
         update
     };
 };
-var renderCube = (state, actions) => h('div', {
-    id: 'cube-container',
-    oncreate: () => {
-        actions.initCube(state);
-    }
-});
-//# sourceMappingURL=Cube.js.map
-
-const STORAGE_ID = 'battlecube-storage';
-const persist = (state) => localStorage.setItem(STORAGE_ID, JSON.stringify(state));
-const get = () => {
-    const promise = new Promise((resolve) => {
-        try {
-            const data = localStorage.getItem(STORAGE_ID);
-            if (data) {
-                return resolve(JSON.parse(data));
-            }
-            else {
-                return resolve(null);
-            }
-        }
-        catch (error) {
-            console.error('Error retrieving data from locale storage', error);
-            resolve(null);
-        }
-    });
-    return promise;
-};
-const remove = () => localStorage.removeItem(STORAGE_ID);
-//# sourceMappingURL=localStorage.js.map
 
 const io = socket('http://localhost:9999');
 const cubeActions = {
@@ -50447,18 +50517,6 @@ const cubeActions = {
     updateCube: ({ cube, players }) => {
         cube.update({ players });
     }
-};
-const storageActions = {
-    persistState: ({ players, setup }) => {
-        persist({ players, setup });
-    },
-    getPersistedState: () => async (update) => {
-        const retrievedState = await get();
-        if (retrievedState) {
-            update((state) => (Object.assign({}, state, retrievedState)));
-        }
-    },
-    removePersistedState: () => remove()
 };
 const playerActions = {
     addPlayer: (state, _a, player) => {
@@ -50482,7 +50540,7 @@ const playerActions = {
     }
 };
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
-var actions = Object.assign({}, cubeActions, storageActions, playerActions, { showNewSpeedWhileDragging: (state, actions, sliderSpeedValue) => {
+var actions = Object.assign({}, cubeActions, playerActions, { showNewSpeedWhileDragging: (state, actions, sliderSpeedValue) => {
         const newState = Object.assign({}, state, { sliderSpeedValue });
         return newState;
     }, start: (state, actions) => {
@@ -50580,17 +50638,107 @@ var actions = Object.assign({}, cubeActions, storageActions, playerActions, { sh
             updateCube();
         });
     }, clearLog: () => ({ log: [] }) });
-//# sourceMappingURL=actions.js.map
 
-app({
+var renderCube = (state, actions) => h('div', {
+    id: 'cube-container',
+    oncreate: () => {
+        actions.initCube(state);
+    }
+});
+
+const STORAGE_ID = 'battlecube-storage';
+const store = {
+    set: (state) => {
+        return Promise.resolve().then(() => {
+            localStorage.setItem(STORAGE_ID, JSON.stringify(state));
+        });
+    },
+    get: () => {
+        return Promise.resolve().then(() => {
+            const state = localStorage.getItem(STORAGE_ID);
+            if (state)
+                return JSON.parse(state);
+            return {};
+        });
+    },
+    remove: () => {
+        return Promise.resolve().then(() => {
+            localStorage.removeItem(STORAGE_ID);
+            return {};
+        });
+    }
+};
+const storageActions = {
+    persistState: (state) => (update) => {
+        update((state) => {
+            const { players, setup } = state;
+            store.set({ players, setup });
+            return state;
+        });
+    },
+    getPersistedState: () => async (state) => {
+        const retrievedState = await store.get();
+        return Object.assign({}, state, retrievedState);
+    },
+    removePersistedState: () => store.remove()
+};
+const actionsOnWhichToPersist = ['addPlayer', 'removePlayer', 'recordWin'];
+const logSaveMessage = () => console.log('State persisted to locale storage');
+const handleUpdate = (state, result) => {
+    const updatedState = Object.assign({}, state, result);
+    store
+        .set(updatedState)
+        .then(logSaveMessage);
+};
+var persist = (app) => {
+    return async (props, root) => {
+        const persistedState = await store.get();
+        if (persistedState) {
+            Object.assign(props.state, persistedState);
+        }
+        function enhanceActionsToPeristData(actions) {
+            return Object.keys(actions || {}).reduce((enhancedActions, name) => {
+                const action = actions[name];
+                enhancedActions[name] = (state, actions, data) => {
+                    const result = action(state, actions, data);
+                    if (typeof result === 'function') {
+                        return (update) => {
+                            return result((withState) => {
+                                if (actionsOnWhichToPersist.indexOf(name) > -1) {
+                                    handleUpdate(state, result);
+                                }
+                                return update(withState);
+                            });
+                        };
+                    }
+                    else {
+                        if (actionsOnWhichToPersist.indexOf(name) > -1) {
+                            handleUpdate(state, result);
+                        }
+                        return result;
+                    }
+                };
+                return enhancedActions;
+            }, {});
+        }
+        window.addEventListener('unload', () => {
+            props.actions.persistState();
+            logSaveMessage();
+        });
+        // add storage actions...yeah, probably not supposed to mutate state this way ;)
+        Object.assign(props.actions, storageActions);
+        // presently does not enhance actions of modules
+        props.actions = enhanceActionsToPeristData(props.actions);
+        return app(props, root);
+    };
+};
+
+const persistedApp = persist(app);
+persistedApp({
     actions,
     init: (_s, actions$$1) => {
-        actions$$1.getPersistedState();
         actions$$1.updateGameStatus();
         actions$$1.log();
-        window.addEventListener('unload', () => {
-            actions$$1.persistState();
-        });
     },
     state: Object.assign({}, initialState),
     modules: { botForm },
@@ -50615,6 +50763,5 @@ app({
         }, state.botForm.isOpen ? 'Close' : 'Add bot')
     ])
 }, document.getElementById('app'));
-//# sourceMappingURL=client.js.map
 
 }());
