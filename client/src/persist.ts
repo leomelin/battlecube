@@ -41,15 +41,18 @@ const storageActions = {
   removePersistedState: () => store.remove()
 };
 
-const actionsToSyncWithStorage = ['addPlayer', 'removePlayer', 'recordWin', 'setup.updateSpeed'];
+const actionsToSyncWithStorage = [
+  'addPlayer',
+  'removePlayer',
+  'recordWin',
+  'setup.updateSpeed'
+];
 
-const logSaveMessage = () => console.log('State persisted to locale storage');
+const logSaveMessage = () => console.log('Synced state change with locale storage');
 
 const handleUpdate = (state: IAppState, result: IAppState) => {
   const updatedState = Object.assign({}, state, result);
-  store
-    .set(updatedState)
-    .then(logSaveMessage);
+  store.set(updatedState).then(logSaveMessage);
 };
 
 export default (app: any) => {
@@ -63,29 +66,41 @@ export default (app: any) => {
       return Object.keys(actions || {}).reduce((enhancedActions: any, name) => {
         const namespacedName = `${namespace}${name}`;
         const action = actions[name];
-        enhancedActions[name] = typeof action === 'function' ? (
-          state: IAppState,
-          actions: IActions,
-          data: any
-        ) => {
-          const result = action(state, actions, data);
-          if (typeof result === 'function') {
-            return (update: Function) => {
-              return result((withState: any) => {
+        enhancedActions[name] =
+          typeof action === 'function'
+            ? (state: IAppState, actions: IActions, data: any) => {
+              const result = action(state, actions, data);
+              if (typeof result === 'function') {
+                return (update: Function) => {
+                  return result((withState: any) => {
+                    if (actionsToSyncWithStorage.indexOf(name) > -1) {
+                      handleUpdate(state, result);
+                    }
+                    return update(withState);
+                  });
+                };
+              } else {
                 if (actionsToSyncWithStorage.indexOf(name) > -1) {
                   handleUpdate(state, result);
                 }
-                return update(withState);
-              });
-            };
-          } else {
-            if (actionsToSyncWithStorage.indexOf(name) > -1) {
-              handleUpdate(state, result);
+                return result;
+              }
             }
-            return result;
-          }
-        } : enhanceActionsToSyncWithStorage(action, namespacedName);
+            : enhanceActionsToSyncWithStorage(action, namespacedName);
         return enhancedActions;
+      }, {});
+    }
+
+    function enhanceModuleActionsToSyncWithStorage(modules: any) {
+      return Object.keys(
+        modules || {}
+      ).reduce((newModules: any, moduleName: any) => {
+        const module = modules[moduleName];
+        newModules[moduleName] = module;
+        newModules[moduleName].actions = enhanceActionsToSyncWithStorage(
+          module.actions
+        );
+        return newModules;
       }, {});
     }
 
@@ -96,8 +111,11 @@ export default (app: any) => {
 
     // add storage actions...yeah, probably not supposed to mutate actions this way
     Object.assign(props.actions, storageActions);
-    // presently does not enhance actions of modules
+
     props.actions = enhanceActionsToSyncWithStorage(props.actions);
+    // presently does not enhance child modules of modules
+    props.modules = enhanceModuleActionsToSyncWithStorage(props.modules);
+
     return app(props, root);
   };
 };
