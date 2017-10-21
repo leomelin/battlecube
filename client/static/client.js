@@ -50470,7 +50470,7 @@ const createCube = () => {
         const scale = config.CUBE_WIDTH / segments;
         const s = new Matrix4().makeScale(scale, scale, scale);
         // Center grid
-        const center = (segments - 1) / 2.0;
+        const center = segments / 2.0;
         const t = new Matrix4().makeTranslation(-center, -center, -center);
         // Create transformation matrix
         const st = new Matrix4().multiplyMatrices(s, t);
@@ -50506,6 +50506,12 @@ const createCube = () => {
         update
     };
 };
+var renderCube = (state, actions) => h('div', {
+    id: 'cube-container',
+    oncreate: () => {
+        actions.initCube(state);
+    }
+});
 
 const io = socket('http://localhost:9999');
 const cubeActions = {
@@ -50638,13 +50644,6 @@ var actions = Object.assign({}, cubeActions, playerActions, { showNewSpeedWhileD
             updateCube();
         });
     }, clearLog: () => ({ log: [] }) });
-
-var renderCube = (state, actions) => h('div', {
-    id: 'cube-container',
-    oncreate: () => {
-        actions.initCube(state);
-    }
-});
 
 const STORAGE_ID = 'battlecube-storage';
 const store = {
