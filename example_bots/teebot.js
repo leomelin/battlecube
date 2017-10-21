@@ -1,5 +1,8 @@
 const http = require('http');
 const [port] = process.argv.slice(2);
+
+const minMoves = 1;
+const moveFraction = 2;
 const deterministic = false;
 
 if (!port) {
@@ -108,13 +111,15 @@ const moveDistance = (n, data) => {
   }
 
   // Find the longest path as fallback
-  done.reduce((best, x) => best.moves.length < x.moves.length ? x : best, [])
+  const best = done.reduce(
+    (best, x) => best.moves.length < x.moves.length ? x : best, 
+    {moves: []})
   return best.moves.map(m => { return {task: 'MOVE', direction: m} })
 }
 
 const getDirections = (data) => {
   const numTasks = data.gameInfo.numOfTasksPerTick;
-  const moves = moveDistance(Math.max(1, numTasks / 3), data);
+  const moves = moveDistance(Math.max(minMoves, numTasks / moveFraction), data);
   console.log("Moves:", JSON.stringify(moves))
   const targets = pickTargets(numTasks - moves.length, data);
   console.log("Targets:", JSON.stringify(targets))
