@@ -45,14 +45,24 @@ const actionsToSyncWithStorage = [
   'addPlayer',
   'removePlayer',
   'recordWin',
-  'setup.updateSpeed'
+  'setup.updateSpeed',
+  'setup.up',
+  'setup.down'
 ];
 
 const logSaveMessage = () => console.log('Synced state change with locale storage');
 
-const handleUpdate = (state: IAppState, result: IAppState) => {
-  const updatedState = Object.assign({}, state, result);
-  store.set(updatedState).then(logSaveMessage);
+const handleUpdate = (actionName: string, state: IAppState, result: IAppState) => {
+  const [prefix, nestedAction] = actionName.split('.');
+  if (nestedAction) {
+    store.get().then((data: IAppState) => {
+      const update = Object.assign({}, data[prefix], result);
+      const newData = Object.assign({}, data, { [prefix]: update });
+      return store.set(newData).then(logSaveMessage);
+    });
+  }
+  const { players, setup } = Object.assign({}, state, result);
+  store.set({ players, setup }).then(logSaveMessage);
 };
 
 export default (app: any) => {
@@ -73,15 +83,15 @@ export default (app: any) => {
               if (typeof result === 'function') {
                 return (update: Function) => {
                   return result((withState: any) => {
-                    if (actionsToSyncWithStorage.indexOf(name) > -1) {
-                      handleUpdate(state, result);
+                    if (actionsToSyncWithStorage.indexOf(namespacedName) > -1) {
+                      handleUpdate(namespacedName, state, result);
                     }
                     return update(withState);
                   });
                 };
               } else {
-                if (actionsToSyncWithStorage.indexOf(name) > -1) {
-                  handleUpdate(state, result);
+                if (actionsToSyncWithStorage.indexOf(namespacedName) > -1) {
+                  handleUpdate(namespacedName, state, result);
                 }
                 return result;
               }
@@ -113,6 +123,7 @@ export default (app: any) => {
     Object.assign(props.actions, storageActions);
 
     props.actions = enhanceActionsToSyncWithStorage(props.actions);
+
     // presently does not enhance child modules of modules
     props.modules = enhanceModuleActionsToSyncWithStorage(props.modules);
 

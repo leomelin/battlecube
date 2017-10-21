@@ -2,7 +2,7 @@ import { app, h } from 'hyperapp';
 import { div, h1, main, label, button } from '@hyperapp/html';
 import './client.css';
 import initialState, { GameStatus, IAppState, IPlayer } from './initialState';
-import { LogItem, Slider, Player } from './views';
+import { LogItem, Slider, Player, Setup } from './views';
 import actions, { IActions } from './actions';
 import renderCube from './cube';
 import botForm, { renderBotForm } from './botFormModule';
@@ -22,6 +22,7 @@ persistedApp(
     view: (state: IAppState, actions: IActions) =>
       main({}, [
         h1({}, 'Battle³'),
+        Setup(state, actions),
         label({}, `Speed: ${state.sliderSpeedValue} ms`),
         Slider(state, actions),
         button(

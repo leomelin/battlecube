@@ -1,10 +1,11 @@
-import { h, State } from 'hyperapp';
+import { h } from 'hyperapp';
 import { form, button } from '@hyperapp/html';
 import { IAppState } from './initialState';
 import { IActions } from './actions';
 import { Input } from './views';
 import { PlayerStatus } from './initialState';
 import './form.css';
+import { minLen, hasProtocalInUrl, isHex } from './helpers';
 
 type Test = [any, string];
 
@@ -47,17 +48,39 @@ const defaultFormValues = {
   color: ''
 };
 
-const minLen = (minLength: number) => (v: string) => v && v.length > minLength;
-const urlRegex = /^(http|https):\/\//;
-const hasProtocalInUrl = (value: string) => urlRegex.test(value);
-const hexRegex = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
-export const isHex = (value: string) => hexRegex.test(value);
-
 const inputConfig = [
   { id: 'url', placeholder: 'http://myboturl', type: 'url' },
   { id: 'name', placeholder: 'Name' },
   { id: 'color', placeholder: 'Color (6 digit hex value)' }
 ];
+
+export const formActions = {
+  setFormValue: (
+    state: IBotFormState,
+    _a: IBotFormActions,
+    { id, value }: { id: string; value: string }
+  ) => ({ values: { ...state.values, [id]: value } }),
+
+  clearForm: () => ({ values: defaultFormValues }),
+
+  toggleForm: (state: IBotFormState) => ({ isOpen: !state.isOpen }),
+
+  validate: (_s: IBotFormState, _a: IBotFormActions, { id, value }: any) => (
+    update: any
+  ) => {
+    update((state: IBotFormState) => {
+      const error = state.tests[
+        id
+      ].reduce((errorMessage: string, test: Test) => {
+        if (!test[0](value)) {
+          return test[1];
+        }
+        return errorMessage;
+      }, null);
+      return { errors: { [id]: error } };
+    });
+  }
+};
 
 export default {
   state: {
@@ -77,33 +100,7 @@ export default {
       color: null
     }
   },
-  actions: {
-    setFormValue: (
-      state: IBotFormState,
-      _a: IBotFormActions,
-      { id, value }: { id: string; value: string }
-    ) => ({ values: { ...state.values, [id]: value } }),
-
-    clearForm: () => ({ values: defaultFormValues }),
-
-    toggleForm: (state: IBotFormState) => ({ isOpen: !state.isOpen }),
-
-    validate: (_s: IBotFormState, _a: IBotFormActions, { id, value }: any) => (
-      update: any
-    ) => {
-      update((state: IBotFormState) => {
-        const error = state.tests[
-          id
-        ].reduce((errorMessage: string, test: Test) => {
-          if (!test[0](value)) {
-            return test[1];
-          }
-          return errorMessage;
-        }, null);
-        return { errors: { [id]: error } };
-      });
-    }
-  }
+  actions: formActions
 };
 
 const formInputs = (values: any, errors: any, actions: IActions) =>

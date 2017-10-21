@@ -30,12 +30,15 @@ export interface IPlayer extends State {
   wins: number;
 }
 
+export interface IGameSetup {
+  edgeLength: number;
+  speed: number;
+  numOfTasksPerTick: number;
+  [key: string]: number;
+}
+
 export interface ISetup extends State {
-  setup: {
-    edgeLength: number;
-    speed: number;
-    numOfTasksPerTick: number;
-  };
+  setup: IGameSetup;
   players: IPlayer[];
 }
 
@@ -53,6 +56,7 @@ export interface IAppState extends ISetup {
   log: ILogItem[];
   cube: any;
   botForm: IBotFormState;
+  [key: string]: any;
 }
 
 export default {

@@ -1,5 +1,6 @@
 import {
   IAppState,
+  IGameSetup,
   GameStatus,
   ILogItem,
   MessageType,
@@ -42,6 +43,8 @@ export interface IActions extends Actions<IAppState> {
   start: IStart;
   setup: {
     updateSpeed: IUpdateSpeed;
+    up(id: string): IGameSetup;
+    down(id: string): IGameSetup;
   };
   log: ILog;
   clearLog(): any;
@@ -126,7 +129,19 @@ export default {
       };
       io.updateSetup(newSetup);
       return newSetup;
-    }
+    },
+
+    up: (
+      state: IGameSetup,
+      _a: IActions,
+      id: string
+    ) => ({ [id]: state[id] + 1 }),
+
+    down: (
+      state: IGameSetup,
+      _a: IActions,
+      id: string
+    ) => ({ [id]: state[id] - 1 })
   },
 
   updateGameStatus: (state: IAppState, { updateCube, recordWin }: IActions) => (

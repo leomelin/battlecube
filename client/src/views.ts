@@ -1,10 +1,10 @@
 /* tslint:disable */
 import { h } from 'hyperapp';
-import { div, span, li, input, p, button } from '@hyperapp/html';
-import { ILogItem, MessageType, IAppState } from './initialState';
+import { div, span, li, input, p, button, h2, label } from '@hyperapp/html';
+import { ILogItem, MessageType, IAppState, GameStatus } from './initialState';
 import { IActions } from './actions';
 import { PlayerStatus, IPlayer } from './initialState';
-import { isHex } from './botFormModule';
+import { isHex } from './helpers';
 
 interface IItem {
   [key: string]: Function;
@@ -126,7 +126,7 @@ export const Input = ({
   oninput,
   error
 }: any) =>
-  div({className: 'bot-input-group'}, [
+  div({ className: 'bot-input-group' }, [
     input({
       type,
       id,
@@ -136,5 +136,57 @@ export const Input = ({
       oninput,
       style: isHex(value) ? { backgroundColor: value } : {}
     }),
-    div({ className: 'error', style: { display: error ? 'flex' : 'none' }}, error)
+    div(
+      { className: 'error', style: { display: error ? 'flex' : 'none' } },
+      error
+    )
   ]);
+
+export const Setup = (state: IAppState, { setup }: IActions): any => {
+  return div(
+    {
+      className: 'settings',
+      style: {
+        display: state.gameStatus === GameStatus.stopped ? 'flex' : 'none'
+      }
+    },
+    [
+      div({ className: 'setting' }, [
+        label({}, 'Tick tasks'),
+        h2({}, state.setup.numOfTasksPerTick),
+        button(
+          {
+            className: 'settings-button',
+            onclick: () => setup.down('numOfTasksPerTick')
+          },
+          'ー'
+        ),
+        button(
+          {
+            className: 'settings-button',
+            onclick: () => setup.up('numOfTasksPerTick')
+          },
+          '＋'
+        )
+      ]),
+      div({ className: 'setting' }, [
+        label({}, 'Edge length'),
+        h2({}, state.setup.edgeLength),
+        button(
+          {
+            className: 'settings-button',
+            onclick: () => setup.down('edgeLength')
+          },
+          'ー'
+        ),
+        button(
+          {
+            className: 'settings-button',
+            onclick: () => setup.up('edgeLength')
+          },
+          '＋'
+        )
+      ])
+    ]
+  );
+};
