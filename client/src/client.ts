@@ -1,5 +1,5 @@
 import { app, h } from 'hyperapp';
-import { div, h1, main, label, button } from '@hyperapp/html';
+import { div, h1, main, label, button, ul } from '@hyperapp/html';
 import './client.css';
 import state, { GameStatus, IAppState, IPlayer } from './initialState';
 import { LogItem, Slider, Player, Setup } from './views';
@@ -7,8 +7,18 @@ import actions, { IActions } from './actions';
 import renderCube from './cube';
 import botForm, { renderBotForm } from './botFormModule';
 import syncActionsAndInjectEmitter from './enhancer';
+const actionsToSyncWithStorage = [
+  'addPlayer',
+  'removePlayer',
+  'recordWin',
+  'setup.updateSpeed',
+  'setup.up',
+  'setup.down'
+];
 
-const enhancedApp = syncActionsAndInjectEmitter(app);
+const enhancedApp = syncActionsAndInjectEmitter(app, {
+  syncedActions: actionsToSyncWithStorage
+});
 
 enhancedApp(
   {
@@ -19,7 +29,7 @@ enhancedApp(
       actions.log();
     },
     events: {
-      reinit: (state: IAppState, actions: IActions, data: any) => {
+      'cube:resize': (state: IAppState, actions: IActions, data: any): void => {
         state.cube.resize(data.edgeLength);
       }
     },
@@ -43,7 +53,7 @@ enhancedApp(
             className: 'log',
             style: { display: state.log.length < 1 ? 'none' : 'flex' }
           },
-          [h('ul', {}, state.log.map(LogItem(state.players)))]
+          [ul({}, state.log.map(LogItem(state.players)))]
         ),
         div(
           { className: 'players' },

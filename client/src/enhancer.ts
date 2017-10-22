@@ -44,15 +44,6 @@ const storageActions = {
   removePersistedState: () => store.remove()
 };
 
-const actionsToSyncWithStorage = [
-  'addPlayer',
-  'removePlayer',
-  'recordWin',
-  'setup.updateSpeed',
-  'setup.up',
-  'setup.down'
-];
-
 const logSaveMessage = () =>
   console.log('Synced state change with locale storage');
 
@@ -75,6 +66,7 @@ const handleUpdate = (
 
 function enhanceActionsToSyncWithStorage(
   actions: IActions,
+  syncedActions: string[],
   emit: any,
   prefix = ''
 ) {
@@ -85,29 +77,29 @@ function enhanceActionsToSyncWithStorage(
     enhancedActions[name] =
       typeof action === 'function'
         ? (state: IAppState, actions: IActions, data: any) => {
-            const result = action(state, actions, data, emit);
-            if (typeof result === 'function') {
-              return (update: Function) => {
-                return result((withState: any) => {
-                  if (actionsToSyncWithStorage.indexOf(namespacedName) > -1) {
-                    handleUpdate(namespacedName, state, result);
-                  }
-                  return update(withState, emit);
-                });
-              };
-            } else {
-              if (actionsToSyncWithStorage.indexOf(namespacedName) > -1) {
-                handleUpdate(namespacedName, state, result);
-              }
-              return result;
+          const result = action(state, actions, data, emit);
+          if (typeof result === 'function') {
+            return (update: Function) => {
+              return result((withState: any) => {
+                if (syncedActions.indexOf(namespacedName) > -1) {
+                  handleUpdate(namespacedName, state, result);
+                }
+                return update(withState, emit);
+              });
+            };
+          } else {
+            if (syncedActions.indexOf(namespacedName) > -1) {
+              handleUpdate(namespacedName, state, result);
             }
+            return result;
           }
-        : enhanceActionsToSyncWithStorage(action, emit, namespacedName);
+        }
+        : enhanceActionsToSyncWithStorage(action, syncedActions, emit, namespacedName);
     return enhancedActions;
   }, {});
 }
 
-function enhanceModuleActionsToSyncWithStorage(modules: any, emit: any) {
+function enhanceModuleActionsToSyncWithStorage(modules: any, syncedActions: string[], emit: any) {
   return Object.keys(
     modules || {}
   ).reduce((newModules: any, moduleName: any) => {
@@ -115,21 +107,23 @@ function enhanceModuleActionsToSyncWithStorage(modules: any, emit: any) {
     newModules[moduleName] = module;
     newModules[moduleName].actions = enhanceActionsToSyncWithStorage(
       module.actions,
+      syncedActions,
       emit
     );
     return newModules;
   }, {});
 }
 
-export default (app: any) => {
+export default (app: any, opts: { syncedActions: string[] }) => {
+  const actionsToSyncWithStorage = opts.syncedActions || [];
+
   return async (props: any, root: any) => {
     const persistedState = await store.get();
 
     if (persistedState) {
-      Object.assign(props.state, persistedState, { emitter });
+      Object.assign(props.state, persistedState, { sliderSpeedValue: persistedState.setup.speed });
     }
 
-    // add storage actions...yeah, probably not supposed to mutate actions this way
     Object.assign(props.actions, storageActions, {__emit: (
       state: IAppState,
       actions: IActions,
@@ -145,18 +139,20 @@ export default (app: any) => {
 
     const emit = (message: { name: string, data: any }) => _emit(message);
 
-    props.actions = enhanceActionsToSyncWithStorage(props.actions, emit);
+    props.actions = enhanceActionsToSyncWithStorage(props.actions, actionsToSyncWithStorage, emit);
 
     // presently does not enhance child modules of modules
-    props.modules = enhanceModuleActionsToSyncWithStorage(props.modules, emit);
+    props.modules = enhanceModuleActionsToSyncWithStorage(props.modules, actionsToSyncWithStorage, emit);
+
+    const appActions = app(props, root);
+
+    _emit = appActions.__emit;
 
     window.addEventListener('unload', () => {
-      props.actions.persistState();
+      appActions.persistState();
       logSaveMessage();
     });
 
-    const appActions = app(props, root);
-    _emit = appActions.__emit;
     return appActions;
   };
 };

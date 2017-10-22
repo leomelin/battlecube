@@ -132,7 +132,10 @@ export default {
 
     up: (state: IGameSetup, actions: IActions, id: string, emit: Function) => {
       if (id === 'edgeLength') {
-        emit({ name: 'reinit', data: { edgeLength: state.edgeLength + 1 } });
+        emit({
+          name: 'cube:resize',
+          data: { edgeLength: state.edgeLength + 1 }
+        });
       }
       return { [id]: state[id] + 1 };
     },
@@ -144,10 +147,13 @@ export default {
       emit: Function
     ) => {
       if (id === 'edgeLength') {
-        emit({ name: 'reinit', data: {
-          ...state,
-          ...{ edgeLength: state.edgeLength - 1 }
-        }});
+        emit({
+          name: 'cube:resize',
+          data: {
+            ...state,
+            ...{ edgeLength: state.edgeLength - 1 }
+          }
+        });
       }
       return { [id]: state[id] - 1 };
     }
