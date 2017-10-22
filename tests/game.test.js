@@ -1,3 +1,5 @@
+const getValidatedGameConfig = require('../build/server/src/validators').getValidatedGameConfig;
+
 const Game = require('../build/server/src/game').Game;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -9,10 +11,212 @@ const createMockSocket = (func) => ({
   }
 });
 
+describe('test game config validation', () => {
+  test('should fail when no max num of ticks set', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    const gameConfig = getValidatedGameConfig({
+      'setup': {
+        'edgeLength': 8,
+        'speed': 0,
+        'numOfTasksPerTick': 1
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': 'http://localhost:4001'
+        },
+        {
+          'name': 'Petra',
+          'url': 'http://localhost:4002'
+        },
+        {
+          'name': 'Carmine',
+          'url': 'http://localhost:4003'
+        },
+        {
+          'name': 'Whoopie',
+          'url': 'http://localhost:4004'
+        }]
+    }, createMockSocket(socket));
+    expect(gameConfig).toBeNull();
+    expect(eventsList.length).toBe(1);
+    expect(eventsList[0].data.error).toBe('INVALID_GAME_CONFIGURATION');
+  });
+
+  test('should fail when edgelength is too small for all players to fit inside the cube', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    const gameConfig = getValidatedGameConfig({
+      'setup': {
+        'maxNumOfTicks': 200,
+        'edgeLength': 2,
+        'speed': 0,
+        'numOfTasksPerTick': 1
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': 'http://localhost:4001'
+        },
+        {
+          'name': 'Petra',
+          'url': 'http://localhost:4002'
+        },
+        {
+          'name': 'Carmine',
+          'url': 'http://localhost:4003'
+        },
+        {
+          'name': 'Dickson',
+          'url': 'http://localhost:4005'
+        },
+        {
+          'name': 'Dickson2',
+          'url': 'http://localhost:4006'
+        },
+        {
+          'name': 'Dickson3',
+          'url': 'http://localhost:4007'
+        },
+        {
+          'name': 'Dickson4',
+          'url': 'http://localhost:4008'
+        },
+        {
+          'name': 'Dickson5',
+          'url': 'http://localhost:4009'
+        },
+        {
+          'name': 'Whoopie',
+          'url': 'http://localhost:4004'
+        }]
+    }, createMockSocket(socket));
+    expect(gameConfig).toBeNull();
+    expect(eventsList.length).toBe(1);
+    expect(eventsList[0].data.error).toBe('INVALID_GAME_CONFIGURATION');
+  });
+
+  test('should fail when multiple players have same name', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    const gameConfig = getValidatedGameConfig({
+      'setup': {
+        'maxNumOfTicks': 200,
+        'edgeLength': 8,
+        'speed': 0,
+        'numOfTasksPerTick': 1
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': 'http://localhost:4001'
+        },
+        {
+          'name': 'John',
+          'url': 'http://localhost:4002'
+        },
+        {
+          'name': 'Carmine',
+          'url': 'http://localhost:4003'
+        },
+        {
+          'name': 'Whoopie',
+          'url': 'http://localhost:4004'
+        }]
+    }, createMockSocket(socket));
+    expect(gameConfig).toBeNull();
+    expect(eventsList.length).toBe(1);
+    expect(eventsList[0].data.error).toBe('INVALID_GAME_CONFIGURATION');
+  });
+
+  test('should fail when speed is negative', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    const gameConfig = getValidatedGameConfig({
+      'setup': {
+        'maxNumOfTicks': 200,
+        'edgeLength': 8,
+        'speed': -1,
+        'numOfTasksPerTick': 1
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': 'http://localhost:4001'
+        },
+        {
+          'name': 'Paul',
+          'url': 'http://localhost:4002'
+        },
+        {
+          'name': 'Carmine',
+          'url': 'http://localhost:4003'
+        },
+        {
+          'name': 'Whoopie',
+          'url': 'http://localhost:4004'
+        }]
+    }, createMockSocket(socket));
+    expect(gameConfig).toBeNull();
+    expect(eventsList.length).toBe(1);
+    expect(eventsList[0].data.error).toBe('INVALID_GAME_CONFIGURATION');
+  });
+
+  test('should fail when numOfTasksPerTick is zero', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    const gameConfig = getValidatedGameConfig({
+      'setup': {
+        'maxNumOfTicks': 200,
+        'edgeLength': 8,
+        'speed': 0,
+        'numOfTasksPerTick': 0
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': 'http://localhost:4001'
+        },
+        {
+          'name': 'Paul',
+          'url': 'http://localhost:4002'
+        },
+        {
+          'name': 'Carmine',
+          'url': 'http://localhost:4003'
+        },
+        {
+          'name': 'Whoopie',
+          'url': 'http://localhost:4004'
+        }]
+    }, createMockSocket(socket));
+    expect(gameConfig).toBeNull();
+    expect(eventsList.length).toBe(1);
+    expect(eventsList[0].data.error).toBe('INVALID_GAME_CONFIGURATION');
+  });
+});
+
 describe('test game logic', () => {
   test('should construct game object', () => {
     const game = new Game({
       'setup': {
+        'maxNumOfTicks': 200,
         'edgeLength': 8,
         'speed': 0,
         'numOfTasksPerTick': 1
@@ -49,6 +253,7 @@ describe('test game logic', () => {
     };
     const game = new Game({
       'setup': {
+        'maxNumOfTicks': 200,
         'edgeLength': 8,
         'speed': 0,
         'numOfTasksPerTick': 1,
@@ -102,6 +307,7 @@ describe('test game logic', () => {
     };
     const game = new Game({
       'setup': {
+        'maxNumOfTicks': 200,
         'edgeLength': 8,
         'speed': 0,
         'numOfTasksPerTick': 1,
@@ -153,6 +359,7 @@ describe('test game logic', () => {
     };
     const game = new Game({
       'setup': {
+        'maxNumOfTicks': 200,
         'edgeLength': 8,
         'speed': 0,
         'numOfTasksPerTick': 1,
@@ -278,6 +485,7 @@ describe('test game logic', () => {
     };
     const game = new Game({
       'setup': {
+        'maxNumOfTicks': 200,
         'edgeLength': 8,
         'speed': 0,
         'numOfTasksPerTick': 1,
@@ -377,6 +585,7 @@ describe('test game logic', () => {
 
     const game = new Game({
       'setup': {
+        'maxNumOfTicks': 200,
         'edgeLength': 8,
         'speed': 0,
         'numOfTasksPerTick': 1,
@@ -479,6 +688,7 @@ describe('test game logic', () => {
     };
     const game = new Game({
       'setup': {
+        'maxNumOfTicks': 200,
         'edgeLength': 8,
         'speed': 0,
         'numOfTasksPerTick': 2,
@@ -531,6 +741,71 @@ describe('test game logic', () => {
     expect(eventsList).toMatchSnapshot();
   });
 
+  test('Game should end when it has run long enough', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    const johnDirections = [{
+      task: 'MOVE',
+      direction: '+Y'
+    }, {
+      task: 'MOVE',
+      direction: '-Y'
+    }];
+
+    const paulDirections = [{
+      task: 'NOOP'
+    }, {
+      task: 'NOOP'
+    }];
+
+    const gameConfig = {
+      'setup': {
+        'maxNumOfTicks': 200,
+        'edgeLength': 8,
+        'speed': 0,
+        'numOfTasksPerTick': 2,
+        'playerStartPositions': [
+          {
+            'name': 'John',
+            'x': 0,
+            'y': 0,
+            'z': 0
+          },
+          {
+            'name': 'Paul',
+            'x': 0,
+            'y': 0,
+            'z': 1
+          }
+        ]
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': (nextTickInfo) => {
+            return johnDirections;
+          }
+        },
+        {
+          'name': 'Paul',
+          'url': (nextTickInfo) => {
+            return paulDirections;
+          }
+        }
+      ]
+    };
+    const mockSocket = createMockSocket(socket);
+    const game = new Game(gameConfig, mockSocket);
+
+    game.start();
+
+    // Wait game to finish
+    await wait(1000);
+    expect(eventsList[eventsList.length - 1]).toMatchSnapshot();
+  });
 });
 
 

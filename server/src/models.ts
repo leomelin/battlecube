@@ -11,6 +11,7 @@ export class PlayerPosition extends Coordinate {
 }
 
 export class GameSetup {
+  maxNumOfTicks: number;
   edgeLength: number;
   speed: number = 0;
   numOfTasksPerTick: number;

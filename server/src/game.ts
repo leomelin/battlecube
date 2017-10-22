@@ -257,7 +257,9 @@ export class Game {
       });
     });
 
-    if (this.lostPlayers.length === this.gameConfig.players.length || this.preValidationInfo.players.length === 1) {
+    // Make the game end if 1. all players are lost, 2. there is only one player left 3. game has been running long enough
+    if (this.lostPlayers.length === this.gameConfig.players.length || this.preValidationInfo.players.length === 1 ||
+      this.currentTick === this.gameConfig.setup.maxNumOfTicks - 1) {
       this.gameEnded = true;
     }
   }
@@ -265,14 +267,20 @@ export class Game {
   getHighscores(): HighScoreInfo {
     let winner;
     const scores = this.lostPlayers;
-    if (this.playerPositions.length) {
+    if (this.playerPositions.length === 1) {
       winner = {
         ...(<PlayerSetup>this.gameConfig.players.find(p => p.name === this.playerPositions[0].name)),
         highScore: this.currentTick
       };
       scores.push(winner);
     }
-
+    if (this.playerPositions.length > 1) {
+      // In tie situation, push all remaining players to scores array with currentTick number as high score
+      scores.push(...this.playerPositions.map(remainingPlayer => ({
+        ...(<PlayerSetup>this.gameConfig.players.find(p => p.name === remainingPlayer.name)),
+        highScore: this.currentTick
+      })));
+    }
     return {
       winner,
       scores,

@@ -3,6 +3,7 @@ import Error from './error-code';
 import { BotDirection, GameConfig, GameSetup } from './models';
 
 const gameSetupSchema = Joi.object().keys({
+  maxNumOfTicks: Joi.number().positive().integer().required(),
   edgeLength: Joi.number().positive().integer().required(),
   speed: Joi.number().positive().integer().allow(0).default(0).optional(),
   numOfTasksPerTick: Joi.number().positive().integer().required(),

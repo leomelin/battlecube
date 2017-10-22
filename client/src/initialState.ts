@@ -31,6 +31,7 @@ export interface IPlayer extends State {
 }
 
 export interface IGameSetup {
+  maxNumOfTicks: number;
   edgeLength: number;
   speed: number;
   numOfTasksPerTick: number;
@@ -62,6 +63,7 @@ export interface IAppState extends ISetup {
 export default {
   sliderSpeedValue: 200,
   setup: {
+    maxNumOfTicks: 1000,
     edgeLength: 8,
     speed: 200,
     numOfTasksPerTick: 1

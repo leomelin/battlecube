@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`test game logic Game should end when it has run long enough 1`] = `
+Object {
+  "data": Object {
+    "id": "mock-socket-id",
+    "result": "TIE",
+    "scores": Array [
+      Object {
+        "highScore": 200,
+        "name": "John",
+      },
+      Object {
+        "highScore": 200,
+        "name": "Paul",
+      },
+    ],
+  },
+  "event": "GAME_ENDED",
+}
+`;
+
 exports[`test game logic should play two ticks on single bot directions response 1`] = `
 Array [
   Object {

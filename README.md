@@ -27,6 +27,7 @@ Basically, all you have to do is create a bot that stays in the grid, avoids col
 ```js
 {
   "setup": {
+    "maxNumOfTicks": <number>, /* This must be set to force the game to stop at some point if bots won't die */
     "edgeLength": <number>,
     "speed": <number>, /* milliseconds to delay between ticks, zero being the fastest setting. */
     "numOfTasksPerTick": <number>, /* how many tasks bots can send at once (= how many ticks bots need to plan in advance) */
