@@ -107,7 +107,6 @@ export default {
       ...state,
       sliderSpeedValue
     };
-
     return newState;
   },
 
@@ -131,17 +130,27 @@ export default {
       return newSetup;
     },
 
-    up: (
-      state: IGameSetup,
-      _a: IActions,
-      id: string
-    ) => ({ [id]: state[id] + 1 }),
+    up: (state: IGameSetup, actions: IActions, id: string, emit: Function) => {
+      if (id === 'edgeLength') {
+        emit({ name: 'reinit', data: { edgeLength: state.edgeLength + 1 } });
+      }
+      return { [id]: state[id] + 1 };
+    },
 
     down: (
       state: IGameSetup,
-      _a: IActions,
-      id: string
-    ) => ({ [id]: state[id] - 1 })
+      actions: IActions,
+      id: string,
+      emit: Function
+    ) => {
+      if (id === 'edgeLength') {
+        emit({ name: 'reinit', data: {
+          ...state,
+          ...{ edgeLength: state.edgeLength - 1 }
+        }});
+      }
+      return { [id]: state[id] - 1 };
+    }
   },
 
   updateGameStatus: (state: IAppState, { updateCube, recordWin }: IActions) => (
@@ -233,7 +242,7 @@ export default {
 
         const updatedPlayers = state.players.map((player: IPlayer) => {
           const { x = null, y = null, z = null } =
-          players.find((p: IPlayer) => p.name === player.name) || {};
+            players.find((p: IPlayer) => p.name === player.name) || {};
           const position = { x, y, z };
           return x !== null
             ? { ...player, position, status: PlayerStatus.active }

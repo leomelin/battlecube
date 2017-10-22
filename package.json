@@ -50,6 +50,7 @@
     "@types/three": "^0.84.26",
     "hyperapp": "github:rikuvan/hyperapp",
     "joi": "^11.1.1",
+    "mitt": "^1.1.2",
     "node-fetch": "^1.7.3",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",

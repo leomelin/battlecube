@@ -1,23 +1,28 @@
 import { app, h } from 'hyperapp';
 import { div, h1, main, label, button } from '@hyperapp/html';
 import './client.css';
-import initialState, { GameStatus, IAppState, IPlayer } from './initialState';
+import state, { GameStatus, IAppState, IPlayer } from './initialState';
 import { LogItem, Slider, Player, Setup } from './views';
 import actions, { IActions } from './actions';
 import renderCube from './cube';
 import botForm, { renderBotForm } from './botFormModule';
-import persist from './persist';
+import syncActionsAndInjectEmitter from './enhancer';
 
-const persistedApp = persist(app);
+const enhancedApp = syncActionsAndInjectEmitter(app);
 
-persistedApp(
+enhancedApp(
   {
+    state,
     actions,
-    init: (_s: IAppState, actions: IActions): void => {
+    init: (state: IAppState, actions: IActions): void => {
       actions.updateGameStatus();
       actions.log();
     },
-    state: { ...initialState },
+    events: {
+      reinit: (state: IAppState, actions: IActions, data: any) => {
+        state.cube.resize(data.edgeLength);
+      }
+    },
     modules: { botForm },
     view: (state: IAppState, actions: IActions) =>
       main({}, [

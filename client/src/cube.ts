@@ -52,18 +52,6 @@ export const createCube = () => {
     );
     camera.position.z = 200;
     camera.lookAt(new Vector3(0, 0, 0));
-    geometry = new BoxGeometry(
-      config.CUBE_WIDTH,
-      config.CUBE_WIDTH,
-      config.CUBE_WIDTH,
-      segments,
-      segments,
-      segments
-    );
-    material = new MeshPhongMaterial({
-      wireframe: true,
-      color: '#55ff55'
-    });
     ambientLight = new AmbientLight(0x898989);
     light = new DirectionalLight(0xffffff, 0.5);
     light.position.set(-50, 250, 300);
@@ -86,6 +74,18 @@ export const createCube = () => {
   };
 
   function addCube() {
+    geometry = new BoxGeometry(
+      config.CUBE_WIDTH,
+      config.CUBE_WIDTH,
+      config.CUBE_WIDTH,
+      segments,
+      segments,
+      segments
+    );
+    material = new MeshPhongMaterial({
+      wireframe: true,
+      color: '#55ff55'
+    });
     cube = new Mesh(geometry, material);
     cube.name = 'cube';
     // cube.matrixAutoUpdate  = false;
@@ -138,9 +138,17 @@ export const createCube = () => {
     });
   };
 
+  const resize = (length: number) => {
+    scene.remove(cube);
+    segments = length;
+    addCube();
+    render();
+  };
+
   return {
     init,
-    update
+    update,
+    resize
   };
 };
 
