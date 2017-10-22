@@ -75,6 +75,7 @@ export class Game {
       players: this.playerPositions,
       items: this.otherItems,
       gameInfo: {
+        id: this.socket.id,
         edgeLength: this.edgeLength,
         numOfTasksPerTick: this.numOfTasksPerTick,
         numOfBotsInPlay: this.playerPositions.length,
@@ -275,6 +276,7 @@ export class Game {
     return {
       winner,
       scores,
+      id: this.socket.id,
       result: winner ? 'WINNER_FOUND' : 'TIE'
     };
   }
@@ -297,7 +299,7 @@ export class Game {
 
   async start() {
     this.positionPlayers();
-    this.socket.emit('GAME_STARTED');
+    this.socket.emit('GAME_STARTED', { id: this.socket.id });
     this.gameStarted = true;
     this.preValidationInfo.collisions = [];
     this.otherItems = [];

@@ -3,6 +3,9 @@
 exports[`test game logic should play two ticks on single bot directions response 1`] = `
 Array [
   Object {
+    "data": Object {
+      "id": "mock-socket-id",
+    },
     "event": "GAME_STARTED",
   },
   Object {
@@ -10,6 +13,7 @@ Array [
       "gameInfo": Object {
         "currentTick": 0,
         "edgeLength": 8,
+        "id": "mock-socket-id",
         "numOfBotsInPlay": 2,
         "numOfTasksPerTick": 2,
       },
@@ -54,6 +58,7 @@ Array [
       "gameInfo": Object {
         "currentTick": 1,
         "edgeLength": 8,
+        "id": "mock-socket-id",
         "numOfBotsInPlay": 2,
         "numOfTasksPerTick": 2,
       },
@@ -98,6 +103,7 @@ Array [
       "gameInfo": Object {
         "currentTick": 2,
         "edgeLength": 8,
+        "id": "mock-socket-id",
         "numOfBotsInPlay": 2,
         "numOfTasksPerTick": 2,
       },
@@ -146,6 +152,7 @@ Array [
   },
   Object {
     "data": Object {
+      "id": "mock-socket-id",
       "result": "WINNER_FOUND",
       "scores": Array [
         Object {

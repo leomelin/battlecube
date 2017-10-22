@@ -3,6 +3,7 @@ const Game = require('../build/server/src/game').Game;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const createMockSocket = (func) => ({
+  id: 'mock-socket-id',
   emit: (event, data) => {
     return func(JSON.parse(JSON.stringify({ event, data })));
   }

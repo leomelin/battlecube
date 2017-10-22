@@ -49,7 +49,12 @@ Basically, all you have to do is create a bot that stays in the grid, avoids col
 3. Listen to "GAME_STARTED", "PLAYER_LOST", "GAME_ENDED", "PLAYER_MOVE_ATTEMPT", "PLAYER_PLACED_BOMB", "PLAYER_DID_NOTHING" and "NEXT_TICK" events. These will keep you informed what has happened:
 
 ###### GAME_STARTED event
-No json, just a confirmation that a new game was successfully initialized.
+A confirmation that a new game was successfully initialized.
+```js
+{
+  "id": <string> /* Game id */
+}
+``` 
 
 ###### PLAYER_LOST event
 Get info when some player loses the game
@@ -64,6 +69,7 @@ Get info when some player loses the game
 Here we can get info about the winner
 ```js
 {
+  "id": <string>, // Game id
   "result": "TIE"|"WINNER_FOUND",
   "winner": { // Optionally here if not TIE
     "name": <string>,
@@ -115,6 +121,7 @@ A new tick happened, get current game info, bomb and player positions
 ```js
 {
   "gameInfo": {
+    "id": <string>,
     "edgeLength": <number>,
     "numOfTasksPerTick": <number>, /* how many tasks bots can do per tick */
     "numOfBotsInPlay": <number>,
@@ -145,7 +152,7 @@ A new tick happened, get current game info, bomb and player positions
 
 Your bot needs to implement this design to be able to play.
 
-#### POST /play
+#### POST /
 
 This is the endpoint that gets called by the Battlecube server.
 Your bot implementation should have this endpoint implemented and it should accept the following json structure as HTTP request body with *Content-Type: application/json*.

@@ -18,10 +18,11 @@ export class GameSetup {
 }
 
 export class HighScoreInfo {
-  result: 'TIE'|'WINNER_FOUND';
+  id: string;
+  result: 'TIE' | 'WINNER_FOUND';
   winner?: PlayerWithHighScore;
   scores: PlayerWithHighScore[];
-};
+}
 
 export class PlayerSetup {
   name: string;
@@ -48,6 +49,7 @@ export class GameInfo {
   numOfTasksPerTick: number;
   numOfBotsInPlay: number;
   currentTick: number;
+  id: string;
 }
 
 export class NextTickInfo {
