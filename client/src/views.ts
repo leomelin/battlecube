@@ -63,7 +63,7 @@ export const Slider = (state: IAppState, actions: any) =>
       {
         className: 'slider',
         type: 'range',
-        min: '10',
+        min: '0',
         max: '2000',
         step: '10',
         value: state.sliderSpeedValue,

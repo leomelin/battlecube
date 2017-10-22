@@ -623,7 +623,7 @@ const Slider = (state$$1, actions) => div({ className: 'slider-wrap' }, [
     input({
         className: 'slider',
         type: 'range',
-        min: '10',
+        min: '0',
         max: '2000',
         step: '10',
         value: state$$1.sliderSpeedValue,
