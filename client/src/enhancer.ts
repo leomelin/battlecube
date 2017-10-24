@@ -1,15 +1,17 @@
 import { IAppState } from './initialState';
 import { IActions } from './actions';
+import { pick } from './helpers';
 import mitt, { Emitter } from 'mitt';
 
 const emitter: Emitter = new mitt();
 
 const STORAGE_ID = 'battlecube-storage';
 
-const store = {
+const makeStore = (includedState: string[]) => ({
   set: (state: any) => {
+    const sliceToSave = pick(includedState, state);
     return Promise.resolve().then(() => {
-      localStorage.setItem(STORAGE_ID, JSON.stringify(state));
+      localStorage.setItem(STORAGE_ID, JSON.stringify(sliceToSave));
     });
   },
   get: () => {
@@ -25,97 +27,98 @@ const store = {
       return {};
     });
   }
-};
-
-const storageActions = {
-  persistState: (state: IAppState) => (update: Function) => {
-    update((state: IAppState) => {
-      const { players, setup } = state;
-      store.set({ players, setup });
-      return state;
-    });
-  },
-
-  getPersistedState: () => async (state: IAppState) => {
-    const retrievedState = await store.get();
-    return { ...state, ...retrievedState };
-  },
-
-  removePersistedState: () => store.remove()
-};
+});
 
 const logSaveMessage = () =>
   console.log('Synced state change with locale storage');
 
-const handleUpdate = (
-  actionName: string,
-  state: IAppState,
-  result: IAppState
-) => {
-  const [prefix, nestedAction] = actionName.split('.');
-  if (nestedAction) {
-    store.get().then((data: IAppState) => {
-      const update = Object.assign({}, data[prefix], result);
-      const newData = Object.assign({}, data, { [prefix]: update });
-      return store.set(newData).then(logSaveMessage);
-    });
-  }
-  const { players, setup } = Object.assign({}, state, result);
-  store.set({ players, setup }).then(logSaveMessage);
-};
-
-function enhanceActionsToSyncWithStorage(
-  actions: IActions,
-  syncedActions: string[],
-  emit: any,
-  prefix = ''
-) {
-  const namespace = prefix.length > 0 ? `${prefix}.` : '';
-  return Object.keys(actions || {}).reduce((enhancedActions: any, name) => {
-    const namespacedName = `${namespace}${name}`;
-    const action = actions[name];
-    enhancedActions[name] =
-      typeof action === 'function'
-        ? (state: IAppState, actions: IActions, data: any) => {
-          const result = action(state, actions, data, emit);
-          if (typeof result === 'function') {
-            return (update: Function) => {
-              return result((withState: any) => {
-                if (syncedActions.indexOf(namespacedName) > -1) {
-                  handleUpdate(namespacedName, state, result);
-                }
-                return update(withState, emit);
-              });
-            };
-          } else {
-            if (syncedActions.indexOf(namespacedName) > -1) {
-              handleUpdate(namespacedName, state, result);
-            }
-            return result;
-          }
-        }
-        : enhanceActionsToSyncWithStorage(action, syncedActions, emit, namespacedName);
-    return enhancedActions;
-  }, {});
-}
-
-function enhanceModuleActionsToSyncWithStorage(modules: any, syncedActions: string[], emit: any) {
-  return Object.keys(
-    modules || {}
-  ).reduce((newModules: any, moduleName: any) => {
-    const module = modules[moduleName];
-    newModules[moduleName] = module;
-    newModules[moduleName].actions = enhanceActionsToSyncWithStorage(
-      module.actions,
-      syncedActions,
-      emit
-    );
-    return newModules;
-  }, {});
-}
-
-export default (app: any, opts: { syncedActions: string[] }) => {
+export default (app: any, opts: { syncedActions: string[], syncedState: string[] }) => {
   const actionsToSyncWithStorage = opts.syncedActions || [];
+  const stateSlice = opts.syncedState || [];
+  const store = makeStore(stateSlice);
+
+  const storageActions = {
+    persistState: (state: IAppState) => (update: Function) => {
+      update((state: IAppState) => {
+        store.set(state);
+        return state;
+      });
+    },
+
+    getPersistedState: () => async (state: IAppState) => {
+      const retrievedState = await store.get();
+      return { ...state, ...retrievedState };
+    },
+
+    removePersistedState: () => store.remove()
+  };
+
+  const handleUpdate = (
+    actionName: string,
+    state: IAppState,
+    result: IAppState
+  ) => {
+    const [prefix, nestedAction] = actionName.split('.');
+    if (nestedAction) {
+      store.get().then((data: IAppState) => {
+        const update = Object.assign({}, data[prefix], result);
+        const newData = Object.assign({}, data, { [prefix]: update });
+        return store.set(newData).then(logSaveMessage);
+      });
+    }
+    const { players, setup } = Object.assign({}, state, result);
+    store.set({ players, setup }).then(logSaveMessage);
+  };
+
+  function enhanceActionsToSyncWithStorage(
+    actions: IActions,
+    syncedActions: string[],
+    emit: any,
+    prefix = ''
+  ) {
+    const namespace = prefix.length > 0 ? `${prefix}.` : '';
+    return Object.keys(actions || {}).reduce((enhancedActions: any, name) => {
+      const namespacedName = `${namespace}${name}`;
+      const action = actions[name];
+      enhancedActions[name] =
+        typeof action === 'function'
+          ? (state: IAppState, actions: IActions, data: any) => {
+            const result = action(state, actions, data, emit);
+            if (typeof result === 'function') {
+              return (update: Function) => {
+                return result((withState: any) => {
+                  if (syncedActions.indexOf(namespacedName) > -1) {
+                    handleUpdate(namespacedName, state, result);
+                  }
+                  return update(withState, emit);
+                });
+              };
+            } else {
+              if (syncedActions.indexOf(namespacedName) > -1) {
+                handleUpdate(namespacedName, state, result);
+              }
+              return result;
+            }
+          }
+          : enhanceActionsToSyncWithStorage(action, syncedActions, emit, namespacedName);
+      return enhancedActions;
+    }, {});
+  }
+
+  function enhanceModuleActionsToSyncWithStorage(modules: any, syncedActions: string[], emit: any) {
+    return Object.keys(
+      modules || {}
+    ).reduce((newModules: any, moduleName: any) => {
+      const module = modules[moduleName];
+      newModules[moduleName] = module;
+      newModules[moduleName].actions = enhanceActionsToSyncWithStorage(
+        module.actions,
+        syncedActions,
+        emit
+      );
+      return newModules;
+    }, {});
+  }
 
   return async (props: any, root: any) => {
     const persistedState = await store.get();

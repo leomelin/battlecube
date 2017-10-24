@@ -7,7 +7,8 @@ import actions, { IActions } from './actions';
 import renderCube from './cube';
 import botForm, { renderBotForm } from './botFormModule';
 import syncActionsAndInjectEmitter from './enhancer';
-const actionsToSyncWithStorage = [
+
+const actionsSyncedWithStorage = [
   'addPlayer',
   'removePlayer',
   'recordWin',
@@ -15,9 +16,14 @@ const actionsToSyncWithStorage = [
   'setup.up',
   'setup.down'
 ];
+const stateSyncedWithStorage = [
+  'setup',
+  'players'
+];
 
 const enhancedApp = syncActionsAndInjectEmitter(app, {
-  syncedActions: actionsToSyncWithStorage
+  syncedState: stateSyncedWithStorage,
+  syncedActions: actionsSyncedWithStorage
 });
 
 enhancedApp(
