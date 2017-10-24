@@ -5,7 +5,8 @@ import {
   ILogItem,
   MessageType,
   PlayerStatus,
-  IPlayer
+  IPlayer,
+  IPosition
 } from './initialState';
 import socket, { ITickInfo } from './socket';
 import { createCube } from './cube';
@@ -61,8 +62,8 @@ const cubeActions = {
     cube.init(state);
     return { cube };
   },
-  updateCube: ({ cube, players }: IAppState) => {
-    cube.update({ players });
+  updateCube: ({ cube, players, bombs }: IAppState) => {
+    cube.update({ players, bombs });
   }
 };
 
@@ -236,7 +237,7 @@ export default {
       });
     });
 
-    io.onTick(async ({ players = [], gameInfo }: ITickInfo) => {
+    io.onTick(async ({ players = [], gameInfo, items }: ITickInfo) => {
       await update((state: IAppState) => {
         const playerList = players.map((p: IPlayer) => p.name).join(', ');
         const currentPlayers = `Active players: ${playerList}`;
@@ -254,7 +255,7 @@ export default {
             ? { ...player, position, status: PlayerStatus.active }
             : { ...player, position, status: PlayerStatus.inactive };
         });
-        return { log, players: updatedPlayers };
+        return { log, players: updatedPlayers, bombs: items };
       });
 
       updateCube();

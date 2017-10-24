@@ -37,11 +37,17 @@ export default (serverUrl: string): ISocket => {
     onStop: action => io.on('GAME_ENDED', (scores: any) => action(scores)),
     onPlayerMove: action =>
       io.on('PLAYER_MOVE_ATTEMPT', ({ name, x, y, z }: any) => {
-        action({ name, message: `🚶 Tried to move to X: ${x} Y: ${y} Z: ${z}` });
+        action({
+          name,
+          message: `🚶 Tried to move to X: ${x} Y: ${y} Z: ${z}`
+        });
       }),
     onPlantBomb: action =>
       io.on('PLAYER_PLACED_BOMB', ({ name, x, y, z }: any) => {
-        action({ name, message: `💣 Placed a BOMB on X: ${x} Y: ${y} Z: ${z}` });
+        action({
+          name,
+          message: `💣 Placed a BOMB on X: ${x} Y: ${y} Z: ${z}`
+        });
       }),
     onPlayerDoesNothing: action =>
       io.on('PLAYER_DID_NOTHING', ({ name, x, y, z }: any) => {

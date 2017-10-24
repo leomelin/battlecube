@@ -11,9 +11,13 @@ import {
   Vector3,
   PCFSoftShadowMap,
   AmbientLight,
-  Matrix4
+  Matrix4,
+  IcosahedronGeometry,
+  EdgesGeometry,
+  LineBasicMaterial,
+  LineSegments
 } from 'three';
-import { IAppState, PlayerStatus } from './initialState';
+import { IAppState, PlayerStatus, IPosition } from './initialState';
 
 const config = {
   WIDTH: 400,
@@ -37,7 +41,7 @@ export const createCube = () => {
   let renderer: any;
   let cube: any;
   let segments: number;
-  let children: any;
+  let bots: any;
   let container: any;
   let material: any;
 
@@ -99,11 +103,11 @@ export const createCube = () => {
   const getPosition = (x: number, y: number, z: number) => {
     // Scale grid entity coordinates to grid space
     const scale = config.CUBE_WIDTH / segments;
-    const s = new Matrix4().makeScale(scale,scale,scale);
+    const s = new Matrix4().makeScale(scale, scale, scale);
 
     // Center grid
     const center = segments / 2.0;
-    const t = new Matrix4().makeTranslation(-center,-center,-center);
+    const t = new Matrix4().makeTranslation(-center, -center, -center);
 
     // Create transformation matrix
     const st = new Matrix4().multiplyMatrices(s, t);
@@ -112,13 +116,23 @@ export const createCube = () => {
     return new Vector3(x, y, z).applyMatrix4(st);
   };
 
-  const update = ({ players }: IAppState) => {
+  const makeBomb = () => {
+    const geometry = new IcosahedronGeometry(6, 0);
+    const material = new MeshPhongMaterial({
+      color: 0x9b9b9b,
+      flatShading: true
+    });
+    const mesh = new Mesh(geometry, material);
+    return mesh;
+  };
+
+  const update = ({ players, bombs }: IAppState) => {
     cube.children = [];
-    children = players
+    bots = players
       .filter((p: any) => p.status !== PlayerStatus.inactive && p.name)
       .map((p: any) => ({ ...p.position, color: p.color, name: p.name }));
 
-    children.forEach((p: any) => {
+    bots.forEach((p: any) => {
       const width = config.CUBE_WIDTH / segments;
       const geo = new SphereGeometry(width / 2);
       const material = new MeshPhongMaterial({
@@ -134,8 +148,16 @@ export const createCube = () => {
       const pos = getPosition(p.x, p.y, p.z);
       bot.position.set(pos.x, pos.y, pos.z);
       cube.add(bot);
-      render();
     });
+
+    bombs.forEach(({ x, y, z }: IPosition) => {
+      const bomb = makeBomb();
+      const p = getPosition(x, y, z);
+      bomb.position.set(p.x, p.y, p.z);
+      cube.add(bomb);
+    });
+
+    render();
   };
 
   const resize = (length: number) => {

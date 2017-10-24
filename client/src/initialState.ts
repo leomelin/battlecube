@@ -43,11 +43,23 @@ export interface ISetup extends State {
   players: IPlayer[];
 }
 
+export interface IPosition {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface IBomb extends IPosition {
+  type: string;
+}
+
 export interface ILogItem {
   name?: string;
   message: any;
   type?: MessageType;
   color: string;
+  position?: IPosition;
+  items: IBomb;
 }
 
 export interface IAppState extends ISetup {
@@ -57,6 +69,7 @@ export interface IAppState extends ISetup {
   log: ILogItem[];
   cube: any;
   botForm: IBotFormState;
+  bombs: IBomb[];
   [key: string]: any;
 }
 
@@ -102,6 +115,7 @@ export default {
       wins: 0
     }
   ],
+  bombs: [],
   gameStatus: GameStatus.stopped,
   error: null,
   log: [],
