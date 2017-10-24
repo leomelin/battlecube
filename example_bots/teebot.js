@@ -33,7 +33,7 @@ const helpers = (data) => {
   }
 };
 
-const attackArea = (tx, ty, tz, n, data) => {
+const explode = (tx, ty, tz, n, data) => {
   let queue = [{x: tx, y: ty, z: tz}]
   let done = [];
   let tasks = [];
@@ -65,6 +65,37 @@ const attackArea = (tx, ty, tz, n, data) => {
 
   return tasks;
 };
+
+const implode = (tx, ty, tz, n, data) => {
+  let queue = [{x: tx, y: ty, z: tz, d: 0}]
+  let done = [];
+
+  const {hasBomb, inBounds, me} = helpers(data);
+  const isDone = (p) => done.some(it => coordEq(it, p));
+  while(queue.length) {
+    const pos = queue.shift();
+
+    if (pos.d < data.gameInfo.numOfTasksPerTick) {
+      const neighbors = [
+        {x: pos.x + 1, y: pos.y + 0, z: pos.z + 0, d: pos.d + 1},
+        {x: pos.x - 1, y: pos.y + 0, z: pos.z + 0, d: pos.d + 1},
+        {x: pos.x + 0, y: pos.y + 1, z: pos.z + 0, d: pos.d + 1},
+        {x: pos.x + 0, y: pos.y - 1, z: pos.z + 0, d: pos.d + 1},
+        {x: pos.x + 0, y: pos.y + 0, z: pos.z + 1, d: pos.d + 1},
+        {x: pos.x + 0, y: pos.y + 0, z: pos.z - 1, d: pos.d + 1}
+      ].filter(p => inBounds(p) && !isDone(p) && !coordEq(p, me) && !hasBomb(p));
+      queue = queue.concat(shuffle(neighbors));
+    }
+
+    done.push(pos);
+  }
+
+  const tasks = done.sort((a, b) => b.d - a.d).splice(0, n).map(pos => {
+    return { task: 'BOMB', x: pos.x, y: pos.y, z: pos.z };
+  });
+
+  return tasks;
+}
 
 const pickTargets = (n, data) => {
   const others = data.players.filter(p => p.name != data.currentPlayer.name);
@@ -124,7 +155,8 @@ const getDirections = (data) => {
   const targets = pickTargets(numTasks - moves.length, data);
   console.log("Targets:", JSON.stringify(targets))
   const flatMap = (xs, f) => xs.reduce((ts, x) => ts.concat(f(x)), [])
-  const tasks = moves.concat(flatMap(targets, t => attackArea(t.x, t.y, t.z, t.n, data)))
+  const strategy = () => Math.random() < 0.8 ? explode : implode;
+  const tasks = moves.concat(flatMap(targets, t => strategy()(t.x, t.y, t.z, t.n, data)))
   console.log("Tasks:", JSON.stringify(tasks))
   return tasks;
 };
