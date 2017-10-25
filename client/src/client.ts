@@ -7,6 +7,7 @@ import actions, { IActions } from './actions';
 import renderCube from './cube';
 import botForm, { renderBotForm } from './botFormModule';
 import syncActionsAndInjectEmitter from './enhancer';
+import { isValidSetupAndPlayersState } from './helpers';
 
 const actionsSyncedWithStorage = [
   'addPlayer',
@@ -23,7 +24,8 @@ const stateSyncedWithStorage = [
 
 const enhancedApp = syncActionsAndInjectEmitter(app, {
   syncedState: stateSyncedWithStorage,
-  syncedActions: actionsSyncedWithStorage
+  syncedActions: actionsSyncedWithStorage,
+  stateValidator: isValidSetupAndPlayersState
 });
 
 enhancedApp(

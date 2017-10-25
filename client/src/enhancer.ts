@@ -32,9 +32,17 @@ const makeStore = (includedState: string[]) => ({
 const logSaveMessage = () =>
   console.log('Synced state change with locale storage');
 
-export default (app: any, opts: { syncedActions: string[], syncedState: string[] }) => {
+interface IEnhancerOptions {
+  syncedActions?: string[];
+  syncedState?: string[];
+  stateValidator?: Function;
+}
+
+export default (app: any, opts: IEnhancerOptions) => {
   const actionsToSyncWithStorage = opts.syncedActions || [];
   const stateSlice = opts.syncedState || [];
+  const alwaysTrue = () => true;
+  const isValidStore = opts.stateValidator || alwaysTrue;
   const store = makeStore(stateSlice);
 
   const storageActions = {
@@ -123,7 +131,7 @@ export default (app: any, opts: { syncedActions: string[], syncedState: string[]
   return async (props: any, root: any) => {
     const persistedState = await store.get();
 
-    if (persistedState) {
+    if (persistedState && isValidStore(persistedState)) {
       Object.assign(props.state, persistedState, { sliderSpeedValue: persistedState.setup.speed });
     }
 
