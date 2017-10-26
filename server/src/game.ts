@@ -151,39 +151,31 @@ export class Game {
     });
   }
 
-  async fetchNewDirectionFromBots(nextTickInfo: NextTickInfo) {
-    for (const player of this.playerPositions) {
-      const playerSetup = <PlayerSetup>this.gameConfig.players.find(p => p.name === player.name);
+  playerLost(playerSetup: PlayerSetup, cause: any) {
+    this.socket.emit('PLAYER_LOST', {
+      cause,
+      name: playerSetup.name
+    });
+
+    if (!this.lostPlayers.find(p => p.name === playerSetup.name)) {
+      this.lostPlayers.push({
+        ...playerSetup,
+        highScore: this.currentTick
+      });
+    }
+  }
+
+  executeDirectionsOfAllBots() {
+    const lostPlayerNames = this.lostPlayers.map(p => p.name);
+    const activePlayers = this.playerPositions
+      .filter(p => !lostPlayerNames.includes(p.name))
+      .map(player => <PlayerSetup>this.gameConfig.players.find(p => p.name === player.name));
+
+    for (const playerSetup of activePlayers) {
       try {
-        // Only fetch new directions via api on start of sub tick sequence
-        if (this.subTick === 1) {
-          const payload = await getDirectionsFromBot({
-            currentPlayer: playerSetup,
-            ...nextTickInfo
-          });
-
-          // If not valid, error is thrown
-          const directions = getValidatedBotDirections(payload, this.gameConfig);
-          this.cachedDirections[player.name] = directions;
-        }
-
-        this.applyBotDirections(playerSetup, [this.cachedDirections[player.name][this.subTick - 1]]);
-      } catch (e) {
-        if (e.error && e.error === Error[Error.VALIDATION_ERROR]) {
-          this.socket.emit('PLAYER_LOST', {
-            name: playerSetup.name,
-            cause: e
-          });
-        } else {
-          this.socket.emit('PLAYER_LOST', {
-            name: playerSetup.name,
-            cause: e
-          });
-        }
-        if (!this.lostPlayers.find(p => p.name === player.name)) this.lostPlayers.push({
-          ...playerSetup,
-          highScore: this.currentTick
-        });
+        this.applyBotDirections(playerSetup, [this.cachedDirections[playerSetup.name][this.subTick - 1]]);
+      } catch (cause) {
+        this.playerLost(playerSetup, cause);
       }
     }
 
@@ -229,6 +221,36 @@ export class Game {
 
     // All remaining players are added here
     this.preValidationInfo.players = [...this.playerPositions];
+  }
+
+  async fetchNewDirectionFromBots(nextTickInfo: NextTickInfo) {
+    (await Promise.all(this.playerPositions.map(async (player: PlayerPosition) => {
+      const playerSetup = <PlayerSetup>this.gameConfig.players.find(p => p.name === player.name);
+      try {
+        // Only fetch new directions via api on start of sub tick sequence
+        if (this.subTick === 1) {
+          const payload = await getDirectionsFromBot({
+            currentPlayer: playerSetup,
+            ...nextTickInfo
+          });
+
+          // If not valid, error is thrown
+          const directions = getValidatedBotDirections(payload, this.gameConfig);
+          this.cachedDirections[player.name] = directions;
+        }
+        return null;
+      } catch (cause) {
+        return {
+          playerSetup,
+          cause
+        };
+      }
+    })))
+      .filter(item => item) // Filter out successfulls (promise has returned null for valid ones)
+      .forEach(({ playerSetup, cause }: { playerSetup: PlayerSetup, cause: any }) => {
+        // Players can lose at this point if directions are invalid or timeout is exceeded
+        this.playerLost(playerSetup, cause);
+      });
   }
 
   statusCheck() {
@@ -326,6 +348,7 @@ export class Game {
       this.resetPreValidationInfo();
       this.socket.emit('NEXT_TICK', nextTickInfo);
       await this.fetchNewDirectionFromBots(nextTickInfo);
+      this.executeDirectionsOfAllBots();
       this.statusCheck();
       this.currentTick = this.currentTick + 1;
       await wait(this.gameConfig.setup.speed);

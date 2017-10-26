@@ -369,6 +369,12 @@ describe('test game logic', () => {
             'x': 0,
             'y': 0,
             'z': 0
+          },
+          {
+            'name': 'Paul',
+            'x': 2,
+            'y': 3,
+            'z': 4
           }
         ]
       },
@@ -386,6 +392,15 @@ describe('test game logic', () => {
               z: 0
             }];
           }
+        },
+        {
+          'name': 'Paul',
+          'url': (nextTickInfo) => {
+            return [{
+              task: 'MOVE',
+              direction: '+X'
+            }];
+          }
         }
       ]
     }, createMockSocket(socket));
@@ -394,7 +409,7 @@ describe('test game logic', () => {
 
     // Wait game to finish
     await wait(1000);
-    expect(eventsList.length).toBe(4);
+    expect(eventsList.length).toBe(5);
     expect(eventsList[0].event).toBe('GAME_STARTED');
     expect(eventsList[1].event).toBe('NEXT_TICK');
     expect(eventsList[2].event).toBe('PLAYER_LOST');
@@ -402,8 +417,9 @@ describe('test game logic', () => {
       name: 'John',
       cause: { 'details': 'Invalid amount of directions sent', 'error': 'VALIDATION_ERROR' }
     });
-    expect(eventsList[3].event).toBe('GAME_ENDED');
-    expect(eventsList[3].data.result).toBe('TIE');
+    expect(eventsList[3].event).toBe('PLAYER_MOVE_ATTEMPT');
+    expect(eventsList[4].event).toBe('GAME_ENDED');
+    expect(eventsList[4].data.result).toBe('WINNER_FOUND');
   });
 
   test('should make two bots collide, both should lose', async () => {
