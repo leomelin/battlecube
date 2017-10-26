@@ -169,7 +169,7 @@ export default {
       await update((state: IAppState) => {
         const winner = finalInfo.winner
           ? `🏆 WINNER: ${finalInfo.winner.name}`
-          : 'Error occurred';
+          : '👔 TIE.. No winner found.';
 
         const results = finalInfo.scores
           .sort((a: any, b: any) => b.highScore - a.highScore)
