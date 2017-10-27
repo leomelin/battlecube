@@ -255,27 +255,14 @@ export class Game {
 
   statusCheck() {
     this.preValidationInfo.outOfBoundsPlayers.forEach((player) => {
-      this.socket.emit('PLAYER_LOST', {
-        name: player.name,
-        cause: 'Player moved out of bounds'
-      });
-      if (!this.lostPlayers.find(p => p.name === player.name)) this.lostPlayers.push({
-        ...player,
-        highScore: this.currentTick
-      });
+      const playerSetup = <PlayerSetup>this.gameConfig.players.find(p => p.name === player.name);
+      this.playerLost(playerSetup, 'Player moved out of bounds');
     });
 
     this.preValidationInfo.collisions.forEach((collision) => {
       collision.players.forEach((player) => {
-        this.socket.emit('PLAYER_LOST', {
-          name: player.name,
-          cause: collision.hasBomb ? 'Player stepped on a BOMB' : 'Player crashed to other player'
-        });
         const playerSetup = <PlayerSetup>this.gameConfig.players.find(p => p.name === player.name);
-        if (!this.lostPlayers.find(p => p.name === player.name)) this.lostPlayers.push({
-          ...playerSetup,
-          highScore: this.currentTick
-        });
+        this.playerLost(playerSetup, collision.hasBomb ? 'Player stepped on a BOMB' : 'Player crashed to other player');
       });
     });
 
