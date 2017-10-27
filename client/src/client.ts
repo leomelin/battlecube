@@ -1,8 +1,8 @@
 import { app, h } from 'hyperapp';
 import { div, h1, main, label, button, ul } from '@hyperapp/html';
 import './client.css';
-import state, { GameStatus, IAppState, IPlayer } from './initialState';
-import { LogItem, Slider, Player, Setup } from './views';
+import state, { GameStatus, IAppState, IPlayer, IError } from './initialState';
+import { LogItem, Slider, Player, Setup, ErrorNotification } from './views';
 import actions, { IActions } from './actions';
 import renderCube from './cube';
 import botForm, { renderBotForm } from './botFormModule';
@@ -17,10 +17,7 @@ const actionsSyncedWithStorage = [
   'setup.up',
   'setup.down'
 ];
-const stateSyncedWithStorage = [
-  'setup',
-  'players'
-];
+const stateSyncedWithStorage = ['setup', 'players'];
 
 const enhancedApp = syncActionsAndInjectEmitter(app, {
   syncedState: stateSyncedWithStorage,
@@ -39,7 +36,8 @@ enhancedApp(
     events: {
       'cube:resize': (state: IAppState, actions: IActions, data: any): void => {
         state.cube.resize(data.edgeLength);
-      }
+      },
+      error: (_s: IAppState, { showError }: IActions, data: IError) => showError(data)
     },
     modules: { botForm },
     view: (state: IAppState, actions: IActions) =>
@@ -48,6 +46,7 @@ enhancedApp(
         Setup(state, actions),
         label({}, `Speed: ${state.sliderSpeedValue} ms`),
         Slider(state, actions),
+        state.error && ErrorNotification(state.error),
         button(
           {
             disabled: state.gameStatus === GameStatus.started,

@@ -1,7 +1,7 @@
 /* tslint:disable */
 import { h } from 'hyperapp';
-import { div, span, li, input, p, button, h2, label } from '@hyperapp/html';
-import { ILogItem, MessageType, IAppState, GameStatus } from './initialState';
+import { div, span, li, input, p, button, h2, label, aside } from '@hyperapp/html';
+import { ILogItem, MessageType, IAppState, GameStatus, IError, ErrorSeverity } from './initialState';
 import { IActions } from './actions';
 import { PlayerStatus, IPlayer } from './initialState';
 import { isHex } from './helpers';
@@ -157,14 +157,14 @@ export const Setup = (state: IAppState, { setup }: IActions): any => {
         button(
           {
             className: 'settings-button',
-            onclick: () => setup.down('numOfTasksPerTick')
+            onclick: () => setup.down({ id: 'numOfTasksPerTick' })
           },
           'ー'
         ),
         button(
           {
             className: 'settings-button',
-            onclick: () => setup.up('numOfTasksPerTick')
+            onclick: () => setup.up({ id: 'numOfTasksPerTick' })
           },
           '＋'
         )
@@ -175,14 +175,14 @@ export const Setup = (state: IAppState, { setup }: IActions): any => {
         button(
           {
             className: 'settings-button',
-            onclick: () => setup.down('edgeLength')
+            onclick: () => setup.down({ id: 'edgeLength', numOfPlayers: state.players.length })
           },
           'ー'
         ),
         button(
           {
             className: 'settings-button',
-            onclick: () => setup.up('edgeLength')
+            onclick: () => setup.up({ id: 'edgeLength' })
           },
           '＋'
         )
@@ -190,3 +190,12 @@ export const Setup = (state: IAppState, { setup }: IActions): any => {
     ]
   );
 };
+
+export const ErrorNotification = (error: IError) => {
+  return (
+    aside({className: `notifications ${ErrorSeverity[error.severity]}`}, [
+      p(error.message)
+    ])
+  )
+};
+

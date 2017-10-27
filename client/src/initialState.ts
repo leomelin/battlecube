@@ -53,6 +53,16 @@ export interface IBomb extends IPosition {
   type: string;
 }
 
+export enum ErrorSeverity {
+  warning,
+  error
+}
+
+export interface IError {
+  message: string;
+  severity: ErrorSeverity;
+}
+
 export interface ILogItem {
   name?: string;
   message: any;
@@ -65,7 +75,7 @@ export interface ILogItem {
 export interface IAppState extends ISetup {
   sliderSpeedValue: number;
   gameStatus: GameStatus;
-  error: any;
+  error: IError | null;
   log: ILogItem[];
   cube: any;
   botForm: IBotFormState;

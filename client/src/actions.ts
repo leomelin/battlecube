@@ -6,7 +6,8 @@ import {
   MessageType,
   PlayerStatus,
   IPlayer,
-  IPosition
+  IError,
+  ErrorSeverity
 } from './initialState';
 import socket, { ITickInfo } from './socket';
 import { createCube } from './cube';
@@ -44,8 +45,8 @@ export interface IActions extends Actions<IAppState> {
   start: IStart;
   setup: {
     updateSpeed: IUpdateSpeed;
-    up(id: string): IGameSetup;
-    down(id: string): IGameSetup;
+    up(data: { id: string, numOfPlayers?: number }): IGameSetup;
+    down(data: { id: string, numOfPlayers?: number }): IGameSetup;
   };
   log: ILog;
   clearLog(): any;
@@ -95,9 +96,20 @@ const playerActions = {
 
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
 
+const NOTIFICATION_DURATION = 4000;
+
 export default {
   ...cubeActions,
   ...playerActions,
+
+  showError: (
+    state: IAppState,
+    actions: IActions,
+    { message, severity }: IError
+  ) => (update: Function) => {
+    update({ error: { message, severity } });
+    setTimeout(update, NOTIFICATION_DURATION, { error: null });
+  },
 
   showNewSpeedWhileDragging: (
     state: IAppState,
@@ -111,8 +123,18 @@ export default {
     return newState;
   },
 
-  start: (state: IAppState, actions: IActions) => {
+  start: (state: IAppState, actions: IActions, data: any, emit: any) => {
     actions.clearLog();
+    if (state.players.length < 2) {
+      emit({
+        name: 'error',
+        data: {
+          message: 'You must have al least two bots for a battle',
+          severity: ErrorSeverity.warning
+        }
+      });
+      return;
+    }
     io.startGame({
       setup: state.setup,
       players: state.players.map(p => ({ name: p.name, url: p.url }))
@@ -131,7 +153,12 @@ export default {
       return newSetup;
     },
 
-    up: (state: IGameSetup, actions: IActions, id: string, emit: Function) => {
+    up: (
+      state: IGameSetup,
+      actions: IActions,
+      { id }: any,
+      emit: Function
+    ) => {
       if (id === 'edgeLength') {
         emit({
           name: 'cube:resize',
@@ -144,9 +171,22 @@ export default {
     down: (
       state: IGameSetup,
       actions: IActions,
-      id: string,
+      { id, numOfPlayers }: any,
       emit: Function
     ) => {
+      if (state.edgeLength === 2 || numOfPlayers >= state.edgeLength + 1) {
+        emit({
+          name: 'error',
+          data: {
+            message: 'Your cube cannot be any smaller',
+            severity: ErrorSeverity.warning
+          }
+        });
+        return;
+      }
+      if (id === 'numOfTasksPerTick' && state[id] === 1) {
+        return;
+      }
       if (id === 'edgeLength') {
         emit({
           name: 'cube:resize',
