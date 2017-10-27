@@ -258,9 +258,6 @@ export default {
     });
 
     io.onPlayerLoses(async ({ name, message }: ILogItem) => {
-      update((state: IAppState) => ({
-        log: [{ name, message, type: MessageType.special }, ...state.log]
-      }));
       await update(({ players, log }: IAppState) => {
         const newLog = [{ name, message, type: MessageType.special }, ...log];
         const updatedPlayers = players.map((p: any) => {
