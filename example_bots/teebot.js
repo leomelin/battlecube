@@ -3,6 +3,9 @@ const [port] = process.argv.slice(2);
 
 const minMoves = 1;
 const moveFraction = 2;
+const implodeRadiusFraction = 2;
+const explodeImplodeRatio = 0.8;
+const randomMovement = false;
 const deterministic = false;
 
 if (!port) {
@@ -72,10 +75,12 @@ const implode = (tx, ty, tz, n, data) => {
 
   const {hasBomb, inBounds, me} = helpers(data);
   const isDone = (p) => done.some(it => coordEq(it, p));
+  const implodeRadius = Math.ceil(data.gameInfo.numOfTasksPerTick / implodeRadiusFraction)
+
   while(queue.length) {
     const pos = queue.shift();
 
-    if (pos.d < data.gameInfo.numOfTasksPerTick) {
+    if (pos.d < implodeRadius) {
       const neighbors = [
         {x: pos.x + 1, y: pos.y + 0, z: pos.z + 0, d: pos.d + 1},
         {x: pos.x - 1, y: pos.y + 0, z: pos.z + 0, d: pos.d + 1},
@@ -113,6 +118,21 @@ const pickTargets = (n, data) => {
   return targets;
 }
 
+const positionDesirability = (pos, data) => {
+  const distSq = (a, b) => (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y) + (b.z - a.z) * (b.z - a.z) 
+  const bombProximityScore = data.items
+    .filter(i => i.type === 'BOMB')
+    .map(i => distSq(i, pos))
+    .reduce((sum, x) => sum + x, 0)
+
+  const playerProximityScore = data.players
+    .filter(p => p.name != data.currentPlayer.name)
+    .map(p => distSq(p, pos))
+    .reduce((sum, x) => sum + x, 0)
+
+  return bombProximityScore + playerProximityScore;
+}
+
 const moveDistance = (n, data) => {
   const {hasBomb, hasPlayer, inBounds, me} = helpers(data);
 
@@ -136,7 +156,14 @@ const moveDistance = (n, data) => {
         {x: pos.x + 0, y: pos.y + 0, z: pos.z + 1, moves: pos.moves.concat(['+Z'])},
         {x: pos.x + 0, y: pos.y + 0, z: pos.z - 1, moves: pos.moves.concat(['-Z'])}
       ].filter(p => inBounds(p) && !isDone(p) && !hasBomb(p) && !hasPlayer(p));
-      queue = queue.concat(shuffle(neighbors));
+      if (randomMovement) {
+        queue = queue.concat(shuffle(neighbors));
+      } else {
+        const rankedNeighbors = neighbors
+          .map(n => ({ x: n.x, y: n.y, z: n.z, moves: n.moves, score: positionDesirability(n, data) }))
+          .sort((a, b) => b.score - a.score);
+        queue = queue.concat(rankedNeighbors);
+      }
     }
     done.push(pos);
   }
@@ -155,7 +182,7 @@ const getDirections = (data) => {
   const targets = pickTargets(numTasks - moves.length, data);
   console.log("Targets:", JSON.stringify(targets))
   const flatMap = (xs, f) => xs.reduce((ts, x) => ts.concat(f(x)), [])
-  const strategy = () => Math.random() < 0.8 ? explode : implode;
+  const strategy = () => Math.random() < explodeImplodeRatio ? explode : implode;
   const tasks = moves.concat(flatMap(targets, t => strategy()(t.x, t.y, t.z, t.n, data)))
   console.log("Tasks:", JSON.stringify(tasks))
   return tasks;
