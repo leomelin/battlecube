@@ -12,10 +12,7 @@ import {
   PCFSoftShadowMap,
   AmbientLight,
   Matrix4,
-  IcosahedronGeometry,
-  EdgesGeometry,
-  LineBasicMaterial,
-  LineSegments
+  IcosahedronGeometry
 } from 'three';
 import { IAppState, PlayerStatus, IPosition } from './initialState';
 
@@ -41,7 +38,6 @@ export const createCube = () => {
   let renderer: any;
   let cube: any;
   let segments: number;
-  let bots: any;
   let container: any;
   let material: any;
 
@@ -59,9 +55,7 @@ export const createCube = () => {
     ambientLight = new AmbientLight(0x898989);
     light = new DirectionalLight(0xffffff, 0.5);
     light.position.set(-50, 250, 300);
-    // light.castShadow = true;
-    // light.mapSize = 512;
-    // light.mapSize = 512;
+
     scene.add(ambientLight);
     scene.add(light);
 
@@ -74,6 +68,7 @@ export const createCube = () => {
     renderer.shadowMap.type = PCFSoftShadowMap;
     container = document.getElementById('cube-container');
     container.appendChild(renderer.domElement);
+
     render();
   };
 
@@ -92,7 +87,7 @@ export const createCube = () => {
     });
     cube = new Mesh(geometry, material);
     cube.name = 'cube';
-    // cube.matrixAutoUpdate  = false;
+
     scene.add(cube);
   }
 
@@ -126,35 +121,68 @@ export const createCube = () => {
     return mesh;
   };
 
-  const update = ({ players, bombs }: IAppState) => {
-    cube.children = [];
-    bots = players
-      .filter((p: any) => p.status !== PlayerStatus.inactive && p.name)
-      .map((p: any) => ({ ...p.position, color: p.color, name: p.name }));
+  const makeBot = ({ color, position: { x, y, z } }: any, name: string) => {
+    const width = config.CUBE_WIDTH / segments;
+    const geo = new SphereGeometry(width / 2);
+    const material = new MeshPhongMaterial({
+      color,
+      shininess: 100,
+      opacity: 0.8
+    });
+    material.transparent = true;
+    const bot = new Mesh(geo, material);
+    bot.name = name;
+    bot.position.set(x, y, z);
+    return bot;
+  };
 
-    bots.forEach((p: any) => {
-      const width = config.CUBE_WIDTH / segments;
-      const geo = new SphereGeometry(width / 2);
-      const material = new MeshPhongMaterial({
-        shininess: 100,
-        color: p.color,
-        opacity: 0.8
-      });
-      material.transparent = true;
-      const bot = new Mesh(geo, material);
-      bot.name = p.name;
-      // bot.castShadow = true;
-      // bot.receiveShadow = true;
-      const pos = getPosition(p.x, p.y, p.z);
-      bot.position.set(pos.x, pos.y, pos.z);
-      cube.add(bot);
+  const hasMoved = (pos1: any, pos2: any) => !pos1.equals(pos2);
+
+  const update = ({ players, bombs }: IAppState) => {
+    const bombMap = bombs.reduce((map: any, b) => {
+      const { x, y, z } = getPosition(b.x, b.y, b.z);
+      map.set(`${x}/${y}/${z}`, { x, y, z });
+      return map;
+    }, new Map());
+
+    const playerMap = players.reduce((map: any, { position, name, color, status }: any) => {
+      if (status === PlayerStatus.inactive || !name) {
+        return map;
+      }
+      map.set(name, { name, color, position: getPosition(position.x, position.y, position.z) });
+      return map;
+    }, new Map());
+
+    for (let i = cube.children.length - 1; i >= 0; i = i - 1) {
+      const obj = cube.children[i];
+
+      if (playerMap.has(obj.name)) {
+        const newPos = playerMap.get(obj.name).position;
+
+        if (hasMoved(newPos, obj.position)) {
+          obj.position.set(newPos.x, newPos.y, newPos.z);
+          playerMap.delete(obj.name);
+        } else {
+          playerMap.delete(obj.name);
+        }
+
+      } else if (!bombMap.has(obj.name)) {
+        cube.remove(obj);
+      } else {
+        bombMap.delete(obj.name);
+      }
+    }
+
+    bombMap.forEach(({ x, y, z }: IPosition, name: string) => {
+      const bomb = makeBomb();
+      bomb.position.set(x, y, z);
+      bomb.name = name;
+      cube.add(bomb);
     });
 
-    bombs.forEach(({ x, y, z }: IPosition) => {
-      const bomb = makeBomb();
-      const p = getPosition(x, y, z);
-      bomb.position.set(p.x, p.y, p.z);
-      cube.add(bomb);
+    playerMap.forEach((player: any, name: string) => {
+      const bot = makeBot(player, name);
+      cube.add(bot);
     });
 
     render();

@@ -132,7 +132,7 @@ export default (app: any, opts: IEnhancerOptions) => {
     const persistedState = await store.get();
 
     if (persistedState && isValidStore(persistedState)) {
-      Object.assign(props.state, persistedState, { sliderSpeedValue: persistedState.setup.speed });
+      //Object.assign(props.state, persistedState, { sliderSpeedValue: persistedState.setup.speed });
     }
 
     Object.assign(props.actions, storageActions, {__emit: (
