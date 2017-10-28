@@ -1,4 +1,6 @@
 import { h } from 'hyperapp';
+import { Easing, Tween, autoPlay, removeAll } from 'es6-tween/src/index.lite';
+autoPlay(true);
 import {
   Scene,
   PerspectiveCamera,
@@ -111,13 +113,15 @@ export const createCube = () => {
     return new Vector3(x, y, z).applyMatrix4(st);
   };
 
-  const makeBomb = () => {
+  const makeBomb = ({ x, y, z }: IPosition, name: string) => {
     const geometry = new IcosahedronGeometry(6, 0);
     const material = new MeshPhongMaterial({
+      name,
       color: 0x9b9b9b,
       flatShading: true
     });
     const mesh = new Mesh(geometry, material);
+    mesh.position.set(x, y, z);
     return mesh;
   };
 
@@ -138,7 +142,16 @@ export const createCube = () => {
 
   const hasMoved = (pos1: any, pos2: any) => !pos1.equals(pos2);
 
-  const update = ({ players, bombs }: IAppState) => {
+  const tweenVector3 = (obj: any, { x, y, z }: any, duration = 100) => {
+    const tweenVector3 = new Tween(obj.position)
+      .to({ x, y, z }, duration)
+      .easing(Easing.Sinusoidal.In)
+      .onUpdate(render)
+      .start();
+    return tweenVector3;
+  };
+
+  const update = ({ players, bombs, setup }: IAppState) => {
     const bombMap = bombs.reduce((map: any, b) => {
       const { x, y, z } = getPosition(b.x, b.y, b.z);
       map.set(`${x}/${y}/${z}`, { x, y, z });
@@ -160,12 +173,13 @@ export const createCube = () => {
         const newPos = playerMap.get(obj.name).position;
 
         if (hasMoved(newPos, obj.position)) {
-          obj.position.set(newPos.x, newPos.y, newPos.z);
+          const newCoords = { x: newPos.x, y: newPos.y, z: newPos.z };
+          tweenVector3(obj, newCoords, setup.speed);
+
           playerMap.delete(obj.name);
         } else {
           playerMap.delete(obj.name);
         }
-
       } else if (!bombMap.has(obj.name)) {
         cube.remove(obj);
       } else {
@@ -174,9 +188,7 @@ export const createCube = () => {
     }
 
     bombMap.forEach(({ x, y, z }: IPosition, name: string) => {
-      const bomb = makeBomb();
-      bomb.position.set(x, y, z);
-      bomb.name = name;
+      const bomb = makeBomb({ x, y, z }, name);
       cube.add(bomb);
     });
 

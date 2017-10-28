@@ -63,8 +63,8 @@ const cubeActions = {
     cube.init(state);
     return { cube };
   },
-  updateCube: ({ cube, players, bombs }: IAppState) => {
-    cube.update({ players, bombs });
+  updateCube: ({ cube, players, bombs, setup }: IAppState) => {
+    cube.update({ players, bombs, setup });
   }
 };
 
