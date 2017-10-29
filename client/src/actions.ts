@@ -11,7 +11,7 @@ import {
 } from './initialState';
 import socket, { ITickInfo } from './socket';
 import { createCube } from './cube';
-import { IBotFormActions } from './botFormModule';
+import { IBotFormActions } from './modules/botFormModule';
 import { Actions } from 'hyperapp';
 
 export const io = socket('http://localhost:9999');

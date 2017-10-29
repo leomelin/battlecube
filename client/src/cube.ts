@@ -1,5 +1,5 @@
 import { h } from 'hyperapp';
-import { Easing, Tween, autoPlay, removeAll } from 'es6-tween/src/index.lite';
+import { Easing, Tween, autoPlay } from 'es6-tween/src/index.lite';
 autoPlay(true);
 import {
   Scene,

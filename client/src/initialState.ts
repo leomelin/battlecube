@@ -1,4 +1,4 @@
-import { IBotFormState } from './botFormModule';
+import { IBotFormState } from './modules/botFormModule'
 import { State } from 'hyperapp';
 
 export enum GameStatus {
@@ -72,7 +72,13 @@ export interface ILogItem {
   items: IBomb;
 }
 
+export enum Page {
+  singleBattle,
+  mutilpleBattle
+}
+
 export interface IAppState extends ISetup {
+  currentView: Page;
   sliderSpeedValue: number;
   gameStatus: GameStatus;
   error: IError | null;
@@ -84,6 +90,7 @@ export interface IAppState extends ISetup {
 }
 
 export default {
+  currentView: Page.singleBattle,
   sliderSpeedValue: 200,
   setup: {
     maxNumOfTicks: 1000,

@@ -1,0 +1,38 @@
+header {
+  display: flex;
+  display: row;
+  width: 100%;
+  minHeight: 40px;
+  justify-content: space-between;
+  justify-items: center;
+}
+
+header-center,
+header-left-,
+header-right- {
+  flex: 1 100%;
+}
+
+header-left- {
+  margin-left: 40px;
+
+  nav {
+    padding: 20px;
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+
+      li {
+        padding: 10px;
+        font-size: 1.2em;
+        color: #43bc43;
+        &:hover {
+          color: #55ff55;
+          border-bottom: 1px solid OrangeRed;
+          padding-bottom: 5px;
+        }
+      }
+    }
+  }
+}

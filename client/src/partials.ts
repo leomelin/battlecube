@@ -1,10 +1,33 @@
 /* tslint:disable */
 import { h } from 'hyperapp';
-import { div, span, li, input, p, button, h2, label, aside } from '@hyperapp/html';
-import { ILogItem, MessageType, IAppState, GameStatus, IError, ErrorSeverity } from './initialState';
+import {
+  div,
+  span,
+  ul,
+  li,
+  input,
+  header,
+  p,
+  button,
+  h1,
+  h2,
+  label,
+  aside,
+  nav
+} from '@hyperapp/html';
+import {
+  ILogItem,
+  MessageType,
+  IAppState,
+  GameStatus,
+  IError,
+  ErrorSeverity,
+  PlayerStatus,
+  IPlayer
+} from './initialState';
 import { IActions } from './actions';
-import { PlayerStatus, IPlayer } from './initialState';
 import { isHex } from './helpers';
+import './styles/header.css';
 
 interface IItem {
   [key: string]: Function;
@@ -175,7 +198,11 @@ export const Setup = (state: IAppState, { setup }: IActions): any => {
         button(
           {
             className: 'settings-button',
-            onclick: () => setup.down({ id: 'edgeLength', numOfPlayers: state.players.length })
+            onclick: () =>
+              setup.down({
+                id: 'edgeLength',
+                numOfPlayers: state.players.length
+              })
           },
           'ー'
         ),
@@ -192,10 +219,24 @@ export const Setup = (state: IAppState, { setup }: IActions): any => {
 };
 
 export const ErrorNotification = (error: IError) => {
-  return (
-    aside({className: `notifications ${ErrorSeverity[error.severity]}`}, [
-      p(error.message)
-    ])
-  )
+  return aside(
+    { className: `notifications ${ErrorSeverity[error.severity]}` },
+    [p(error.message)]
+  );
 };
 
+export const Header = (state: IAppState, actions: IActions) =>
+  header({}, [
+    h('header-left-', {}, [
+      nav({}, [
+        ul({className: 'nav-links'}, [
+          li({}, 'Multiple game runner'),
+          li({}, 'Docs')
+        ])
+      ])
+    ]),
+    h('header-center-', {}, [
+      h1({}, 'Battle³')
+    ]),
+    h('header-right-', {}, [])
+  ]);

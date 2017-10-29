@@ -1,11 +1,11 @@
 import { h } from 'hyperapp';
 import { form, button } from '@hyperapp/html';
-import { IAppState } from './initialState';
-import { IActions } from './actions';
-import { Input } from './views';
-import { PlayerStatus } from './initialState';
-import './form.css';
-import { minLen, hasProtocalInUrl, isHex } from './helpers';
+import { IAppState } from '../initialState';
+import { IActions } from '../actions';
+import { Input } from '../partials';
+import { PlayerStatus } from '../initialState';
+import '../styles/form.css';
+import { minLen, hasProtocalInUrl, isHex } from '../helpers';
 
 type Test = [any, string];
 
