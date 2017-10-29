@@ -114,7 +114,8 @@ export const createCube = () => {
   };
 
   const makeBomb = ({ x, y, z }: IPosition, name: string) => {
-    const geometry = new IcosahedronGeometry(6, 0);
+    const width = config.CUBE_WIDTH / segments / 2.5;
+    const geometry = new IcosahedronGeometry(width, 0);
     const material = new MeshPhongMaterial({
       name,
       color: 0x9b9b9b,
