@@ -14,10 +14,8 @@ header-right- {
 }
 
 header-left- {
-  margin-left: 40px;
-
   nav {
-    padding: 20px;
+    padding: 20px 30px;
     ul {
       display: flex;
       flex-wrap: wrap;

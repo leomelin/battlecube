@@ -23,7 +23,8 @@ import {
   IError,
   ErrorSeverity,
   PlayerStatus,
-  IPlayer
+  IPlayer,
+  Page
 } from './initialState';
 import { IActions } from './actions';
 import { isHex } from './helpers';
@@ -225,18 +226,25 @@ export const ErrorNotification = (error: IError) => {
   );
 };
 
-export const Header = (state: IAppState, actions: IActions) =>
-  header({}, [
+const links = [
+  { type: Page.singleBattle, label: 'Home' },
+  // { type: Page.multipleBattle, label: 'Multiple game runner' },
+  { type: Page.docs, label: 'Docs' }
+];
+
+export const Header = (state: IAppState, changePage: Function) => {
+  return header({}, [
     h('header-left-', {}, [
       nav({}, [
-        ul({className: 'nav-links'}, [
-          li({}, 'Multiple game runner'),
-          li({}, 'Docs')
-        ])
+        ul(
+          {},
+          links
+            .filter(link => state.currentPage !== link.type)
+            .map(link => li({onclick: () => changePage(link.type)}, link.label))
+        )
       ])
     ]),
-    h('header-center-', {}, [
-      h1({}, 'Battle³')
-    ]),
+    h('header-center-', {}, [h1({}, 'Battle³')]),
     h('header-right-', {}, [])
   ]);
+};

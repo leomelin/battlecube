@@ -8,9 +8,13 @@ import botForm from './modules/botFormModule';
 import syncActionsAndInjectEmitter from './enhancer';
 import { isValidSetupAndPlayersState } from './helpers';
 import singleBattle from './pages/singleBattle';
+import multipleBattle from './pages/multipleBattle';
+import docs from './pages/docs';
 
 const pages = {
-  [Page.singleBattle]: singleBattle
+  [Page.singleBattle]: singleBattle,
+  [Page.multipleBattle]: multipleBattle,
+  [Page.docs]: docs
 };
 
 const actionsSyncedWithStorage = [
@@ -41,14 +45,15 @@ enhancedApp(
       'cube:resize': (state: IAppState, actions: IActions, data: any): void => {
         state.cube.resize(data.edgeLength);
       },
-      error: (_s: IAppState, { showError }: IActions, data: IError) => showError(data)
+      error: (_s: IAppState, { showError }: IActions, data: IError) =>
+        showError(data)
     },
     modules: { botForm },
     view: (state: IAppState, actions: IActions) =>
       div({ className: 'container' }, [
-        Header(state, actions),
-        pages[state.currentView](state, actions)]
-      )
+        Header(state, actions.changePage),
+        pages[state.currentPage](state, actions)
+      ])
   },
   document.getElementById('app')
 );

@@ -1,5 +1,5 @@
 import { h } from 'hyperapp';
-import { div, h1, main, label, button, ul } from '@hyperapp/html';
+import { div, main, label, button, ul } from '@hyperapp/html';
 import { GameStatus, IAppState, IPlayer } from '../initialState';
 import { LogItem, Slider, Player, Setup, ErrorNotification } from '../partials';
 import { IActions } from '../actions';

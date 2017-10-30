@@ -74,11 +74,13 @@ export interface ILogItem {
 
 export enum Page {
   singleBattle,
-  mutilpleBattle
+  multipleBattle,
+  docs
 }
 
 export interface IAppState extends ISetup {
-  currentView: Page;
+  loading: boolean;
+  currentPage: Page;
   sliderSpeedValue: number;
   gameStatus: GameStatus;
   error: IError | null;
@@ -90,7 +92,8 @@ export interface IAppState extends ISetup {
 }
 
 export default {
-  currentView: Page.singleBattle,
+  loading: false,
+  currentPage: Page.singleBattle,
   sliderSpeedValue: 200,
   setup: {
     maxNumOfTicks: 1000,
@@ -136,5 +139,6 @@ export default {
   gameStatus: GameStatus.stopped,
   error: null,
   log: [],
-  cube: null
+  cube: null,
+  docs: ''
 };

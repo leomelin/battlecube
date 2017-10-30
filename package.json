@@ -47,9 +47,11 @@
   },
   "dependencies": {
     "@hyperapp/html": "^0.5.1",
+    "@types/marked": "^0.3.0",
     "es6-tween": "^3.8.24",
     "hyperapp": "^0.15.1",
     "joi": "^11.1.1",
+    "marked": "^0.3.6",
     "mitt": "^1.1.2",
     "node-fetch": "^1.7.3",
     "socket.io": "^2.0.3",

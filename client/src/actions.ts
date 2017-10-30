@@ -7,14 +7,29 @@ import {
   PlayerStatus,
   IPlayer,
   IError,
-  ErrorSeverity
+  ErrorSeverity,
+  Page
 } from './initialState';
 import socket, { ITickInfo } from './socket';
 import { createCube } from './cube';
 import { IBotFormActions } from './modules/botFormModule';
 import { Actions } from 'hyperapp';
+import marked from 'marked';
 
 export const io = socket('http://localhost:9999');
+
+const handleErrors = (res: any) => {
+  if (!res.ok) throw Error(res.statusText);
+  return res;
+};
+
+const DOCS_PATH = './docs.md';
+
+const fetchMarkdown = () =>
+  fetch(DOCS_PATH)
+    .then(handleErrors)
+    .then(data => data.text())
+    .then(marked);
 
 interface IStart {
   (state?: IAppState, actions?: IActions): void;
@@ -41,6 +56,8 @@ interface IPersist {
 }
 
 export interface IActions extends Actions<IAppState> {
+  togglerSpinner(state: IAppState): IAppState;
+  changePage(page: Page): any;
   showNewSpeedWhileDragging: IShowNewSpeedWhileDragging;
   start: IStart;
   setup: {
@@ -101,6 +118,18 @@ const NOTIFICATION_DURATION = 4000;
 export default {
   ...cubeActions,
   ...playerActions,
+
+  toggleSpinner: (state: IAppState) => ({ loading: !state.loading }),
+
+  changePage: (state: IAppState, actions: IActions, page: Page) => async (update: Function) => {
+    if (page === Page.docs) {
+      update(actions.toggleSpinner());
+      const docs = await fetchMarkdown();
+      console.log(docs);
+      update({ docs });
+    }
+    update({ currentPage: page });
+  },
 
   showError: (
     state: IAppState,
