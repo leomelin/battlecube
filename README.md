@@ -1,6 +1,19 @@
 # Battle³
 
-Battlecube is a game in which bots fight to survive inside a three-dimensional grid--the cube--by moving and throwing bombs.
+A game in which bots fight to survive inside a three-dimensional grid--the cube--by moving and throwing bombs.
+
+## Part of [Web Dev and Sausage's](https://www.webdevandsausages.org/) Micro Christmas Hackathon (24.11.2017)
+
+The idea is that you/your team creates its own bot(s) to fight other bots in Battle³. In addition, or alternatively, we welcome you to invent new clients to visualize the game. At the end of the hackathon, prizes will be given for bots as well as new clients. For your bot to engage other bots in battle, it will need to have a public url. Where your bot lives is up to you, but we will provide expert help during the hackathon to use a [AWS Lamba](https://aws.amazon.com/lambda/?sc_channel=PS&sc_campaign=acquisition_ND&sc_publisher=google&sc_medium=lambda_b&sc_content=lambda_e&sc_detail=aws%20lambda&sc_category=lambda&sc_segment=161192959428&sc_matchtype=e&sc_country=ND&s_kwcid=AL!4422!3!161192959428!e!!g!!aws%20lambda&ef_id=WaJDZAAAAgRf99VN:20171031124232:s) or a [Firebase function](https://firebase.google.com/docs/functions/).
+
+## Getting started
+
+1. Make sure you have a recent version of node. We have only tested it with v7.10.0 and above.
+2. Clone the repo, `npm install` and `npm run build`.
+3. You will need to have some working bots to see battle. To start off with, use the dummy bots under `/example_bots`. Fire up a bot with `node dumb-bot.js 4001`. Do the same for the three others using ports 4002-4004. Later when you want tougher competition, you can battle with `teebot.js`, who should be a very tough competitor. Notice you will immediately get an error if you have a bot listed as a player which does not respond to requests.
+4. Finally, start up the server and client: `npm run start:all`.
+
+- If you have any issues getting the code running, or find a bug, before the Micro Christmas Hackathon, make an issue in the repo and we will fix it/ try to help you out.
 
 ## Rules
 
@@ -19,6 +32,10 @@ Basically, all you have to do is create a bot that stays in the grid, avoids col
 - If a bot is allowed to give more directions at once (numOfTasksPerTick), directions will be asked again after all directions are evaluated. So with a value of numOfTaskPerTick 2, the server will play two ticks before asking for another 2 directions.
 - The game/grid size might change during the game. If so, players are randomly positioned after that and all the bombs currently placed are removed.
 - The bot that survives the longest amount of *ticks* without losing, *WINS*
+
+## Champion bots
+
+- To judge the strongest bot, we will run a batch of battles, e.g. 100. The winning bot is the bot with the most *wins* or, in the case of a tie, the bot who has has lived the most ticks.
 
 ## Starting a new game
 
