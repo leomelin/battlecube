@@ -89,6 +89,8 @@ export interface IAppState extends ISetup {
   cube: any;
   botForm: IBotFormState;
   bombs: IBomb[];
+  remainingGames: number;
+  docs: string;
   [key: string]: any;
 }
 
@@ -142,6 +144,7 @@ export default {
   ],
   bombs: [],
   gameStatus: GameStatus.stopped,
+  remainingGames: 0,
   error: null,
   log: [],
   cube: null,

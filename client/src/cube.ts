@@ -208,10 +208,23 @@ export const createCube = () => {
     render();
   };
 
+  const reset = () => {
+    camera = null;
+    scene = null;
+    ambientLight = null;
+    light = null;
+    renderer = null;
+    cube = null;
+    segments = 0;
+    container = null;
+    material = null;
+  };
+
   return {
     init,
     update,
-    resize
+    resize,
+    reset
   };
 };
 
@@ -220,5 +233,9 @@ export default (state: any, actions: any) =>
     id: 'cube-container',
     oncreate: () => {
       actions.initCube(state);
+    },
+    onremove: () => {
+      state.cube.reset();
+      actions.destroyCube();
     }
   });

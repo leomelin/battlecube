@@ -14,28 +14,9 @@ import socket, { ITickInfo } from './socket';
 import { createCube } from './cube';
 import { IBotFormActions } from './modules/botFormModule';
 import { Actions } from 'hyperapp';
-import marked from 'marked';
-import { zipWith, sortByProp } from './helpers';
+import playerActions from './playerActions';
 
 export const io = socket('http://localhost:9999');
-
-const handleErrors = (res: any) => {
-  if (!res.ok) throw Error(res.statusText);
-  return res;
-};
-
-const scoreZipper = (player: IPlayer, update: any) => {
-  player.score = player.score + update.highScore;
-  return player;
-};
-
-const DOCS_PATH = './docs.md';
-
-const fetchMarkdown = () =>
-  fetch(DOCS_PATH)
-    .then(handleErrors)
-    .then(data => data.text())
-    .then(marked);
 
 interface IStart {
   (state?: IAppState, actions?: IActions): void;
@@ -53,12 +34,11 @@ interface IShowNewSpeedWhileDragging {
 
 interface ILog {
   InternalActions<State, IActions>(): IAppState;
-  (): any;
+  (): void;
 }
 
 interface IPersist {
   InternalActions<State, IActions>(): void;
-  (): any;
 }
 
 export interface IActions extends Actions<IAppState> {
@@ -68,16 +48,16 @@ export interface IActions extends Actions<IAppState> {
   start: IStart;
   setup: {
     updateSpeed: IUpdateSpeed;
-    up(data: { id: string, numOfPlayers?: number }): IGameSetup;
-    down(data: { id: string, numOfPlayers?: number }): IGameSetup;
+    up(data: { id: string; numOfPlayers?: number }): IGameSetup;
+    down(data: { id: string; numOfPlayers?: number }): IGameSetup;
   };
   log: ILog;
-  clearLog(): any;
-  [key: string]: any;
+  clearLog(): IAppState;
   getPersistedState(): any;
   persistState: IPersist;
   removePersistedState(): any;
   botForm: IBotFormActions;
+  [key: string]: any;
 }
 
 const cubeActions = {
@@ -88,40 +68,8 @@ const cubeActions = {
   },
   updateCube: ({ cube, players, bombs, setup }: IAppState) => {
     cube.update({ players, bombs, setup });
-  }
-};
-
-const playerActions = {
-  addPlayer: (state: IAppState, _a: IActions, player: IPlayer) => {
-    return { players: [...state.players, player] };
   },
-  removePlayer: (state: IAppState, actions: IActions, index: number) => {
-    const players = [
-      ...state.players.slice(0, index),
-      ...state.players.slice(index + 1)
-    ];
-    return { ...state, players };
-  },
-
-  recordWin: (state: IAppState, action: IActions, name: string) => (
-    update: Function
-  ) => {
-    update((newState: IAppState) => {
-      const players = state.players.map((p: IPlayer) => {
-        const wins = p.name === name ? p.wins + 1 : p.wins;
-        return { ...p, wins };
-      });
-
-      return { ...newState, players };
-    });
-  },
-
-  recordScores: (state: IAppState, action: IActions, scores: any) => {
-    const sortedScores = sortByProp('name', scores);
-    const sortedPlayers = sortByProp('name', state.players);
-    const updatedPlayers = zipWith(scoreZipper, sortedPlayers, sortedScores);
-    return { players: updatedPlayers };
-  }
+  destroyCube: () => ({ cube: null })
 };
 
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
@@ -134,15 +82,11 @@ export default {
 
   toggleSpinner: (state: IAppState) => ({ loading: !state.loading }),
 
-  changePage: (state: IAppState, actions: IActions, page: Page) => async (update: Function) => {
-    if (page === Page.docs) {
-      update(actions.toggleSpinner());
-      const docs = await fetchMarkdown();
-      console.log(docs);
-      update({ docs });
-    }
-    update({ currentPage: page });
-  },
+  changePage: (_s: IAppState, _a: IActions, page: Page) => ({
+    currentPage: page
+  }),
+
+  setDocs: (_s: IAppState, _a: IActions, docs: string) => ({ docs }),
 
   showError: (
     state: IAppState,
@@ -183,6 +127,30 @@ export default {
     });
   },
 
+  startBatch: (
+    state: IAppState,
+    actions: IActions,
+    data: any,
+    emit: any
+  ) => async (update: Function) => {
+    actions.clearLog();
+    if (state.players.length < 2) {
+      emit({
+        name: 'error',
+        data: {
+          message: 'You must have al least two bots for a battle',
+          severity: ErrorSeverity.warning
+        }
+      });
+      return;
+    }
+    await update({ remainingGames: 99 });
+    io.startGame({
+      setup: state.setup,
+      players: state.players.map(p => ({ name: p.name, url: p.url }))
+    });
+  },
+
   // set the amount of milliseconds delay you want between ticks
   // could add further config here
   setup: {
@@ -195,12 +163,7 @@ export default {
       return newSetup;
     },
 
-    up: (
-      state: IGameSetup,
-      actions: IActions,
-      { id }: any,
-      emit: Function
-    ) => {
+    up: (state: IGameSetup, actions: IActions, { id }: any, emit: Function) => {
       if (id === 'edgeLength') {
         emit({
           name: 'cube:resize',
@@ -242,9 +205,10 @@ export default {
     }
   },
 
-  updateGameStatus: (state: IAppState, { updateCube, recordWin, recordScores }: IActions) => (
-    update: Function
-  ) => {
+  updateGameStatus: (
+    state: IAppState,
+    { updateCube, recordWin, recordScores, start }: IActions
+  ) => (update: Function) => {
     io.onStart(() => update({ gameStatus: GameStatus.started }));
 
     io.onStop(async (finalInfo: any) => {
@@ -271,11 +235,21 @@ export default {
           { name, message: { winner, scores }, type: MessageType.result },
           ...state.log
         ];
+        if (state.remainingGames > 0) {
+          start();
+          return {
+            ...state,
+            players,
+            remainingGames: state.remainingGames - 1
+          };
+        }
         return { ...state, players, log, gameStatus: GameStatus.stopped };
       });
       recordScores(finalInfo.scores);
       finalInfo.winner && recordWin(finalInfo.winner.name);
-      updateCube();
+      if (state.currentPage === Page.singleBattle) {
+        updateCube();
+      }
     });
   },
 
@@ -337,7 +311,9 @@ export default {
         return { log, players: updatedPlayers, bombs: items };
       });
 
-      updateCube();
+      if (state.currentPage === Page.singleBattle) {
+        updateCube();
+      }
     });
   },
 

@@ -11,7 +11,7 @@ export default (state: IAppState, actions: IActions) =>
     Setup(state, actions),
     label({}, `Speed: ${state.sliderSpeedValue} ms`),
     Slider(state, actions),
-    state.error && ErrorNotification(state.error),
+    ErrorNotification(state.error),
     button(
       {
         disabled: state.gameStatus === GameStatus.started,

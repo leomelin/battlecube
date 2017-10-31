@@ -23,9 +23,10 @@ const actionsSyncedWithStorage = [
   'recordWin',
   'setup.updateSpeed',
   'setup.up',
-  'setup.down'
+  'setup.down',
+  'changePage'
 ];
-const stateSyncedWithStorage = ['setup', 'players'];
+const stateSyncedWithStorage = ['setup', 'players', 'currentPage'];
 
 const enhancedApp = syncActionsAndInjectEmitter(app, {
   syncedState: stateSyncedWithStorage,

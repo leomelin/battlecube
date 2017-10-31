@@ -103,7 +103,8 @@ export const Player = (
   player: IPlayer,
   index: number,
   hasWinner: boolean,
-  actions: IActions
+  actions: IActions,
+  hideButton = false
 ) => {
   const alive = player.status === 1;
   const statusText =
@@ -130,7 +131,7 @@ export const Player = (
         p({ className: 'player-info__detail' }, `wins: ${player.wins.toLocaleString()}`),
         p({ className: 'player-info__detail' }, `score: ${player.score.toLocaleString()}`)
       ]),
-      div({ className: 'player-actions' }, [
+      div({ className: 'player-actions' }, hideButton ? [] : [
         button(
           {
             className: 'btn-small',
@@ -220,7 +221,8 @@ export const Setup = (state: IAppState, { setup }: IActions): any => {
   );
 };
 
-export const ErrorNotification = (error: IError) => {
+export const ErrorNotification = (error: IError | null) => {
+  if (!error) return span({}, []);
   return aside(
     { className: `notifications ${ErrorSeverity[error.severity]}` },
     [p(error.message)]
@@ -229,7 +231,7 @@ export const ErrorNotification = (error: IError) => {
 
 const links = [
   { type: Page.singleBattle, label: 'Home' },
-  // { type: Page.multipleBattle, label: 'Multiple game runner' },
+  { type: Page.multipleBattle, label: 'Multiple game runner' },
   { type: Page.docs, label: 'Docs' }
 ];
 

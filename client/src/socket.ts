@@ -1,5 +1,4 @@
 import socketIO from 'socket.io-client';
-import defaultConfig from './defaultConfig.json';
 import { IPlayer } from './initialState';
 
 export interface ITickInfo {
@@ -31,7 +30,7 @@ export default (serverUrl: string): ISocket => {
   // TODO: log errors
   return {
     io,
-    startGame: config => io.emit('NEW_GAME', config || defaultConfig),
+    startGame: config => io.emit('NEW_GAME', config),
     updateSetup: setup => io.emit('GAME_SETUP_UPDATE', setup),
     onStart: action => io.on('GAME_STARTED', () => action()),
     onStop: action => io.on('GAME_ENDED', (scores: any) => action(scores)),
