@@ -127,7 +127,8 @@ export const Player = (
             )
           ]
         ),
-        p({ className: 'player-info__detail' }, `wins: ${player.wins}`)
+        p({ className: 'player-info__detail' }, `wins: ${player.wins.toLocaleString()}`),
+        p({ className: 'player-info__detail' }, `score: ${player.score.toLocaleString()}`)
       ]),
       div({ className: 'player-actions' }, [
         button(

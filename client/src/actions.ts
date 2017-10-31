@@ -15,12 +15,18 @@ import { createCube } from './cube';
 import { IBotFormActions } from './modules/botFormModule';
 import { Actions } from 'hyperapp';
 import marked from 'marked';
+import { zipWith, sortByProp } from './helpers';
 
 export const io = socket('http://localhost:9999');
 
 const handleErrors = (res: any) => {
   if (!res.ok) throw Error(res.statusText);
   return res;
+};
+
+const scoreZipper = (player: IPlayer, update: any) => {
+  player.score = player.score + update.highScore;
+  return player;
 };
 
 const DOCS_PATH = './docs.md';
@@ -108,6 +114,13 @@ const playerActions = {
 
       return { ...newState, players };
     });
+  },
+
+  recordScores: (state: IAppState, action: IActions, scores: any) => {
+    const sortedScores = sortByProp('name', scores);
+    const sortedPlayers = sortByProp('name', state.players);
+    const updatedPlayers = zipWith(scoreZipper, sortedPlayers, sortedScores);
+    return { players: updatedPlayers };
   }
 };
 
@@ -229,7 +242,7 @@ export default {
     }
   },
 
-  updateGameStatus: (state: IAppState, { updateCube, recordWin }: IActions) => (
+  updateGameStatus: (state: IAppState, { updateCube, recordWin, recordScores }: IActions) => (
     update: Function
   ) => {
     io.onStart(() => update({ gameStatus: GameStatus.started }));
@@ -260,7 +273,7 @@ export default {
         ];
         return { ...state, players, log, gameStatus: GameStatus.stopped };
       });
-
+      recordScores(finalInfo.scores);
       finalInfo.winner && recordWin(finalInfo.winner.name);
       updateCube();
     });

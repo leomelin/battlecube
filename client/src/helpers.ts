@@ -1,6 +1,7 @@
-import initialState, {IAppState} from './initialState';
+import initialState, { IAppState } from './initialState';
 
-export const minLen = (minLength: number) => (v: string) => v && v.length > minLength;
+export const minLen = (minLength: number) => (v: string) =>
+  v && v.length > minLength;
 const urlRegex = /^(http|https):\/\//;
 export const hasProtocalInUrl = (value: string) => urlRegex.test(value);
 const hexRegex = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
@@ -18,9 +19,31 @@ export const pick = (names: string[], obj: any) => {
   return result;
 };
 
+export const zipWith = (fn: Function, a: any, b: any) => {
+  const rv = [];
+  let idx = 0;
+  const len = Math.min(a.length, b.length);
+  while (idx < len) {
+    rv[idx] = fn(a[idx], b[idx]);
+    idx += 1;
+  }
+  return rv;
+};
+
+export const sortByProp = (prop: string, list: any[]) => {
+  return list.sort((a: any, b: any) => {
+    const aa = a[prop];
+    const bb = b[prop];
+    return aa < bb ? -1 : aa > bb ? 1 : 0;
+  });
+};
+
 const isMissingRequiredKeys = (keyList: string[], state: IAppState) => {
   const existingKeys = Object.keys(state);
-  return keyList.reduce((acc, key) => !existingKeys.includes(key) || acc  , false);
+  return keyList.reduce(
+    (acc, key) => !existingKeys.includes(key) || acc,
+    false
+  );
 };
 
 export const isValidSetupAndPlayersState = (state: any) => {
@@ -28,7 +51,10 @@ export const isValidSetupAndPlayersState = (state: any) => {
   if (typeof state !== 'object') {
     return false;
   }
-  if (!state.players || Object.prototype.toString.call(state.players) !== '[object Array]') {
+  if (
+    !state.players ||
+    Object.prototype.toString.call(state.players) !== '[object Array]'
+  ) {
     return false;
   }
   if (!state.setup || isMissingRequiredKeys(requiredSetupKeys, state.setup)) {

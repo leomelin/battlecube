@@ -28,6 +28,7 @@ export interface IPlayer extends State {
     z: number | null
   };
   wins: number;
+  score: number;
 }
 
 export interface IGameSetup {
@@ -108,7 +109,8 @@ export default {
       color: '#FF6767',
       status: PlayerStatus.inactive,
       position: { x: null, y: null, z: null },
-      wins: 0
+      wins: 0,
+      score: 0
     },
     {
       name: 'Petra',
@@ -116,7 +118,8 @@ export default {
       color: '#EAEA00',
       status: PlayerStatus.inactive,
       position: { x: null, y: null, z: null },
-      wins: 0
+      wins: 0,
+      score: 0
     },
     {
       name: 'Carmine',
@@ -124,7 +127,8 @@ export default {
       color: '#00FFFF',
       status: PlayerStatus.inactive,
       position: { x: null, y: null, z: null },
-      wins: 0
+      wins: 0,
+      score: 0
     },
     {
       name: 'Whoopie',
@@ -132,7 +136,8 @@ export default {
       color: '#FF2EFF',
       status: PlayerStatus.inactive,
       position: { x: null, y: null, z: null },
-      wins: 0
+      wins: 0,
+      score: 0
     }
   ],
   bombs: [],
