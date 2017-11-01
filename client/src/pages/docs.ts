@@ -20,7 +20,7 @@ const fetchMarkdown = () =>
     .then(marked);
 
 const getDocs = (docs: string) => {
-  if (!docs.length) {
+  if (!docs || !docs.length) {
     return [
       div({ className: 'docs-loading' }, [div({ className: 'spinner' }, [])])
     ];
@@ -32,10 +32,9 @@ export default ({ docs }: IAppState, { setDocs }: IActions) =>
   main(
     {
       className: 'docs',
-      oncreate: async () => {
-        if (!docs.length) {
-          const docs = await fetchMarkdown();
-          setDocs(docs);
+      oncreate: () => {
+        if (!docs) {
+          fetchMarkdown().then(setDocs);
         }
       }
     },
