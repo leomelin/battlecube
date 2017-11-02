@@ -16,7 +16,7 @@ import {
   Matrix4,
   IcosahedronGeometry
 } from 'three';
-import { IAppState, PlayerStatus, IPosition } from './initialState';
+import { IAppState, PlayerStatus, IPosition } from '../initialState';
 
 const config = {
   WIDTH: 400,

@@ -1,4 +1,4 @@
-import { IBotFormState } from './modules/botFormModule'
+import { IBotFormState } from './modules/botFormModule';
 import { State } from 'hyperapp';
 
 export enum GameStatus {

@@ -33,6 +33,20 @@ const enhancedApp = syncActionsAndInjectEmitter(app, {
   syncedActions: actionsSyncedWithStorage,
   stateValidator: isValidSetupAndPlayersState
 });
+import marked from 'marked';
+
+const DOCS_PATH = './docs.md';
+
+const handleErrors = (res: any) => {
+  if (!res.ok) throw Error(res.statusText);
+  return res;
+};
+
+const fetchMarkdown = () =>
+  fetch(DOCS_PATH)
+    .then(handleErrors)
+    .then(data => data.text())
+    .then(marked);
 
 enhancedApp(
   {
@@ -41,6 +55,7 @@ enhancedApp(
     init: (state: IAppState, actions: IActions): void => {
       actions.updateGameStatus();
       actions.log();
+      fetchMarkdown().then(actions.setDocs);
     },
     events: {
       'cube:resize': (state: IAppState, actions: IActions, data: any): void => {

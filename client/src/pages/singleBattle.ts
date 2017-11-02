@@ -3,7 +3,7 @@ import { div, main, label, button, ul } from '@hyperapp/html';
 import { GameStatus, IAppState, IPlayer } from '../initialState';
 import { LogItem, Slider, Player, Setup, ErrorNotification } from '../partials';
 import { IActions } from '../actions';
-import renderCube from '../cube';
+import renderCube from '../visuals/cube';
 import { renderBotForm } from '../modules/botFormModule';
 
 export default (state: IAppState, actions: IActions) =>

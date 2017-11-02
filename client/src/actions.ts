@@ -11,7 +11,7 @@ import {
   Page
 } from './initialState';
 import socket, { ITickInfo } from './socket';
-import { createCube } from './cube';
+import { createCube } from './visuals/cube';
 import { IBotFormActions } from './modules/botFormModule';
 import { Actions } from 'hyperapp';
 import playerActions from './playerActions';
