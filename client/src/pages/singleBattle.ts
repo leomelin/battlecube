@@ -19,7 +19,7 @@ export default (state: IAppState, actions: IActions) =>
       },
       'Start game'
     ),
-    renderCube(state, actions),
+    div({}, [renderCube(state, actions)]),
     div(
       {
         className: 'log',
@@ -38,7 +38,7 @@ export default (state: IAppState, actions: IActions) =>
         )
       )
     ),
-    renderBotForm(state, actions),
+    div({}, [renderBotForm(state, actions)]),
     button(
       {
         disabled: state.gameStatus === GameStatus.started,

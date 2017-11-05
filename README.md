@@ -89,7 +89,7 @@ Here we can get info about the winner
 {
   "id": <string>, // Game id
   "result": "TIE"|"WINNER_FOUND",
-  "winner": { // Optionally here if not TIE
+  "winner": { /* Optionally here if not TIE */
     "name": <string>,
     "url": <string>, /* the http endpoint for your bot service. e.g. http://my-cool-bot.com */
     "score": <number>
@@ -172,7 +172,7 @@ Your bot needs to implement this design to be able to play.
 
 #### POST /
 
-This is the endpoint that gets called by the Battlecube server.
+This is the endpoint that gets called by the Battle³ server.
 Your bot implementation should have this endpoint implemented and it should accept the following json structure as HTTP request body with *Content-Type: application/json*.
 ```js
 {
@@ -183,7 +183,8 @@ Your bot implementation should have this endpoint implemented and it should acce
   "gameInfo": {
     "edgeLength": <number>,
     "numOfBotsInPlay": <number>,
-    "currentTick": <number>
+    "currentTick": <number>,
+    "numOfTasksPerTick": <number>
   },
   "players": [
     {
@@ -205,7 +206,7 @@ Your bot implementation should have this endpoint implemented and it should acce
   ]
 }
 ```
-After receiving this data, your bot should respond with *Content-Type: application/json*, one of following json structures, and HTTP status 200 OK in under 5000ms:
+After receiving this data, your bot should respond with `Content-Type: application/json`, one of following json structures, and HTTP status 200 OK in under 5000ms:
 
 ###### Move
 Moves the player one unit in any direction

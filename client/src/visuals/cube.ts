@@ -236,6 +236,9 @@ export default (state: any, actions: any) =>
     },
     onremove: () => {
       state.cube.reset();
-      actions.destroyCube();
+      const el = document.querySelector('canvas');
+      if (el) {
+        el.remove();
+      }
     }
   });

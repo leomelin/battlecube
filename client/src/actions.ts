@@ -12,6 +12,7 @@ import {
 } from './initialState';
 import socket, { ITickInfo } from './socket';
 import { createCube } from './visuals/cube';
+import { createScorePlot } from './visuals/scorePlot';
 import { IBotFormActions } from './modules/botFormModule';
 import { Actions } from 'hyperapp';
 import playerActions from './playerActions';
@@ -72,12 +73,24 @@ const cubeActions = {
   destroyCube: () => ({ cube: null })
 };
 
+const scorePlotActions = {
+  initScorePlot: ({ players, remainingGames }: IAppState) => {
+    const scorePlot = createScorePlot();
+    scorePlot.draw(players, remainingGames);
+    return { scorePlot };
+  },
+  updateScorePlot: ({ scorePlot, players, remainingGames }: IAppState) => {
+    scorePlot.draw(players, remainingGames);
+  }
+}
+
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
 
 const NOTIFICATION_DURATION = 4000;
 
 export default {
   ...cubeActions,
+  ...scorePlotActions,
   ...playerActions,
 
   toggleSpinner: (state: IAppState) => ({ loading: !state.loading }),
@@ -134,11 +147,12 @@ export default {
     emit: any
   ) => async (update: Function) => {
     actions.clearLog();
+    await actions.clearScores();
     if (state.players.length < 2) {
       emit({
         name: 'error',
         data: {
-          message: 'You must have al least two bots for a battle',
+          message: 'You must have at least two bots for a battle',
           severity: ErrorSeverity.warning
         }
       });
@@ -207,7 +221,7 @@ export default {
 
   updateGameStatus: (
     state: IAppState,
-    { updateCube, recordWin, recordScores, start }: IActions
+    { updateCube, recordWin, recordScores, start, updateScorePlot }: IActions
   ) => (update: Function) => {
     io.onStart(() => update({ gameStatus: GameStatus.started }));
 
@@ -249,12 +263,14 @@ export default {
       finalInfo.winner && recordWin(finalInfo.winner.name);
       if (state.currentPage === Page.singleBattle) {
         updateCube();
+      } else if (state.currentPage === Page.multipleBattle) {
+        updateScorePlot();
       }
     });
   },
 
   // every time a socket message is received the update function will add a message to the log
-  log: (state: IAppState, { updateCube }: IActions) => (update: Function) => {
+  log: (state: IAppState, { updateCube, updateScorePlot }: IActions) => (update: Function) => {
     io.onPlayerMove(({ name, message }: ILogItem) => {
       update((state: IAppState) => ({
         log: [{ name, message }, ...state.log]
@@ -313,6 +329,8 @@ export default {
 
       if (state.currentPage === Page.singleBattle) {
         updateCube();
+      } else if (state.currentPage === Page.multipleBattle) {
+        updateScorePlot();
       }
     });
   },

@@ -87,10 +87,12 @@ export interface IAppState extends ISetup {
   error: IError | null;
   log: ILogItem[];
   cube: any;
+  scorePlot: any;
   botForm: IBotFormState;
   bombs: IBomb[];
   remainingGames: number;
   docs: string;
+  batch: any[];
   [key: string]: any;
 }
 
@@ -148,5 +150,6 @@ export default {
   error: null,
   log: [],
   cube: null,
+  scorePlot: null,
   docs: ''
 };

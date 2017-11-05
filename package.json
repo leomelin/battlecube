@@ -25,7 +25,9 @@
   },
   "homepage": "https://github.com/leomelin/battlecube#readme",
   "devDependencies": {
+    "@types/d3": "^4.11.0",
     "@types/joi": "^10.4.3",
+    "@types/marked": "^0.3.0",
     "@types/node-fetch": "^1.6.7",
     "@types/socket.io": "^1.4.30",
     "@types/socket.io-client": "^1.4.30",
@@ -48,7 +50,7 @@
   },
   "dependencies": {
     "@hyperapp/html": "^0.5.1",
-    "@types/marked": "^0.3.0",
+    "d3": "^4.11.0",
     "es6-tween": "^3.8.24",
     "hyperapp": "^0.15.1",
     "joi": "^11.1.1",

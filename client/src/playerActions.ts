@@ -32,6 +32,15 @@ export default {
     });
   },
 
+  clearScores: ({ players }: IAppState) => {
+    const clearedPlayers = players.map((p: IPlayer) => ({
+      ...p,
+      wins: 0,
+      score: 0
+    }));
+    return { players: clearedPlayers };
+  },
+
   recordScores: (state: IAppState, action: IActions, scores: any) => {
     const sortedScores = sortByProp('name', scores);
     const sortedPlayers = sortByProp('name', state.players);
