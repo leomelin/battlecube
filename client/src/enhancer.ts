@@ -36,14 +36,17 @@ interface IEnhancerOptions {
   syncedActions?: string[];
   syncedState?: string[];
   stateValidator?: Function;
+  disablePersistence?: boolean;
 }
 
 export default (app: any, opts: IEnhancerOptions) => {
-  const actionsToSyncWithStorage = opts.syncedActions || [];
+  const actionsToSyncWithStorage =
+    opts.syncedActions && !opts.disablePersistence ? opts.syncedActions : [];
   const stateSlice = opts.syncedState || [];
   const alwaysTrue = () => true;
   const isValidStore = opts.stateValidator || alwaysTrue;
   const store = makeStore(stateSlice);
+  const disable = opts.disablePersistence || false;
 
   const storageActions = {
     persistState: (state: IAppState) => (update: Function) => {
@@ -91,29 +94,38 @@ export default (app: any, opts: IEnhancerOptions) => {
       enhancedActions[name] =
         typeof action === 'function'
           ? (state: IAppState, actions: IActions, data: any) => {
-            const result = action(state, actions, data, emit);
-            if (typeof result === 'function') {
-              return (update: Function) => {
-                return result((withState: any) => {
-                  if (syncedActions.indexOf(namespacedName) > -1) {
-                    handleUpdate(namespacedName, state, result);
-                  }
-                  return update(withState, emit);
-                });
-              };
-            } else {
-              if (syncedActions.indexOf(namespacedName) > -1) {
-                handleUpdate(namespacedName, state, result);
+              const result = action(state, actions, data, emit);
+              if (typeof result === 'function') {
+                return (update: Function) => {
+                  return result((withState: any) => {
+                    if (syncedActions.indexOf(namespacedName) > -1) {
+                      handleUpdate(namespacedName, state, result);
+                    }
+                    return update(withState, emit);
+                  });
+                };
+              } else {
+                if (syncedActions.indexOf(namespacedName) > -1) {
+                  handleUpdate(namespacedName, state, result);
+                }
+                return result;
               }
-              return result;
             }
-          }
-          : enhanceActionsToSyncWithStorage(action, syncedActions, emit, namespacedName);
+          : enhanceActionsToSyncWithStorage(
+              action,
+              syncedActions,
+              emit,
+              namespacedName
+            );
       return enhancedActions;
     }, {});
   }
 
-  function enhanceModuleActionsToSyncWithStorage(modules: any, syncedActions: string[], emit: any) {
+  function enhanceModuleActionsToSyncWithStorage(
+    modules: any,
+    syncedActions: string[],
+    emit: any
+  ) {
     return Object.keys(
       modules || {}
     ).reduce((newModules: any, moduleName: any) => {
@@ -131,29 +143,41 @@ export default (app: any, opts: IEnhancerOptions) => {
   return async (props: any, root: any) => {
     const persistedState = await store.get();
 
-    if (persistedState && isValidStore(persistedState)) {
-      Object.assign(props.state, persistedState, { sliderSpeedValue: persistedState.setup.speed });
+    if (persistedState && isValidStore(persistedState) && !disable) {
+      Object.assign(props.state, persistedState, {
+        sliderSpeedValue: persistedState.setup.speed
+      });
     }
 
-    Object.assign(props.actions, storageActions, {__emit: (
-      state: IAppState,
-      actions: IActions,
-      { name, data }: { name: string; data: object }
-    ) => {
-      if (props.events[name]) {
-        emitter.emit(name, props.events[name](state, actions, data));
+    Object.assign(props.actions, storageActions, {
+      __emit: (
+        state: IAppState,
+        actions: IActions,
+        { name, data }: { name: string; data: object }
+      ) => {
+        if (props.events[name]) {
+          emitter.emit(name, props.events[name](state, actions, data));
+        }
+        emitter.emit(name, data);
       }
-      emitter.emit(name, data);
-    }});
+    });
 
     let _emit = (data: any) => {};
 
-    const emit = (message: { name: string, data: any }) => _emit(message);
+    const emit = (message: { name: string; data: any }) => _emit(message);
 
-    props.actions = enhanceActionsToSyncWithStorage(props.actions, actionsToSyncWithStorage, emit);
+    props.actions = enhanceActionsToSyncWithStorage(
+      props.actions,
+      actionsToSyncWithStorage,
+      emit
+    );
 
     // presently does not enhance child modules of modules
-    props.modules = enhanceModuleActionsToSyncWithStorage(props.modules, actionsToSyncWithStorage, emit);
+    props.modules = enhanceModuleActionsToSyncWithStorage(
+      props.modules,
+      actionsToSyncWithStorage,
+      emit
+    );
 
     const appActions = app(props, root);
 

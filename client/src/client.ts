@@ -31,7 +31,8 @@ const stateSyncedWithStorage = ['setup', 'players', 'currentPage'];
 const enhancedApp = syncActionsAndInjectEmitter(app, {
   syncedState: stateSyncedWithStorage,
   syncedActions: actionsSyncedWithStorage,
-  stateValidator: isValidSetupAndPlayersState
+  stateValidator: isValidSetupAndPlayersState,
+  disablePersistence: false
 });
 import marked from 'marked';
 

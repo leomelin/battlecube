@@ -14,6 +14,8 @@ Here is an example of running a bot in a Firebase cloud function: [firebase-bot]
 3. You will need to have some working bots to see battle. To start off with, use the dummy bots under `/example_bots`. Fire up a bot with `node dumb-bot.js 4001`. Do the same for the three others using ports 4002-4004. Later when you want tougher competition, you can battle with `teebot.js`, who should be a very tough competitor. Notice you will immediately get an error if you have a bot listed as a player which does not respond to requests.
 4. Finally, start up the server and client: `npm run start:all`.
 
+- If you want to disable use localeStorage, which can be annoying when making client changes, change `disablePersistence` to `true` in `client.ts`
+
 - If you have any issues getting the code running, or find a bug, before the Micro Christmas Hackathon, make an issue in the repo and we will fix it/ try to help you out.
 
 ## Rules
@@ -237,3 +239,4 @@ Place a bomb to particular coordinates
 ```
 
 Note that the bot needs to respond with an array of tasks. The maximum number of tasks per tick is defined in the game configuration.
+
