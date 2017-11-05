@@ -1,12 +1,18 @@
 const http = require('http');
 const [port] = process.argv.slice(2);
 
-const minMoves = 1;
-const moveFraction = 2;
-const implodeRadiusFraction = 2;
-const explodeImplodeRatio = 0.8;
-const randomMovement = false;
-const deterministic = false;
+const arg = (n, defaultValue) => n >= process.argv.length ? defaultValue : process.argv[n];
+const parseBool = (x) => parseInt(x) ? true : false;
+
+const minMoves = parseInt(arg(3, 1));
+const moveFraction = parseInt(arg(4, 2));
+const implodeRadiusFraction = parseInt(arg(5, 2));
+const explodeImplodeRatio = parseFloat(arg(6, 0.8));
+const randomMovement = parseBool(arg(7, 0));
+const randomTargeting = parseBool(arg(8, 0));
+const randomSpread = parseBool(arg(9, 0));
+const deterministic = parseBool(arg(10, 0));
+const verbose = parseBool(arg(11, 0));
 
 if (!port) {
   console.log('Pass port as command line argument...');
@@ -44,6 +50,16 @@ const explode = (tx, ty, tz, n, data) => {
   const {hasBomb, inBounds, me} = helpers(data);
   const isDone = (p) => done.some(it => coordEq(it, p));
   
+  const prioritize = (xs) => {
+    if(randomSpread) {
+      return shuffle(xs);
+    } else {
+      return xs
+        .map(x => Object.assign({ score: positionDesirability(x, data.currentPlayer.name, data) }, x))
+        .sort((a, b) => a.score - b.score);
+    }
+  };
+
   while(queue.length && tasks.length < n) {
     const pos = queue.shift();
 
@@ -60,7 +76,7 @@ const explode = (tx, ty, tz, n, data) => {
         {x: pos.x + 0, y: pos.y + 0, z: pos.z + 1},
         {x: pos.x + 0, y: pos.y + 0, z: pos.z - 1}
       ].filter(p => inBounds(p) && !isDone(p) && !coordEq(p, me));
-      queue = queue.concat(shuffle(neighbors));
+      queue = queue.concat(prioritize(neighbors));
     }
 
     done.push(pos);
@@ -76,6 +92,16 @@ const implode = (tx, ty, tz, n, data) => {
   const {hasBomb, inBounds, me} = helpers(data);
   const isDone = (p) => done.some(it => coordEq(it, p));
   const implodeRadius = Math.ceil(data.gameInfo.numOfTasksPerTick / implodeRadiusFraction)
+  const prioritize = (xs) => {
+    if(randomSpread) {
+      return shuffle(xs);
+    } else {
+      return xs
+        .map(x => Object.assign({ score: positionDesirability(x, data.currentPlayer.name, data) }, x))
+        .sort((a, b) => a.score - b.score);
+    }
+  };
+
 
   while(queue.length) {
     const pos = queue.shift();
@@ -89,7 +115,7 @@ const implode = (tx, ty, tz, n, data) => {
         {x: pos.x + 0, y: pos.y + 0, z: pos.z + 1, d: pos.d + 1},
         {x: pos.x + 0, y: pos.y + 0, z: pos.z - 1, d: pos.d + 1}
       ].filter(p => inBounds(p) && !isDone(p) && !coordEq(p, me) && !hasBomb(p));
-      queue = queue.concat(shuffle(neighbors));
+      queue = queue.concat(prioritize(neighbors));
     }
 
     done.push(pos);
@@ -104,7 +130,16 @@ const implode = (tx, ty, tz, n, data) => {
 
 const pickTargets = (n, data) => {
   const others = data.players.filter(p => p.name != data.currentPlayer.name);
-  const targets = shuffle(others)
+  const prioritize = (xs) => {
+    if(randomTargeting) {
+      return shuffle(xs);
+    } else {
+      return xs
+        .map(x => Object.assign({ score: positionDesirability(x, x.name, data) }, x))
+        .sort((a, b) => a.score - b.score);
+    }
+  };
+  const targets = prioritize(others)
     .splice(0, n)
     .map(t => Object.assign(t, {n: 1}));
 
@@ -118,7 +153,7 @@ const pickTargets = (n, data) => {
   return targets;
 }
 
-const positionDesirability = (pos, data) => {
+const positionDesirability = (pos, player, data) => {
   const distSq = (a, b) => (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y) + (b.z - a.z) * (b.z - a.z) 
   const bombProximityScore = data.items
     .filter(i => i.type === 'BOMB')
@@ -126,7 +161,7 @@ const positionDesirability = (pos, data) => {
     .reduce((sum, x) => sum + x, 0)
 
   const playerProximityScore = data.players
-    .filter(p => p.name != data.currentPlayer.name)
+    .filter(p => p.name != player)
     .map(p => distSq(p, pos))
     .reduce((sum, x) => sum + x, 0)
 
@@ -160,7 +195,7 @@ const moveDistance = (n, data) => {
         queue = queue.concat(shuffle(neighbors));
       } else {
         const rankedNeighbors = neighbors
-          .map(n => ({ x: n.x, y: n.y, z: n.z, moves: n.moves, score: positionDesirability(n, data) }))
+          .map(n => Object.assign({score: positionDesirability(n, data.currentPlayer.name, data)}, n))
           .sort((a, b) => b.score - a.score);
         queue = queue.concat(rankedNeighbors);
       }
@@ -178,13 +213,13 @@ const moveDistance = (n, data) => {
 const getDirections = (data) => {
   const numTasks = data.gameInfo.numOfTasksPerTick;
   const moves = moveDistance(Math.max(minMoves, numTasks / moveFraction), data);
-  console.log("Moves:", JSON.stringify(moves))
+  if(verbose) console.log("Moves:", JSON.stringify(moves))
   const targets = pickTargets(numTasks - moves.length, data);
-  console.log("Targets:", JSON.stringify(targets))
+  if(verbose) console.log("Targets:", JSON.stringify(targets))
   const flatMap = (xs, f) => xs.reduce((ts, x) => ts.concat(f(x)), [])
   const strategy = () => Math.random() < explodeImplodeRatio ? explode : implode;
   const tasks = moves.concat(flatMap(targets, t => strategy()(t.x, t.y, t.z, t.n, data)))
-  console.log("Tasks:", JSON.stringify(tasks))
+  if(verbose) console.log("Tasks:", JSON.stringify(tasks))
   return tasks;
 };
 
@@ -198,7 +233,7 @@ http.createServer((req, res) => {
 
     req.on('end', () => {
       const nextTickInfo = JSON.parse(jsonString);
-      console.log('we got next tick info', nextTickInfo);
+      if(verbose) console.log('we got next tick info', nextTickInfo);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(getDirections(nextTickInfo)));
     });
@@ -208,3 +243,13 @@ http.createServer((req, res) => {
 
 // Console will print the message
 console.log(`TeeBot running at http://127.0.0.1:${port}/`);
+console.log(`
+  minMoves: ${minMoves}
+  moveFraction: ${moveFraction}
+  implodeRadiusFraction: ${implodeRadiusFraction}
+  explodeImplodeRatio: ${explodeImplodeRatio}
+  randomMovement: ${randomMovement}
+  randomTargeting: ${randomTargeting}
+  randomSpread: ${randomSpread}
+  deterministic: ${deterministic}
+`)
