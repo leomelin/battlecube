@@ -112,12 +112,14 @@ export class Game {
     if (collision) {
       collision.hasBomb = true;
     } else {
-      this.otherItems.push({
-        x,
-        y,
-        z,
-        type: <ItemType>'BOMB'
-      });
+      if (!coordinateIsInUse(<PlaceBombOrder>bombOrder, this.otherItems)) {
+        this.otherItems.push({
+          x,
+          y,
+          z,
+          type: <ItemType>'BOMB'
+        });
+      }
     }
 
     this.socket.emit('PLAYER_PLACED_BOMB', {
@@ -330,9 +332,9 @@ export class Game {
         }
       }
       this.subTick += 1;
-      const nextTickInfo = this.getNextTickInfo();
       this.removeExplodedBombs();
       this.resetPreValidationInfo();
+      const nextTickInfo = this.getNextTickInfo();
       this.socket.emit('NEXT_TICK', nextTickInfo);
       await this.fetchNewDirectionFromBots(nextTickInfo);
       this.executeDirectionsOfAllBots();

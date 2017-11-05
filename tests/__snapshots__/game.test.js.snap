@@ -20,6 +20,343 @@ Object {
 }
 `;
 
+exports[`test game logic should not have bombs in items array after bomb has exploded 1`] = `
+Object {
+  "data": Object {
+    "gameInfo": Object {
+      "currentTick": 8,
+      "edgeLength": 8,
+      "id": "mock-socket-id",
+      "numOfBotsInPlay": 3,
+      "numOfTasksPerTick": 2,
+    },
+    "items": Array [
+      Object {
+        "type": "BOMB",
+        "x": 2,
+        "y": 2,
+        "z": 2,
+      },
+      Object {
+        "type": "BOMB",
+        "x": 0,
+        "y": 4,
+        "z": 5,
+      },
+      Object {
+        "type": "BOMB",
+        "x": 2,
+        "y": 1,
+        "z": 3,
+      },
+    ],
+    "players": Array [
+      Object {
+        "name": "John",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+      },
+      Object {
+        "name": "Ringo",
+        "x": 3,
+        "y": 2,
+        "z": 2,
+      },
+      Object {
+        "name": "Paul",
+        "x": 0,
+        "y": 0,
+        "z": 1,
+      },
+    ],
+  },
+  "event": "NEXT_TICK",
+}
+`;
+
+exports[`test game logic should not have bombs in items array after bomb has exploded 2`] = `
+Object {
+  "data": Object {
+    "cause": "Player stepped on a BOMB",
+    "name": "Ringo",
+  },
+  "event": "PLAYER_LOST",
+}
+`;
+
+exports[`test game logic should not have bombs in items array after bomb has exploded 3`] = `
+Object {
+  "data": Object {
+    "gameInfo": Object {
+      "currentTick": 9,
+      "edgeLength": 8,
+      "id": "mock-socket-id",
+      "numOfBotsInPlay": 2,
+      "numOfTasksPerTick": 2,
+    },
+    "items": Array [
+      Object {
+        "type": "BOMB",
+        "x": 0,
+        "y": 4,
+        "z": 5,
+      },
+      Object {
+        "type": "BOMB",
+        "x": 2,
+        "y": 1,
+        "z": 3,
+      },
+    ],
+    "players": Array [
+      Object {
+        "name": "John",
+        "x": 0,
+        "y": 0,
+        "z": 0,
+      },
+      Object {
+        "name": "Paul",
+        "x": 0,
+        "y": 0,
+        "z": 1,
+      },
+    ],
+  },
+  "event": "NEXT_TICK",
+}
+`;
+
+exports[`test game logic should not have duplicate items in items array 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "id": "mock-socket-id",
+    },
+    "event": "GAME_STARTED",
+  },
+  Object {
+    "data": Object {
+      "gameInfo": Object {
+        "currentTick": 0,
+        "edgeLength": 8,
+        "id": "mock-socket-id",
+        "numOfBotsInPlay": 2,
+        "numOfTasksPerTick": 2,
+      },
+      "items": Array [],
+      "players": Array [
+        Object {
+          "name": "John",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        Object {
+          "name": "Paul",
+          "x": 0,
+          "y": 0,
+          "z": 1,
+        },
+      ],
+    },
+    "event": "NEXT_TICK",
+  },
+  Object {
+    "data": Object {
+      "name": "John",
+      "x": 2,
+      "y": 2,
+      "z": 2,
+    },
+    "event": "PLAYER_PLACED_BOMB",
+  },
+  Object {
+    "data": Object {
+      "name": "Paul",
+      "x": 2,
+      "y": 2,
+      "z": 2,
+    },
+    "event": "PLAYER_PLACED_BOMB",
+  },
+  Object {
+    "data": Object {
+      "gameInfo": Object {
+        "currentTick": 1,
+        "edgeLength": 8,
+        "id": "mock-socket-id",
+        "numOfBotsInPlay": 2,
+        "numOfTasksPerTick": 2,
+      },
+      "items": Array [
+        Object {
+          "type": "BOMB",
+          "x": 2,
+          "y": 2,
+          "z": 2,
+        },
+      ],
+      "players": Array [
+        Object {
+          "name": "John",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        Object {
+          "name": "Paul",
+          "x": 0,
+          "y": 0,
+          "z": 1,
+        },
+      ],
+    },
+    "event": "NEXT_TICK",
+  },
+  Object {
+    "data": Object {
+      "name": "John",
+      "x": 2,
+      "y": 2,
+      "z": 2,
+    },
+    "event": "PLAYER_PLACED_BOMB",
+  },
+  Object {
+    "data": Object {
+      "name": "Paul",
+      "x": 2,
+      "y": 2,
+      "z": 2,
+    },
+    "event": "PLAYER_PLACED_BOMB",
+  },
+  Object {
+    "data": Object {
+      "gameInfo": Object {
+        "currentTick": 2,
+        "edgeLength": 8,
+        "id": "mock-socket-id",
+        "numOfBotsInPlay": 2,
+        "numOfTasksPerTick": 2,
+      },
+      "items": Array [
+        Object {
+          "type": "BOMB",
+          "x": 2,
+          "y": 2,
+          "z": 2,
+        },
+      ],
+      "players": Array [
+        Object {
+          "name": "John",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        Object {
+          "name": "Paul",
+          "x": 0,
+          "y": 0,
+          "z": 1,
+        },
+      ],
+    },
+    "event": "NEXT_TICK",
+  },
+  Object {
+    "data": Object {
+      "name": "John",
+      "x": 2,
+      "y": 2,
+      "z": 2,
+    },
+    "event": "PLAYER_PLACED_BOMB",
+  },
+  Object {
+    "data": Object {
+      "name": "Paul",
+      "x": 2,
+      "y": 2,
+      "z": 2,
+    },
+    "event": "PLAYER_PLACED_BOMB",
+  },
+  Object {
+    "data": Object {
+      "gameInfo": Object {
+        "currentTick": 3,
+        "edgeLength": 8,
+        "id": "mock-socket-id",
+        "numOfBotsInPlay": 2,
+        "numOfTasksPerTick": 2,
+      },
+      "items": Array [
+        Object {
+          "type": "BOMB",
+          "x": 2,
+          "y": 2,
+          "z": 2,
+        },
+      ],
+      "players": Array [
+        Object {
+          "name": "John",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        Object {
+          "name": "Paul",
+          "x": 0,
+          "y": 0,
+          "z": 1,
+        },
+      ],
+    },
+    "event": "NEXT_TICK",
+  },
+  Object {
+    "data": Object {
+      "name": "John",
+      "x": 2,
+      "y": 2,
+      "z": 2,
+    },
+    "event": "PLAYER_PLACED_BOMB",
+  },
+  Object {
+    "data": Object {
+      "name": "Paul",
+      "x": 2,
+      "y": 2,
+      "z": 2,
+    },
+    "event": "PLAYER_PLACED_BOMB",
+  },
+  Object {
+    "data": Object {
+      "id": "mock-socket-id",
+      "result": "TIE",
+      "scores": Array [
+        Object {
+          "highScore": 4,
+          "name": "John",
+        },
+        Object {
+          "highScore": 4,
+          "name": "Paul",
+        },
+      ],
+    },
+    "event": "GAME_ENDED",
+  },
+]
+`;
+
 exports[`test game logic should play two ticks on single bot directions response 1`] = `
 Array [
   Object {

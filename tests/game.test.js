@@ -822,6 +822,183 @@ describe('test game logic', () => {
     await wait(1000);
     expect(eventsList[eventsList.length - 1]).toMatchSnapshot();
   });
+
+  test('should not have duplicate items in items array', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    let johnTickCount = 0;
+    let paulTickCount = 0;
+
+    const johnDirections = [{
+      task: 'BOMB',
+      x: 2,
+      y: 2,
+      z: 2
+    }, {
+      task: 'BOMB',
+      x: 2,
+      y: 2,
+      z: 2
+    }];
+    const paulDirections = [{
+      task: 'BOMB',
+      x: 2,
+      y: 2,
+      z: 2
+    }, {
+      task: 'BOMB',
+      x: 2,
+      y: 2,
+      z: 2
+    }];
+
+    const game = new Game({
+      'setup': {
+        'maxNumOfTicks': 4,
+        'edgeLength': 8,
+        'speed': 0,
+        'numOfTasksPerTick': 2,
+        'playerStartPositions': [
+          {
+            'name': 'John',
+            'x': 0,
+            'y': 0,
+            'z': 0
+          },
+          {
+            'name': 'Paul',
+            'x': 0,
+            'y': 0,
+            'z': 1
+          }
+        ]
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': (nextTickInfo) => {
+            return johnDirections;
+          }
+        },
+        {
+          'name': 'Paul',
+          'url': (nextTickInfo) => {
+            return paulDirections;
+          }
+        }
+      ]
+    }, createMockSocket(socket));
+
+    game.start();
+
+    // Wait game to finish
+    await wait(1000);
+    expect(eventsList).toMatchSnapshot();
+  });
+
+  test('should not have bombs in items array after bomb has exploded', async () => {
+    const eventsList = [];
+    const socket = (eventInfo) => {
+      eventsList.push(eventInfo);
+    };
+
+    let johnTickCount = 0;
+    let paulTickCount = 0;
+
+    const johnDirections = [{
+      task: 'BOMB',
+      x: 2,
+      y: 2,
+      z: 2
+    }, {
+      task: 'BOMB',
+      x: 0,
+      y: 4,
+      z: 5
+    }];
+    const paulDirections = [{
+      task: 'BOMB',
+      x: 2,
+      y: 2,
+      z: 2
+    }, {
+      task: 'BOMB',
+      x: 2,
+      y: 1,
+      z: 3
+    }];
+
+    const ringoDirections = [{
+      task: 'MOVE',
+      direction: '-X'
+    }, {
+      task: 'NOOP'
+    }];
+
+    const game = new Game({
+      'setup': {
+        'maxNumOfTicks': 12,
+        'edgeLength': 8,
+        'speed': 0,
+        'numOfTasksPerTick': 2,
+        'playerStartPositions': [
+          {
+            'name': 'John',
+            'x': 0,
+            'y': 0,
+            'z': 0
+          },
+          {
+            'name': 'Ringo',
+            'x': 7,
+            'y': 2,
+            'z': 2
+          },
+          {
+            'name': 'Paul',
+            'x': 0,
+            'y': 0,
+            'z': 1
+          }
+        ]
+      },
+      'players': [
+        {
+          'name': 'John',
+          'url': (nextTickInfo) => {
+            return johnDirections;
+          }
+        },
+        {
+          'name': 'Paul',
+          'url': (nextTickInfo) => {
+            return paulDirections;
+          }
+        },
+        {
+          'name': 'Ringo',
+          'url': (nextTickInfo) => {
+            return ringoDirections;
+          }
+        }
+      ]
+    }, createMockSocket(socket));
+
+    game.start();
+
+    // Wait game to finish
+    await wait(1000);
+    // 33 next tick before ringo stepping to bomb
+    expect(eventsList[33]).toMatchSnapshot();
+    // 37 ringo lost
+    expect(eventsList[37]).toMatchSnapshot();
+    // 38 next tick after bomb exploding and killing ringo
+    expect(eventsList[38]).toMatchSnapshot();
+  });
+
 });
 
 
