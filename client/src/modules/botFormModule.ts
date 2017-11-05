@@ -140,7 +140,8 @@ export const renderBotForm = (
             ...values,
             status: PlayerStatus.inactive,
             position: { x: null, y: null, z: null },
-            wins: 0
+            wins: 0,
+            score: 0
           };
           actions.addPlayer(newPlayer);
           actions.botForm.clearForm();

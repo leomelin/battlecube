@@ -38,7 +38,7 @@ export default (state: IAppState, actions: IActions) =>
         )
       )
     ),
-    div({}, [renderBotForm(state, actions)]),
+    div({ className: 'player-form-container' }, [renderBotForm(state, actions)]),
     button(
       {
         disabled: state.gameStatus === GameStatus.started,

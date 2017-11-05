@@ -3,7 +3,6 @@ form {
   padding-top: 50px;
   display: flex;
   flex-direction: column;
-  width: 85%;
   justify-content: center;
 
   button {

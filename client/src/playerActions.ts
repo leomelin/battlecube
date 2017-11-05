@@ -8,9 +8,10 @@ const scoreZipper = (player: IPlayer, update: any) => {
 };
 
 export default {
-  addPlayer: (state: IAppState, _a: IActions, player: IPlayer) => {
-    return { players: [...state.players, player] };
-  },
+  addPlayer: (state: IAppState, _a: IActions, player: IPlayer) => ({
+    players: [...state.players, player]
+  }),
+
   removePlayer: (state: IAppState, actions: IActions, index: number) => {
     const players = [
       ...state.players.slice(0, index),

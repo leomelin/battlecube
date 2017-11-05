@@ -82,7 +82,7 @@ const scorePlotActions = {
   updateScorePlot: ({ scorePlot, players, remainingGames }: IAppState) => {
     scorePlot.draw(players, remainingGames);
   }
-}
+};
 
 // see https://github.com/hyperapp/hyperapp/blob/master/docs/thunks.md for how hyperapp actions work
 
@@ -270,7 +270,9 @@ export default {
   },
 
   // every time a socket message is received the update function will add a message to the log
-  log: (state: IAppState, { updateCube, updateScorePlot }: IActions) => (update: Function) => {
+  log: (state: IAppState, { updateCube, updateScorePlot }: IActions) => (
+    update: Function
+  ) => {
     io.onPlayerMove(({ name, message }: ILogItem) => {
       update((state: IAppState) => ({
         log: [{ name, message }, ...state.log]
