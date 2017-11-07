@@ -10,17 +10,6 @@ const RADIUS = Math.min(WIDTH, HEIGHT) / 2 - 5;
 const INNER_RADIUS = 0.3 * RADIUS;
 const THEME_COLOR = '#55ff55';
 
-interface IPlayerArcObject extends DefaultArcObject {
-  data: {
-    score: number;
-    wins: number;
-    color: string;
-    label: string;
-    id: string;
-    width: number;
-  };
-}
-
 const mapPlayerData = (players: IPlayer[]) =>
   players.map((p: IPlayer) => ({
     color: p.color,
@@ -36,15 +25,15 @@ export const createScorePlot = () => {
     .domain([0, 100])
     .range([INNER_RADIUS, RADIUS]);
 
-  const solidArc = arc()
+  const solidArc: any = arc()
     .innerRadius(INNER_RADIUS)
     .outerRadius(
-      (d: IPlayerArcObject) =>
+      (d: any) =>
         (RADIUS - INNER_RADIUS) * (d.data.wins / 100) + INNER_RADIUS
     );
 
   const middleArc: any = arc()
-    .innerRadius((d: IPlayerArcObject) => RADIUS * r(d.data.wins) / RADIUS)
+    .innerRadius((d: any) => RADIUS * r(d.data.wins) / RADIUS)
     .outerRadius(RADIUS);
 
   const coreArc: any = arc()
@@ -70,7 +59,7 @@ export const createScorePlot = () => {
     .append('div')
     .attr('class', 'tooltip');
 
-  const onMouseover = ({ data }: IPlayerArcObject) => {
+  const onMouseover = ({ data }: any) => {
     tip.style('left', `${event.pageX + 10}px`);
     tip.style('top', `${event.pageY + 25}px`);
     tip.style('display', 'inline-block');
@@ -95,7 +84,7 @@ export const createScorePlot = () => {
         .append('path')
         .attr('class', 'solidArc')
         .style('opacity', 0.8)
-        .attr('fill', (d: IPlayerArcObject) => d.data.color)
+        .attr('fill', (d: any) => d.data.color)
         .attr('d', solidArc)
         .merge(sArc.attr('d', solidArc))
         .on('mousemove', onMouseover)
@@ -120,7 +109,7 @@ export const createScorePlot = () => {
         .append('path')
         .attr('class', 'middleArc')
         .style('opacity', 0.2)
-        .attr('fill', ({ data }: IPlayerArcObject) => data.color)
+        .attr('fill', ({ data }: any) => data.color)
         .attr('d', middleArc)
         .merge(mArc.attr('d', middleArc))
         .on('mousemove', onMouseover)

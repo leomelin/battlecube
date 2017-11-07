@@ -249,7 +249,7 @@ export class Game {
       }
     })))
       .filter(item => item) // Filter out successfulls (promise has returned null for valid ones)
-      .forEach(({ playerSetup, cause }: { playerSetup: PlayerSetup, cause: any }) => {
+      .forEach(({ playerSetup, cause }: any) => {
         // Players can lose at this point if directions are invalid or timeout is exceeded
         this.playerLost(playerSetup, cause);
       });
