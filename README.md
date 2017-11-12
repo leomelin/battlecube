@@ -5,7 +5,7 @@ A game in which bots fight to survive inside a three-dimensional grid--the cube-
 ## Part of [Web Dev and Sausage's](https://www.webdevandsausages.org/) Micro Christmas Hackathon (24.11.2017)
 
 The idea is that you/your team creates its own bot(s) to fight other bots in Battle³. In addition, or alternatively, we welcome you to invent new clients to visualize the game. At the end of the hackathon, prizes will be given for bots as well as new clients. For your bot to engage other bots in battle, it will need to have a public url. Where your bot lives is up to you, but we will provide expert help during the hackathon to use a [AWS Lamba](https://aws.amazon.com/lambda/?sc_channel=PS&sc_campaign=acquisition_ND&sc_publisher=google&sc_medium=lambda_b&sc_content=lambda_e&sc_detail=aws%20lambda&sc_category=lambda&sc_segment=161192959428&sc_matchtype=e&sc_country=ND&s_kwcid=AL!4422!3!161192959428!e!!g!!aws%20lambda&ef_id=WaJDZAAAAgRf99VN:20171031124232:s) or a [Firebase function](https://firebase.google.com/docs/functions/).
-Here is an example of running a bot in a Firebase cloud function: [firebase-bot](https://github.com/RikuVan/firebase-teebot). Teebot's player url is https://us-central1-battlecube-teebot.cloudfunctions.net/app.
+Here is an example of running a bot in a Firebase cloud function: [firebase-bot](https://github.com/RikuVan/firebase-teebot). Teebot's player url is https://us-central1-battlecube-teebot.cloudfunctions.net/teebot.
 
 ## Getting started
 
