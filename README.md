@@ -12,7 +12,7 @@ Here is an example of running a bot in a Firebase cloud function: [firebase-bot]
 1. Make sure you have a recent version of node. We have only tested it with v7.10.0 and above.
 2. Clone the repo, `npm install` and `npm run build`.
 3. You will need to have some working bots to see battle. To start off with, use the dummy bots under `/example_bots`. Fire up a bot with `node dumb-bot.js 4001`. Do the same for the three others using ports 4002-4004. Later when you want tougher competition, you can battle with `teebot.js`, who should be a very tough competitor. Notice you will immediately get an error if you have a bot listed as a player which does not respond to requests.
-4. Finally, start up the server and client: `npm run start:all`.
+4. Finally, start up the server and client: `npm run start:all` (If the default ports are already in use, 9999 for the server and 8080 for the client, start:all will probably just hang mysteriously. The ports can be changed in `server.js` and `rollup.config.js`).
 
 - If you want to disable use localeStorage, which can be annoying when making client changes, change `disablePersistence` to `true` in `client.ts`
 
