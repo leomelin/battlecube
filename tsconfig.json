@@ -18,12 +18,9 @@
     ]
   },
   "files": [
-    "client/src/client.ts",
     "server/src/server.ts"
   ],
   "include": [
-    "client/src/*.json",
-    "client/**/*",
     "server/**/*"
   ]
 }

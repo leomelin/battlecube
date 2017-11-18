@@ -1,6 +1,6 @@
-const getValidatedGameConfig = require('../build/server/src/validators').getValidatedGameConfig;
+const getValidatedGameConfig = require('../build/validators').getValidatedGameConfig;
 
-const Game = require('../build/server/src/game').Game;
+const Game = require('../build/game').Game;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

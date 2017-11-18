@@ -4,14 +4,15 @@
   "description": "Battlecube is a game where small cubes (bots) fight each other with bombs inside a cube shaped 3d grid.",
   "main": "build/src/server.js",
   "scripts": {
-    "start:server": "node build/server/src/server.js",
-    "start:server-debug": "node $NODE_DEBUG_OPTION build/server/src/server.js",
+    "start:server": "node build/server.js",
+    "start:server-debug": "node $NODE_DEBUG_OPTION build/server.js",
     "start:client": "npm run copy-docs && rollup --config client/rollup.config.js -w",
     "start:all": "concurrently \"npm run start:server\" \"npm run start:client\"",
-    "copy-assets": "copyfiles client/**/*.json server/**/*.json build/",
-    "build": "rimraf build/ && tsc && npm run copy-assets",
-    "build:client": "npm run copy-docs && rollup --config client/rollup.config.js",
+    "copy-assets": "copyfiles server/**/*.json build/",
+    "build": "rimraf build/ && tsc && npm run copy-assets && npm run build:client",
+    "build:client": "npm run copy-docs && rollup --config client/rollup.config.js && npm run copy-client",
     "copy-docs": "node ./client/copyDocs",
+    "copy-client": "node ./client/copyClient",
     "test": "jest"
   },
   "repository": {
@@ -34,6 +35,8 @@
     "@types/three": "^0.84.26",
     "concurrently": "^3.5.0",
     "copyfiles": "^1.2.0",
+    "cssnano": "^3.10.0",
+    "fs-jetpack": "^1.2.0",
     "jest": "^21.2.1",
     "postcss-nested": "^2.1.2",
     "rimraf": "^2.6.2",
@@ -47,7 +50,8 @@
     "rollup-plugin-typescript": "^0.8.1",
     "tslint": "^5.7.0",
     "tslint-config-airbnb": "^5.3.0",
-    "typescript": "^2.5.3"
+    "typescript": "^2.5.3",
+    "uglify-es": "^3.1.9"
   },
   "dependencies": {
     "@hyperapp/html": "^0.5.1",

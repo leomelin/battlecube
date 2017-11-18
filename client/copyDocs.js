@@ -32,5 +32,6 @@ copyFile(source, dest, function (err) {
   if (err) {
     return console.error(err);
   }
-  console.log('Copied:', source, dest);
+  console.log('Copied docs:', source, dest);
 });
+

@@ -1,5 +1,5 @@
-const helpers = require('../build/server/src/helpers');
-describe('Coordinate is in use helper mehtod', () => {
+const helpers = require('../build/helpers');
+describe('Coordinate is in use helper method', () => {
   const arr = [
     {
       x: 3,
