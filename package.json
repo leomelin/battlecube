@@ -48,6 +48,7 @@
     "rollup-plugin-postcss": "^0.5.5",
     "rollup-plugin-serve": "^0.4.2",
     "rollup-plugin-typescript": "^0.8.1",
+    "rollup-plugin-uglify": "^2.0.1",
     "tslint": "^5.7.0",
     "tslint-config-airbnb": "^5.3.0",
     "typescript": "^2.5.3",
