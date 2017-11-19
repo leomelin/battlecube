@@ -17,7 +17,7 @@ import { IBotFormActions } from './modules/botFormModule';
 import { Actions } from 'hyperapp';
 import playerActions from './playerActions';
 
-export const io = socket('http://localhost:9999');
+export const io = socket('https://battle3.site');
 
 interface IStart {
   (state?: IAppState, actions?: IActions): void;

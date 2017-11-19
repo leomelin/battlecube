@@ -104,12 +104,12 @@ export default {
     maxNumOfTicks: 1000,
     edgeLength: 8,
     speed: 200,
-    numOfTasksPerTick: 1
+    numOfTasksPerTick: 4
   },
   players: [
     {
-      name: 'John',
-      url: 'http://localhost:4001',
+      name: 'Teebot 1',
+      url: 'https://us-central1-battlecube-teebot.cloudfunctions.net/teebot',
       color: '#FF6767',
       status: PlayerStatus.inactive,
       position: { x: null, y: null, z: null },
@@ -117,8 +117,8 @@ export default {
       score: 0
     },
     {
-      name: 'Petra',
-      url: 'http://localhost:4002',
+      name: 'Teebot 2',
+      url: 'https://us-central1-battlecube-teebot.cloudfunctions.net/teebot',
       color: '#EAEA00',
       status: PlayerStatus.inactive,
       position: { x: null, y: null, z: null },
@@ -126,8 +126,8 @@ export default {
       score: 0
     },
     {
-      name: 'Carmine',
-      url: 'http://localhost:4003',
+      name: 'Teebot 3',
+      url: 'https://us-central1-battlecube-teebot.cloudfunctions.net/teebot',
       color: '#00FFFF',
       status: PlayerStatus.inactive,
       position: { x: null, y: null, z: null },
@@ -135,8 +135,8 @@ export default {
       score: 0
     },
     {
-      name: 'Whoopie',
-      url: 'http://localhost:4004',
+      name: 'Teebot 4',
+      url: 'https://us-central1-battlecube-teebot.cloudfunctions.net/teebot',
       color: '#FF2EFF',
       status: PlayerStatus.inactive,
       position: { x: null, y: null, z: null },
