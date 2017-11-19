@@ -1,4 +1,4 @@
-# Battle³
+# [Battle³](https://battle3.site/)
 
 A game in which bots fight to survive inside a three-dimensional grid--the cube--by moving and throwing bombs.
 
