@@ -3,6 +3,7 @@ import { IAppState, IPlayer } from '../initialState';
 import { IActions } from '../actions';
 import { select, scaleLinear, arc, pie, DefaultArcObject, event } from 'd3';
 import '../styles/scorePlot.css';
+import { sortByProp } from '../helpers';
 
 const WIDTH = 400;
 const HEIGHT = 400;
@@ -28,8 +29,7 @@ export const createScorePlot = () => {
   const solidArc: any = arc()
     .innerRadius(INNER_RADIUS)
     .outerRadius(
-      (d: any) =>
-        (RADIUS - INNER_RADIUS) * (d.data.wins / 100) + INNER_RADIUS
+      (d: any) => (RADIUS - INNER_RADIUS) * (d.data.wins / 100) + INNER_RADIUS
     );
 
   const middleArc: any = arc()

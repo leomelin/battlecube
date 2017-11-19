@@ -31,7 +31,7 @@ export const zipWith = (fn: Function, a: any, b: any) => {
 };
 
 export const sortByProp = (prop: string, list: any[]) => {
-  return list.sort((a: any, b: any) => {
+  return list.slice().sort((a: any, b: any) => {
     const aa = a[prop];
     const bb = b[prop];
     return aa < bb ? -1 : aa > bb ? 1 : 0;

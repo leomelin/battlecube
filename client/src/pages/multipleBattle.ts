@@ -3,6 +3,7 @@ import { GameStatus, IAppState, IPlayer } from '../initialState';
 import { Slider, Player, ErrorNotification } from '../partials';
 import { IActions } from '../actions';
 import renderScorePlot from '../visuals/scorePlot';
+import { sortByProp } from '../helpers';
 
 export default (state: IAppState, actions: IActions): any =>
   main({}, [
@@ -21,14 +22,16 @@ export default (state: IAppState, actions: IActions): any =>
     div({}, [renderScorePlot(state, actions)]),
     div(
       { className: 'players' },
-      state.players.map((p: IPlayer, index: number) =>
-        Player(
-          p,
-          index,
-          state.players.filter(p => p.status === 1).length === 1,
-          actions,
-          true
+      sortByProp('wins', state.players)
+        .reverse()
+        .map((p: IPlayer, index: number) =>
+          Player(
+            p,
+            index,
+            state.players.filter(p => p.status === 1).length === 1,
+            actions,
+            true
+          )
         )
-      )
     )
   ]);

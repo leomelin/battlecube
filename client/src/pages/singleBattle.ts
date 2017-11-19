@@ -5,6 +5,7 @@ import { LogItem, Slider, Player, Setup, ErrorNotification } from '../partials';
 import { IActions } from '../actions';
 import renderCube from '../visuals/cube';
 import { renderBotForm } from '../modules/botFormModule';
+import { sortByProp } from '../helpers';
 
 export default (state: IAppState, actions: IActions) =>
   main({}, [
@@ -29,16 +30,20 @@ export default (state: IAppState, actions: IActions) =>
     ),
     div(
       { className: 'players' },
-      state.players.map((p: IPlayer, index: number) =>
-        Player(
-          p,
-          index,
-          state.players.filter(p => p.status === 1).length === 1,
-          actions
+      sortByProp('wins', state.players)
+        .reverse()
+        .map((p: IPlayer, index: number) =>
+          Player(
+            p,
+            index,
+            state.players.filter(p => p.status === 1).length === 1,
+            actions
+          )
         )
-      )
     ),
-    div({ className: 'player-form-container' }, [renderBotForm(state, actions)]),
+    div({ className: 'player-form-container' }, [
+      renderBotForm(state, actions)
+    ]),
     button(
       {
         disabled: state.gameStatus === GameStatus.started,
