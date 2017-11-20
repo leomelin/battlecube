@@ -5,7 +5,7 @@ import mitt, { Emitter } from 'mitt';
 
 const emitter: Emitter = new mitt();
 
-const STORAGE_ID = 'battlecube-storage';
+const STORAGE_ID = 'battle3.site-storage';
 
 const makeStore = (includedState: string[]) => ({
   set: (state: any) => {
