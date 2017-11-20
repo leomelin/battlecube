@@ -62,3 +62,11 @@ export const isValidSetupAndPlayersState = (state: any) => {
   }
   return true;
 };
+
+export const isNullOrEmptyObject = (v: any): boolean => {
+  if (!v) return true;
+  else if (typeof v === 'object' && Object.getOwnPropertyNames(v) < 1) {
+    return true;
+  }
+  return false;
+};

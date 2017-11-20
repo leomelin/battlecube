@@ -1,5 +1,6 @@
 import socketIO from 'socket.io-client';
 import { IPlayer } from './initialState';
+import { isNullOrEmptyObject } from './helpers';
 
 export interface ITickInfo {
   players: IPlayer[] | any;
@@ -57,7 +58,10 @@ export default (serverUrl: string): ISocket => {
       }),
     onPlayerLoses: action =>
       io.on('PLAYER_LOST', ({ name, cause }: any) => {
-        action({ name, message: `💀 ${cause}` });
+        const causeMessage = isNullOrEmptyObject(cause)
+          ? 'Death from inexplicable causes, e.g. 404'
+          : cause;
+        action({ name, message: `💀 ${causeMessage}` });
       }),
     onTick: action =>
       io.on('NEXT_TICK', (info: ITickInfo) => {
