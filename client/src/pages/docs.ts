@@ -1,5 +1,5 @@
 import { h } from 'hyperapp';
-import { main, h1, article, div } from '@hyperapp/html';
+import { div, h1, article, div } from '@hyperapp/html';
 import { IAppState } from '../initialState';
 import '../styles/docs.css';
 import { IActions } from '../actions';
@@ -15,7 +15,7 @@ const getDocs = (docs: string) => {
 };
 
 export default ({ docs }: IAppState, { setDocs }: IActions) =>
-  main(
+  div(
     {
       className: 'docs'
     },
