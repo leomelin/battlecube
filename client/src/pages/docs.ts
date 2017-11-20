@@ -1,5 +1,5 @@
 import { h } from 'hyperapp';
-import { div, h1, article, div } from '@hyperapp/html';
+import { div, article, div } from '@hyperapp/html';
 import { IAppState } from '../initialState';
 import '../styles/docs.css';
 import { IActions } from '../actions';
