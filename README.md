@@ -224,7 +224,7 @@ Moves the player one unit in any direction
 Place a bomb to particular coordinates
 ```js
 [{
-  "task": "PLACE_BOMB",
+  "task": "BOMB",
   "x": <number>, 
   "y": <number>,
   "z": <number> 
